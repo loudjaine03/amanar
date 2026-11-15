@@ -103,4 +103,5 @@ Gravity, air pressure, radiation and polar light cannot be reproduced on Earth. 
 
 **AI use**: the app was scaffolded with Lovable, and code, analysis scripts and text were written and reviewed with AI assistants (including Claude by Anthropic). All numbers come from our scripts and the cited datasets.
 
-Team Hoggar: _names here_ · App: _link here_ · Demo video: _link here_
+Team Hoggar: BENSALEM Loudjaine - AGUENI Nesrine - HAMMAMOUCHE Marwa - SOUAKRI Serine - BOUZAR Rahma
+App: https://amanar-tau.vercel.app/
