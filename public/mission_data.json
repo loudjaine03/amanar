@@ -2,7 +2,7 @@
  "meta": {
   "version": 2,
   "mock": false,
-  "generated": "2026-11-15T04:13+00:00",
+  "generated": "2026-11-15T06:39+00:00",
   "sources": [
    {
     "id": "cop_dem",
@@ -76,7 +76,7 @@
    },
    {
     "id": "artemis9",
-    "name": "NASA (Oct 2024): nine candidate Artemis landing regions near the lunar south pole",
+    "name": "NASA (Oct 2024): updated list of nine Artemis III candidate regions (Peak Near Shackleton is not among them)",
     "url": "https://www.nasa.gov/news-release/nasa-provides-update-on-artemis-iii-moon-landing-regions/"
    },
    {
@@ -86,7 +86,7 @@
    },
    {
     "id": "change7",
-    "name": "The Planetary Society: Chang'e-7, preferred landing site on the rim of Shackleton crater",
+    "name": "The Planetary Society: Chang'e-7, preferred candidate site on the rim of Shackleton crater; final landing area not announced",
     "url": "https://www.planetary.org/space-missions/change-7"
    },
    {
@@ -168,6 +168,16 @@
     "id": "niosh_heat",
     "name": "NIOSH (CDC): heat stress workplace recommendations (water, acclimatisation, buddy system)",
     "url": "https://www.cdc.gov/niosh/heat-stress/recommendations/index.html"
+   },
+   {
+    "id": "artemis_update",
+    "name": "NASA NTRS (LPSC 2026): Artemis III site selection update, 13 to 9 regions; removed regions are not judged unsuitable for later missions",
+    "url": "https://ntrs.nasa.gov/citations/20250011660"
+   },
+   {
+    "id": "change7_delay",
+    "name": "Scientific American (updated 24 Aug 2026): Chang'e-7 launch delayed to 2027",
+    "url": "https://scientificamerican.com/article/chinas-change-7-moonshot-will-seek-water-ice-at-the-lunar-south-pole"
    },
    {
     "id": "team",
@@ -324,6 +334,7 @@
     "source": "jezero_floor"
    },
    "tiles": "https://trek.nasa.gov/tiles/Mars/EQ/Mars_MOLA_blend200ppx_HRSC_ClrShade_clon0dd_200mpp_lzw/1.0.0/default/default028mm/{z}/{y}/{x}.jpg",
+   "zone_context": "Known geography of this map, not detected by the model: crater floor to the east, the delta front west of the landing site, the western rim and inlet canyon beyond it.",
    "map_center": [
     18.4447,
     77.4508
@@ -528,17 +539,17 @@
      "parts": [
       {
        "site": "ahnet",
-       "ground": "smooth crater floor",
+       "ground": "gentle terrain",
        "zones": 4
       },
       {
        "site": "tassili",
-       "ground": "delta and rougher floor",
+       "ground": "intermediate, rougher terrain",
        "zones": 22
       },
       {
        "site": "hoggar",
-       "ground": "crater rim and inlet canyon",
+       "ground": "steep terrain",
        "zones": 7
       }
      ],
@@ -564,17 +575,17 @@
     "parts": [
      {
       "site": "ahnet",
-      "ground": "smooth crater floor",
+      "ground": "gentle terrain",
       "share": 24
      },
      {
       "site": "tassili",
-      "ground": "delta and rougher floor",
+      "ground": "intermediate, rougher terrain",
       "share": 39
      },
      {
       "site": "hoggar",
-      "ground": "crater rim and inlet canyon",
+      "ground": "steep terrain",
       "share": 34
      }
     ],
@@ -659,7 +670,7 @@
      },
      "geology": {
       "level": "match",
-      "text": "River, alluvial-fan and evaporite deposits of a former valley network: the same family of rocks as Jezero's delta and lake beds.",
+      "text": "The same kinds of depositional processes as Jezero's delta and lake beds (river, alluvial-fan and evaporite deposits of a former valley network), not the same composition: Jezero also has clays and carbonates, and an igneous floor.",
       "source": "ahnet_epsc"
      },
      "label": "Rocks only",
@@ -1169,18 +1180,18 @@
    "picks": {
     "driving": {
      "site": "tassili",
-     "why": "Closest terrain mix over the main 20 km window (59/100); the twin model finds its closest twins for 39% of the whole map. Ahnet Basin for smooth crater floor; Tassili n'Ajjer for delta and rougher floor; Hoggar (Atakor) for crater rim and inlet canyon."
+     "why": "Highest terrain overlap score over the main 20 km window (59/100); the twin model finds its closest twins for 39% of the whole map. Ahnet Basin for gentle terrain; Tassili n'Ajjer for intermediate, rougher terrain; Hoggar (Atakor) for steep terrain."
     },
     "rocks": {
      "site": "ahnet",
-     "why": "River, alluvial-fan and evaporite deposits of a former valley network: the same family of rocks as Jezero's delta and lake beds."
+     "why": "The same kinds of depositional processes as Jezero's delta and lake beds (river, alluvial-fan and evaporite deposits of a former valley network), not the same composition: Jezero also has clays and carbonates, and an igneous floor."
     },
     "radar": {
      "site": "tassili",
-     "why": "11 radar hotspot(s) pass all checks (1.18 km²)."
+     "why": "11 radar anomalies pass all four checks (1.18 km²): unverified candidates for a GPR survey."
     }
    },
-   "headline": "It depends on the part of Jezero: smooth crater floor → Ahnet Basin; delta and rougher floor → Tassili n'Ajjer; crater rim and inlet canyon → Hoggar (Atakor). Rocks: Ahnet Basin matches.",
+   "headline": "It depends on the part of Jezero: gentle terrain → Ahnet Basin; intermediate, rougher terrain → Tassili n'Ajjer; steep terrain → Hoggar (Atakor). Geology (literature): Ahnet Basin matches the processes.",
    "breaks": [
     {
      "text": "Gravity: Earth 9.81 m/s², Mars 3.73 m/s² (0.38 g)",
@@ -1234,6 +1245,7 @@
     "source": "msl_lakes"
    },
    "tiles": "https://trek.nasa.gov/tiles/Mars/EQ/Mars_MOLA_blend200ppx_HRSC_ClrShade_clon0dd_200mpp_lzw/1.0.0/default/default028mm/{z}/{y}/{x}.jpg",
+   "zone_context": "Known geography of this strip, not detected by the model: crater-floor plains to the north, the lower slopes of Mount Sharp rising to the south.",
    "map_center": [
     -4.707,
     137.387
@@ -1438,17 +1450,17 @@
      "parts": [
       {
        "site": "ahnet",
-       "ground": "crater-floor plains",
+       "ground": "gentle terrain",
        "zones": 1
       },
       {
        "site": "tassili",
-       "ground": "lower slopes of Mount Sharp",
+       "ground": "intermediate, rougher terrain",
        "zones": 1
       },
       {
        "site": "hoggar",
-       "ground": "steeper mound",
+       "ground": "steep terrain",
        "zones": 1
       }
      ],
@@ -1474,12 +1486,12 @@
     "parts": [
      {
       "site": "ahnet",
-      "ground": "crater-floor plains",
+      "ground": "gentle terrain",
       "share": 23
      },
      {
       "site": "hoggar",
-      "ground": "steeper mound",
+      "ground": "steep terrain",
       "share": 53
      }
     ],
@@ -1744,8 +1756,8 @@
       }
      },
      "geology": {
-      "level": "match",
-      "text": "Thick sandstone successions exposed in cliffs and buttes: a stack of layers to read bottom to top.",
+      "level": "partial",
+      "text": "Thick sandstone successions in cliffs and buttes: good for practising layered-outcrop mapping, but the lithology and setting differ from Gale's lake mudstones and sulfate-bearing layers.",
       "source": "tassili_whc"
      },
      "label": "Partial analog",
@@ -2074,18 +2086,18 @@
    "picks": {
     "driving": {
      "site": "tassili",
-     "why": "Closest terrain mix over the main 8 km window (59/100); the twin model finds its closest twins for 13% of the whole map. Ahnet Basin for crater-floor plains; Hoggar (Atakor) for steeper mound."
+     "why": "Highest terrain overlap score over the main 8 km window (59/100); the twin model finds its closest twins for 13% of the whole map. Ahnet Basin for gentle terrain; Hoggar (Atakor) for steep terrain."
     },
     "rocks": {
      "site": "tassili",
-     "why": "Thick sandstone successions exposed in cliffs and buttes: a stack of layers to read bottom to top."
+     "why": "Thick sandstone successions in cliffs and buttes: good for practising layered-outcrop mapping, but the lithology and setting differ from Gale's lake mudstones and sulfate-bearing layers. (No site fully matches the target's geology.)"
     },
     "radar": {
      "site": "tassili",
-     "why": "11 radar hotspot(s) pass all checks (1.18 km²)."
+     "why": "11 radar anomalies pass all four checks (1.18 km²): unverified candidates for a GPR survey."
     }
    },
-   "headline": "It depends on the part of Gale: crater-floor plains → Ahnet Basin; steeper mound → Hoggar (Atakor). Rocks: Tassili n'Ajjer matches.",
+   "headline": "It depends on the part of Gale: gentle terrain → Ahnet Basin; steep terrain → Hoggar (Atakor). Geology (literature): no full match; Tassili n'Ajjer comes closest.",
    "breaks": [
     {
      "text": "Gravity: Earth 9.81 m/s², Mars 3.73 m/s² (0.38 g)",
@@ -2131,14 +2143,15 @@
    "title": "Lunar south pole",
    "short": "Moon · South pole",
    "body": "moon",
-   "mission": "Artemis base region; planned Chang'e-7 landing area (2027)",
-   "goal": "A permanent base on sunlit crater rims next to permanently shadowed, icy craters.",
-   "why": "Peak near Shackleton was on NASA's 2022 list of Artemis candidate regions; China's Chang'e-7 targets the same rim.",
+   "mission": "Study area near Peak Near Shackleton (2022 Artemis III candidate region; preferred Chang'e-7 area)",
+   "goal": "Terrain rehearsal for missions to sunlit crater rims beside permanently shadowed craters. Terrain only: no sunlight, communication, water-ice or polar-temperature analysis, so not a base-site assessment.",
+   "why": "Peak Near Shackleton was one of NASA's 13 Artemis III candidate regions in 2022; it is not in the updated list of nine from October 2024. China's Chang'e-7 prefers the nearby Shackleton rim; its final landing site is not announced and its launch moved to 2027.",
    "rocks": {
     "text": "Impact-churned highland regolith (feldspar-rich), boulders, and icy cold traps in permanent shadow",
     "source": "shackleton"
    },
    "tiles": "https://trek.nasa.gov/tiles/Moon/EQ/LRO_WAC_Mosaic_Global_303ppd_v02/1.0.0/default/default028mm/{z}/{y}/{x}.jpg",
+   "zone_context": "Known geography of this map, not detected by the model: crater rims and walls around Shackleton and its neighbours, with gentler ground between craters.",
    "map_center": [
     -88.838,
     124.57
@@ -2340,12 +2353,12 @@
      "parts": [
       {
        "site": "tassili",
-       "ground": "gentler ground between craters",
+       "ground": "gentle terrain",
        "zones": 30
       },
       {
        "site": "hoggar",
-       "ground": "crater walls and ridges",
+       "ground": "steep terrain",
        "zones": 64
       }
      ],
@@ -2966,18 +2979,18 @@
    "picks": {
     "driving": {
      "site": "hoggar",
-     "why": "Closest terrain mix over the main 20 km window (59/100); the twin model finds its closest twins for 67% of the whole map."
+     "why": "Highest terrain overlap score over the main 20 km window (59/100); the twin model finds its closest twins for 67% of the whole map."
     },
     "rocks": {
      "site": "hoggar",
-     "why": "Igneous and crystalline rock with rugged volcanic relief, but basalt and phonolite rather than lunar highland rock, and no impact regolith. (No site fully matches the target's rocks.)"
+     "why": "Igneous and crystalline rock with rugged volcanic relief, but basalt and phonolite rather than lunar highland rock, and no impact regolith. (No site fully matches the target's geology.)"
     },
     "radar": {
      "site": "tassili",
-     "why": "11 radar hotspot(s) pass all checks (1.18 km²)."
+     "why": "11 radar anomalies pass all four checks (1.18 km²): unverified candidates for a GPR survey."
     }
    },
-   "headline": "Best terrain: Hoggar (Atakor). No site fully matches the target's rocks; Hoggar (Atakor) comes closest. The twin model agrees: Hoggar (Atakor) holds the closest twins for 67% of the map.",
+   "headline": "Highest terrain overlap: Hoggar (Atakor). No site fully matches the target's geology (literature); Hoggar (Atakor) comes closest. The twin model agrees: Hoggar (Atakor) holds the closest twins for 67% of the map.",
    "breaks": [
     {
      "text": "Gravity: Earth 9.81 m/s², Moon 1.62 m/s² (0.17 g)",

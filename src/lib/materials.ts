@@ -1,5 +1,7 @@
-// Materials and crew safety. What each part of a rover or habitat must survive on the target (cited),
-// and whether THIS site can test it, decided from the site's measured numbers, not by hand.
+// Materials and crew planning indicators. What each part of a rover or habitat must survive on the target
+// (cited), and whether THIS site can host a candidate field test: two levels are site/target ratios of
+// measured numbers (wheels, chassis), five are team judgement and tagged that way. Pressure numbers are
+// physics under stated assumptions; none of the test levels is experimentally validated.
 // Also the pressure physics used by the sensor simulation (Rehearse).
 import type { Body, MissionData, SiteId, Tag, TargetId, TestLevel } from "@/types/mission";
 
@@ -78,19 +80,29 @@ export interface MaterialRow {
   component: string;
   options: string;
   threat: string;
+  /** Cited source of the threat; null when the threat is written by the team. */
+  threatSource: string | null;
   /** What the site gives, with its numbers. */
   here: string;
   level: TestLevel;
+  /** "data": the level is a ratio of measured numbers (site / target). "judgement": set by the team. */
+  basis: "data" | "judgement";
+  basisText: string;
   lab: string;
+  /** Tag of the LEVEL: Measured for data, Judgement for team judgement. */
   tag: Tag;
+  /** Source of the level: the dataset for data rows, "team" for judgement rows. */
   source: string;
 }
 
 const pct = (a: number, b: number) => (b > 0 ? Math.round((100 * a) / b) : 0);
 const levelOf = (share: number): TestLevel =>
   share >= 50 ? "field" : share >= 25 ? "partial" : "no";
+const RATIO_RULE = "50% or more = test here, 25 to 50% = partly, below = not here";
+const JUDGEMENT = "Team judgement from the threat above: no site measurement for it yet.";
 
-/** Every row's level comes from a ratio of measured numbers (site vs target) or from physics. */
+/** Two levels are computed (wheels: roughness ratio; chassis: temperature-swing ratio). The other five have
+ *  no site measurement behind them yet, so their level is team judgement and is tagged that way. */
 export function materialRows(data: MissionData, target: TargetId, sid: SiteId): MaterialRow[] {
   const t = data.targets[target];
   const site = data.sites[sid];
@@ -112,10 +124,13 @@ export function materialRows(data: MissionData, target: TargetId, sid: SiteId): 
         ? "Abrasive regolith and blocky crater rims; no repair possible."
         : "Sharp embedded rocks punched holes in Curiosity's thin aluminium wheels.",
       here: `Rough ground (90th percentile) ${roughSite} m here vs ${roughTarget} m on ${t.title}: ${roughShare}% of the target's roughness.`,
+      threatSource: moon ? "glenn_tire" : "msl_wheels",
       level: levelOf(roughShare),
+      basis: "data",
+      basisText: `From data: site roughness is ${roughShare}% of the target's (${RATIO_RULE}).`,
       lab: "Cold behaviour of the metal" + (moon ? " in vacuum." : "."),
       tag: "Measured",
-      source: moon ? "glenn_tire" : "msl_wheels",
+      source: "cop_dem",
     },
     {
       id: "seals",
@@ -125,10 +140,13 @@ export function materialRows(data: MissionData, target: TargetId, sid: SiteId): 
         ? "Apollo: abrasive dust made suit pressure seals leak."
         : "Fine dust in joints; rubber stiffens in the cold.",
       here: "Wind-blown sand and dust at every site: open and close seals hundreds of times and log leaks with a pressure sensor.",
+      threatSource: "lunar_dust",
       level: "field",
+      basis: "judgement",
+      basisText: JUDGEMENT,
       lab: moon ? "Vacuum with lunar dust simulant." : `Cold at ${env.pressure_kpa} kPa outside.`,
-      tag: "Reference",
-      source: "lunar_dust",
+      tag: "Judgement",
+      source: "team",
     },
     {
       id: "solar",
@@ -138,10 +156,13 @@ export function materialRows(data: MissionData, target: TargetId, sid: SiteId): 
         ? "Clinging, scratching dust; the Sun stays low on the horizon at the pole."
         : "Dust build-up cut InSight's power until the mission ended.",
       here: `Real desert wind and dust: measure power lost per day and compare cleaning methods. ${c.rain_mm_year ?? "?"} mm of rain a year rarely washes panels.`,
+      threatSource: "insight_dust",
       level: moon ? "partial" : "field",
+      basis: "judgement",
+      basisText: JUDGEMENT,
       lab: moon ? "Electrostatic dust in vacuum." : "Nothing essential.",
-      tag: "Reference",
-      source: "insight_dust",
+      tag: "Judgement",
+      source: "team",
     },
     {
       id: "structure",
@@ -149,10 +170,13 @@ export function materialRows(data: MissionData, target: TargetId, sid: SiteId): 
       options: "Aluminium or titanium alloy, carbon-fibre composite",
       threat: `Daily temperature swing fatigues joints: about ${env.day_swing_c}°C on ${moon ? "the Moon" : "Mars"}.`,
       here: `${swing}°C daily swing here: ${swingShare}% of the target's. Months of cycles plus vibration on rough tracks.`,
+      threatSource: env.source,
       level: levelOf(swingShare),
+      basis: "data",
+      basisText: `From data: the daily swing here is ${swingShare}% of the target's (${RATIO_RULE}).`,
       lab: "The full temperature range in a thermal chamber.",
       tag: "Measured",
-      source: env.source,
+      source: "nasa_power",
     },
     {
       id: "thermal",
@@ -162,7 +186,10 @@ export function materialRows(data: MissionData, target: TargetId, sid: SiteId): 
         ? "UV, micrometeorites and abrasion."
         : "UV and sand abrasion of the outer layer.",
       here: "Strong desert sun, sand and wind: outer-layer wear and colour change over weeks.",
+      threatSource: null,
       level: "partial",
+      basis: "judgement",
+      basisText: JUDGEMENT,
       lab: moon
         ? "Insulation works differently in vacuum: test it there."
         : `Insulation at ${env.pressure_kpa} kPa.`,
@@ -177,7 +204,10 @@ export function materialRows(data: MissionData, target: TargetId, sid: SiteId): 
         ? "Dust clogs mechanisms; liquids boil off in vacuum."
         : "Dust in moving parts; grease thickens in the cold.",
       here: `Long dusty drives: log motor current and temperature. Coldest nights here ${Math.min(...c.monthly_tmin_c.filter((v): v is number => v !== null))}°C.`,
+      threatSource: null,
       level: "partial",
+      basis: "judgement",
+      basisText: JUDGEMENT,
       lab: moon ? "Vacuum and deep cold." : "Cold start of the motors.",
       tag: "Judgement",
       source: "team",
@@ -191,10 +221,14 @@ export function materialRows(data: MissionData, target: TargetId, sid: SiteId): 
         hab.siteKN <= 0
           ? `Outside air here is ${c.air_pressure_kpa} kPa, more than 70 kPa inside: the wall would be pushed inward. Pressurise an uncrewed test module to ${Math.round(hab.proofInsideKPa)} kPa to get the target's outward load.`
           : `Same inside pressure gives only ${Math.round(hab.siteKN * 10) / 10} kN/m² here (${Math.round(hab.share * 100)}%). An uncrewed proof test at ${Math.round(hab.proofInsideKPa)} kPa inside gives the target load.`,
+      threatSource: env.source,
       level: "partial",
+      basis: "judgement",
+      basisText:
+        "Team judgement: the numbers are physics, but whether a proof test counts as a partial test is our call (the vacuum outside cannot be reproduced).",
       lab: "Leak rate with near-vacuum outside.",
-      tag: "Measured",
-      source: "isa",
+      tag: "Judgement",
+      source: "team",
     },
   ];
 }
@@ -242,8 +276,8 @@ export function crewSafety(
   return [
     {
       id: "heat",
-      hazard: "Heat",
-      value: tmax === null ? "no data" : `${tmax}°C average hottest days`,
+      hazard: "Heat (monthly climate average)",
+      value: tmax === null ? "no data" : `${tmax}°C average daily maximum`,
       risk:
         tmax === null ? "warn" : tmax > heatLimit ? "fail" : tmax > heatLimit - 3 ? "warn" : "ok",
       advice:
@@ -262,8 +296,8 @@ export function crewSafety(
     },
     {
       id: "cold",
-      hazard: "Cold nights",
-      value: tmin === null ? "no data" : `${tmin}°C average coldest nights`,
+      hazard: "Cold nights (monthly climate average)",
+      value: tmin === null ? "no data" : `${tmin}°C average daily minimum`,
       risk: tmin === null ? "warn" : tmin < SAFETY.coldC ? "warn" : "ok",
       advice:
         "Winter sleeping bags and layers; cold mornings also slow batteries and stiffen seals.",
@@ -284,20 +318,20 @@ export function crewSafety(
     },
     {
       id: "flood",
-      hazard: "Flash floods in dry valleys",
+      hazard: "Yearly rain (flash-flood risk not modelled)",
       value: `${Math.round(rain)} mm of rain a year`,
       risk: rain > SAFETY.rainWarnMm ? "warn" : "ok",
-      advice: "Rare, but sudden after storms: never camp in a wadi bed; check the forecast daily.",
+      advice:
+        "Context only: yearly totals do not give flash-flood odds (short storms and upstream valleys matter). Never camp in a wadi bed; check the forecast daily.",
       tag: "Judgement",
       source: "nasa_power",
     },
     {
       id: "help",
-      hazard: "Distance to help",
-      value: `${Math.round(c.hub.distance_km)} km (straight line) to ${c.hub.name}, ≈${evacH.toFixed(1)} h at ${SAFETY.offroadKmH} km/h`,
+      hazard: "Distance to help (straight line)",
+      value: `${Math.round(c.hub.distance_km)} km to ${c.hub.name}`,
       risk: evacH > 2 ? "warn" : "ok",
-      advice:
-        "Satellite phone, first-aid kit with a trained member, two vehicles, and a local guide.",
+      advice: `Illustrative travel-time proxy: about ${evacH.toFixed(1)} h at an assumed ${SAFETY.offroadKmH} km/h, not a verified evacuation route. Plan a real road route; satellite phone, first-aid kit with a trained member, two vehicles and a local guide.`,
       tag: "Judgement",
       source: "team",
     },

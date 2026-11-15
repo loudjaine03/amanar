@@ -14,6 +14,7 @@ import { Route as CompareRouteImport } from './routes/compare'
 import { Route as MethodRouteImport } from './routes/method'
 import { Route as PlanRouteImport } from './routes/plan'
 import { Route as RehearseRouteImport } from './routes/rehearse'
+import { Route as ReportRouteImport } from './routes/report'
 import { Route as SiteRouteImport } from './routes/site'
 
 const IndexRoute = IndexRouteImport.update({
@@ -41,6 +42,11 @@ const RehearseRoute = RehearseRouteImport.update({
   path: '/rehearse',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReportRoute = ReportRouteImport.update({
+  id: '/report',
+  path: '/report',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SiteRoute = SiteRouteImport.update({
   id: '/site',
   path: '/site',
@@ -53,6 +59,7 @@ export interface FileRoutesByFullPath {
   '/method': typeof MethodRoute
   '/plan': typeof PlanRoute
   '/rehearse': typeof RehearseRoute
+  '/report': typeof ReportRoute
   '/site': typeof SiteRoute
 }
 export interface FileRoutesByTo {
@@ -61,6 +68,7 @@ export interface FileRoutesByTo {
   '/method': typeof MethodRoute
   '/plan': typeof PlanRoute
   '/rehearse': typeof RehearseRoute
+  '/report': typeof ReportRoute
   '/site': typeof SiteRoute
 }
 export interface FileRoutesById {
@@ -70,15 +78,24 @@ export interface FileRoutesById {
   '/method': typeof MethodRoute
   '/plan': typeof PlanRoute
   '/rehearse': typeof RehearseRoute
+  '/report': typeof ReportRoute
   '/site': typeof SiteRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/compare' | '/method' | '/plan' | '/rehearse' | '/site'
+  fullPaths:
+    '/' | '/compare' | '/method' | '/plan' | '/rehearse' | '/report' | '/site'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/compare' | '/method' | '/plan' | '/rehearse' | '/site'
+  to: '/' | '/compare' | '/method' | '/plan' | '/rehearse' | '/report' | '/site'
   id:
-    '__root__' | '/' | '/compare' | '/method' | '/plan' | '/rehearse' | '/site'
+    | '__root__'
+    | '/'
+    | '/compare'
+    | '/method'
+    | '/plan'
+    | '/rehearse'
+    | '/report'
+    | '/site'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -87,6 +104,7 @@ export interface RootRouteChildren {
   MethodRoute: typeof MethodRoute
   PlanRoute: typeof PlanRoute
   RehearseRoute: typeof RehearseRoute
+  ReportRoute: typeof ReportRoute
   SiteRoute: typeof SiteRoute
 }
 
@@ -127,6 +145,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RehearseRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/report': {
+      id: '/report'
+      path: '/report'
+      fullPath: '/report'
+      preLoaderRoute: typeof ReportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/site': {
       id: '/site'
       path: '/site'
@@ -143,6 +168,7 @@ const rootRouteChildren: RootRouteChildren = {
   MethodRoute: MethodRoute,
   PlanRoute: PlanRoute,
   RehearseRoute: RehearseRoute,
+  ReportRoute: ReportRoute,
   SiteRoute: SiteRoute,
 }
 export const routeTree = rootRouteImport

@@ -1,6 +1,29 @@
 # What changed
 
-## Choices, real ML, materials, safety, sensors (15 Nov, evening)
+The **current version** is described in the first sections below and in the README (67 tests). Sections under "Earlier versions" are kept for history only: their targets (Marius Hills), scores (the old weighted /24 score) and test counts are **superseded** and no longer describe the app.
+
+## Current version
+
+### Wording matched to the evidence (15 Nov, final)
+
+- Lunar target described as a south-polar terrain window near Peak Near Shackleton: one of NASA's 13 Artemis III candidate regions in 2022 (not in the October 2024 list of nine), next to the preferred Chang'e-7 area (final site not announced, launch moved to 2027). Not a base-site assessment.
+- "Terrain overlap score" with its scope explained (equal weights, correlated measures, distributions not spatial arrangement, team-defined bands, different DEM resolutions); all three first places are moderate (59/100).
+- Geology renamed "geological correspondence (literature-based)": processes and setting, not composition. Tassili–Gale lowered to partial (sandstone vs lake mudstone and sulfates); Ahnet–Jezero reworded (same processes, not same composition).
+- Twin-map terrain classes are now "gentle / intermediate / steep terrain" from slope, with known geography noted separately; not detected geological units.
+- Twin model: "closest of three site profiles"; 87% is site recognition on held-out Earth blocks, not a Mars/Moon accuracy; the no-twin cutoff is a heuristic.
+- Crew safety renamed "crew planning indicators" (screening, not a safety assessment); yearly rain says flash-flood risk is not modelled; travel time is an illustrative proxy, not an evacuation route.
+- Radar: "anomaly screening", unverified candidates; the local 1.5 px test vs whole-box offsets clarified.
+- Rover and sensors: digital traverse rehearsal; equal wheel loads, 10 cm footprint, static load only, ground pressure is not bearing capacity; Mars delay is the 14 Nov 2026 light time (it varies from about 3 to 22 min).
+- Method page: scope-and-limits table; Ahnet's prior literature (Caddeo et al. 2025) acknowledged. 67 tests.
+
+### PDF report and honest materials labels (15 Nov, later)
+
+- **PDF export is back**: a printable results report (`/report`, linked from Plan and Compare) with your plan, ranked sites, reachable spots with coordinates, the comparison and twin map, materials, crew safety, data, limits and sources. _Save as PDF_ uses the browser's print dialog; Markdown download kept.
+- **Materials labels fixed**: only wheels (roughness ratio) and chassis (temperature-swing ratio) are computed; seals, solar panels, thermal blankets, mechanisms and the habitat shell are now tagged as team judgement, with the reason shown.
+- Reachable-spot logic moved into `src/lib/plan.ts` and tested against A*. 66 tests.
+
+### Choices, real ML, materials, safety, sensors (15 Nov, evening)
+
 - **Plan page is back (step 1)**: you choose the destination, what to test (driving, rock science, radar under sand, crew training), which part of the target (landing area, whole map, or a spot you click), your rover's slope limit, the month, a heat limit and the farthest distance from town.
 - **Real machine learning, run live**: a k-nearest-neighbour "twin" model is trained on the 7,500 Algerian cells and applied to every 400 m cell of the real Mars/Moon maps. On the Plan page the same model runs in your browser, only on Earth ground your rover or crew can use. No hand-set weights; each goal's ordering rule is written on the page. A test checks that the browser gives back the pipeline's (scikit-learn) predictions. Model check: 87% of unseen 4 km Earth blocks are given back to the right site; shares move by at most 2 points with other measure sets.
 - **Twin map on Compare**: which Algerian site holds the closest terrain twins of each part of Jezero, Gale and the lunar south pole; the "it depends on the part" headline now follows it (zones kept as a second check).
@@ -9,16 +32,20 @@
 - **Simulated pressure sensors (Rehearse)**: barometer, tilt, wheel load cells and ground pressure along the planned route, with elevation and slope profiles; rover mass, wheels and footprint can be changed; Earth twin rover mass from the target's gravity (JPL Scarecrow method).
 - "Rehearse a drive through these spots" sends the Plan's spots to the Rehearse page. 62 tests.
 
-## Review fixes (15 Nov, afternoon)
+## Earlier versions (superseded, kept for history)
+
+### Review fixes (15 Nov, afternoon)
+
 - **Real Mars and Moon data in the comparison**: Jezero (USGS/NASA CTX DTM 20 m, checked against MOLA), Gale (NASA-AMMOS MMGIS DEM 20 m), lunar south pole (NASA LOLA heights 40 m, checked against Shackleton's published wall slope). Same six terrain measures on Earth and on the target (`pipeline/terrain.py`).
-- **Challenge fit**: the lunar target is now the south pole (permanent-base region: Peak near Shackleton, Artemis 2022 candidate, Chang'e-7 target) instead of the equatorial Marius Hills.
+- **Challenge fit**: the lunar target is now the south pole (Peak Near Shackleton area: a 2022 Artemis III candidate region, near the preferred Chang'e-7 area) instead of the equatorial Marius Hills.
 - **Not decided by design**: ranking by measured terrain match only; geology is a separate cited check that sets the label; the double-weighted hand "materials" axis, and the temperature and dryness axes that did not separate the sites, are gone. Stability over 11 variants is shown. Result: no site wins everything (Jezero: Tassili for driving, Ahnet for rocks).
 - **ML honesty**: R² inside each site only (pooled 0.93 removed); clustering terrain types removed (they mostly re-found the sites); radar hotspots checked for box edge, visible boundaries, image alignment and smooth flat cover; spot picks keep out of the 800 m border.
 - **Scale**: equal windows compared cell by cell; best 4 km area searched inside each box.
 - **Hardware**: tests computed per site and target (slopes, wheel wear, relief, radar, heating and cooling), shown on the Site page; generic lab-only items listed separately.
 - **Interface**: four steps (Destination, Compare, Site, Rehearse), English only, larger text, downloadable Markdown report. 42 tests.
 
-## Jury round (15 Nov)
+### Jury round (15 Nov)
+
 - **Name**: Amanar (Tuareg name for Orion, "the guide"), with Algeria Beyond Earth as subtitle.
 - **Simpler interface**: one 5-step bar (Target, Find, Compare, Hardware, Rehearse); Compare split into Map / Score / Limits tabs; Finder shows 3 questions, the rest under "More options"; fewer captions; status chip removed.
 - **Materials** (new step 04): environment gap table, 7 hardware components with candidate materials, threat, field test, lab test and a TEST HERE / HERE + LAB / LAB ONLY badge. Wheel tests point to the roughest site.
@@ -27,9 +54,10 @@
 - **Crew safety** (step 05): night-cold caution, workable season per site, steep-ground share, crew checklist; logged to the Dossier.
 - Pipeline adds night temperatures, elevation, air pressure and terrain roughness per site. 91 tests.
 
-## Final build (14-15 Nov 2026)
+### First build (14-15 Nov 2026)
 
 **Fixed**
+
 - `mission_data.json` was half-merged: Tassili's hub distance was computed for an old box (150.9 km, real: 60 km), hotspot lists were empty, the "Reference" tag broke the type and tests, verdict rule differed between Python (70 %) and the app (50 %). Now one script generates everything and the app re-checks the verdicts (test).
 - Overlays and grids were never copied to `public/`, so Stage 02 showed "image not available" and Stage 03 only had a mock Ahnet grid. Now generated straight into `public/`.
 - `01_export_stack.js` listed boxes that were not the ones exported. Updated.
@@ -37,6 +65,7 @@
 - 8 failing tests rewritten for the real data; 81 tests pass; `npm run build` passes.
 
 **Added**
+
 - Two more destinations: Gale (Mars, layered rocks) and Marius Hills (Moon, lava tubes), each with its own terrain rule, materials judgements, audit, waypoints and signal delay (Moon 1.3 s, real time).
 - ML in `pipeline/build_all.py`: radar-surprise model (gradient boosting, spatial-block validation), terrain units (Gaussian mixture), 7,500-cell feature table.
 - AI Analog Finder page (`/finder`) with the form (destination, objective, where, constraints, priority), site ranking, score map, explained top spots, look-alike search, Dossier export, and "drive a rover through the top spots" (reachability checked with A*).

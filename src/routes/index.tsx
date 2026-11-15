@@ -33,7 +33,7 @@ function Index() {
         <div className="hero-content">
           <div className="eyebrow">
             <span className="eyebrow-dot" />
-            NASA Space Apps 2026 · Earth analogs for Moon bases and Mars
+            NASA Space Apps 2026 · Earth terrain analogs for Mars and the lunar south pole
           </div>
           <h1>
             AMANAR<span>ALGERIA BEYOND EARTH</span>
@@ -124,20 +124,20 @@ function Index() {
           </div>
           <div>
             <Gem />
-            <h3>Are the rocks the same?</h3>
+            <h3>Is the geology alike?</h3>
             <p>
-              Checked against published geology, one cited sentence per site. It never changes the
-              terrain score: it changes the label (&ldquo;Strong&rdquo;, &ldquo;Terrain only&rdquo;,
-              &hellip;).
+              A team reading of published geology, one cited sentence per site: processes and
+              setting, not rock chemistry. It never changes the terrain score: it changes the label
+              (&ldquo;Partial&rdquo;, &ldquo;Terrain only&rdquo;, &hellip;).
             </p>
           </div>
           <div>
             <Radar />
-            <h3>What is under the sand?</h3>
+            <h3>Radar anomaly screening</h3>
             <p>
-              A model predicts L-band radar from the surface; where radar is brighter than expected,
-              something may be buried. Four checks then remove the usual artefacts. Candidates, not
-              discoveries.
+              A model predicts L-band radar from the surface and flags where it is brighter than
+              expected. Four checks remove the usual artefacts. Unverified candidates for a
+              subsurface survey, not discoveries.
             </p>
           </div>
         </div>

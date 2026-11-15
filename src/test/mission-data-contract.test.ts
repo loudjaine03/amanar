@@ -135,6 +135,20 @@ describe("the comparison is measured, not decided by hand", () => {
       if (split) for (const p of tw.parts) expect(tg.headline).toContain(p.ground);
     }
   });
+  it("wording stays within what is measured (review corrections)", () => {
+    const moon = data.targets.moon_south;
+    expect(moon.why).toContain("2022");
+    expect(moon.why).toContain("October 2024");
+    expect(`${moon.mission} ${moon.goal}`).not.toMatch(/base region|permanent base on/i);
+    expect(moon.goal).toMatch(/not a base-site assessment/);
+    // terrain classes come from slope only: no geological unit names
+    for (const t of TARGETS)
+      for (const p of data.targets[t].twins.parts)
+        expect(p.ground).toMatch(/^(gentle|intermediate, rougher|steep) terrain$|^the whole map$/);
+    // Tassili's sandstone is not Gale's lake mudstone
+    expect(data.targets.gale.sites.tassili.geology.level).toBe("partial");
+    expect(data.targets.jezero.sites.ahnet.geology.text).toMatch(/not the same composition/);
+  });
   it("picks name the right sites", () => {
     for (const t of TARGETS) {
       const tg = data.targets[t];

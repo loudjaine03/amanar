@@ -22,7 +22,10 @@ describe("materials and crew safety (src/lib/materials.ts)", () => {
   it("every row cites a source that exists", () => {
     for (const t of TARGETS)
       for (const s of SITES) {
-        for (const r of materialRows(data, t, s)) expect(ids.has(r.source)).toBe(true);
+        for (const r of materialRows(data, t, s)) {
+          expect(ids.has(r.source)).toBe(true);
+          if (r.threatSource) expect(ids.has(r.threatSource)).toBe(true);
+        }
         for (const r of crewSafety(data, s, 7, 40)) expect(ids.has(r.source)).toBe(true);
       }
   });
@@ -35,6 +38,26 @@ describe("materials and crew safety (src/lib/materials.ts)", () => {
           data.targets[t].stats["rough"]!.p90;
         const want = share >= 50 ? "field" : share >= 25 ? "partial" : "no";
         expect(row.level).toBe(want);
+      }
+  });
+  it("only wheels and chassis levels are computed; the rest are tagged as judgement", () => {
+    for (const t of TARGETS)
+      for (const s of SITES)
+        for (const r of materialRows(data, t, s)) {
+          const computed = r.id === "wheels" || r.id === "structure";
+          expect(r.basis).toBe(computed ? "data" : "judgement");
+          expect(r.tag).toBe(computed ? "Measured" : "Judgement");
+          if (!computed) expect(r.source).toBe("team");
+        }
+  });
+  it("chassis level follows the measured temperature-swing ratio", () => {
+    for (const t of TARGETS)
+      for (const s of SITES) {
+        const row = materialRows(data, t, s).find((r) => r.id === "structure")!;
+        const share =
+          (100 * (data.sites[s].conditions.daily_range_c ?? 0)) /
+          data.meta.env[data.targets[t].body].day_swing_c;
+        expect(row.level).toBe(share >= 50 ? "field" : share >= 25 ? "partial" : "no");
       }
   });
   it("heat risk changes with the month and the limit", () => {

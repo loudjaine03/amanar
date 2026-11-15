@@ -834,42 +834,43 @@ def main():
         tw_parts = [{"site": sid, "ground": words[k], "share": tw["share"][sid]} for sid, k in zip(present, keys_)]
         top_twin = max(C.SITE_ORDER, key=lambda sid: tw["share"][sid])
         split = tw["share"][top_twin] < 60 and len(tw_parts) > 1
-        drive_why = (f"Closest terrain mix over the main {t['meta']['size_km'][0]:.0f} km window ({per_site[driving]['score']}/100); "
+        drive_why = (f"Highest terrain overlap score over the main {t['meta']['size_km'][0]:.0f} km window ({per_site[driving]['score']}/100); "
                      f"the twin model finds its closest twins for {tw['share'][driving]}% of the whole map.")
         if split:
             drive_why += " " + "; ".join(f"{C.SITES[p['site']]['name']} for {p['ground']}" for p in tw_parts) + "."
         picks = {
             "driving": {"site": driving, "why": drive_why},
-            "rocks": {"site": rocks, "why": tc["geology"][rocks][1] + ("" if rocks_full else " (No site fully matches the target's rocks.)")},
+            "rocks": {"site": rocks, "why": tc["geology"][rocks][1] + ("" if rocks_full else " (No site fully matches the target's geology.)")},
             "radar": {"site": rad if radar[rad]["candidates"] else None,
-                      "why": (f"{radar[rad]['candidates']} radar hotspot(s) pass all checks ({radar[rad]['candidate_km2']} km²)." if radar[rad]["candidates"]
-                              else "No radar hotspot passed the checks at any site.")},
+                      "why": (f"{radar[rad]['candidates']} radar anomalies pass all four checks ({radar[rad]['candidate_km2']} km²): unverified candidates for a GPR survey." if radar[rad]["candidates"]
+                              else "No radar anomaly passed the checks at any site.")},
         }
         name = {k: C.SITES[k]["name"] for k in C.SITE_ORDER}
         if split:
             zone_txt = "; ".join(f"{p['ground']} → {name[p['site']]}" for p in tw_parts)
-            rock_txt = (f" Rocks: {name[rocks]} matches." if rocks_full
-                        else f" No site fully matches the rocks; {name[rocks]} comes closest." if tc["geology"][rocks][0] == "partial"
-                        else " No site matches the rocks.")
+            rock_txt = (f" Geology (literature): {name[rocks]} matches the processes." if rocks_full
+                        else f" Geology (literature): no full match; {name[rocks]} comes closest." if tc["geology"][rocks][0] == "partial"
+                        else " Geology (literature): no site matches.")
             headline = f"It depends on the part of {tc['in_text']}: {zone_txt}.{rock_txt}"
         elif top_twin != driving:
-            headline = (f"Closest terrain mix: {name[driving]}; closest twins for most of the map: {name[top_twin]} "
+            headline = (f"Highest terrain overlap: {name[driving]}; closest twins for most of the map: {name[top_twin]} "
                         f"({tw['share'][top_twin]}%).")
         elif driving == rocks and rocks_full:
-            headline = f"Best of the three: {name[driving]}, with the closest terrain and matching rocks."
+            headline = f"Best of the three: {name[driving]}, with the highest terrain overlap and matching geology (literature)."
         elif rocks_full:
-            headline = f"No single site does everything: drive at {name[driving]}, study rocks at {name[rocks]}."
+            headline = f"No single site does everything: drive at {name[driving]}, study geology at {name[rocks]}."
         elif tc["geology"][rocks][0] == "partial":
-            headline = (f"Best terrain: {name[driving]}. No site fully matches the target's rocks; "
+            headline = (f"Highest terrain overlap: {name[driving]}. No site fully matches the target's geology (literature); "
                         f"{name[rocks]} comes closest.")
         else:
-            headline = f"Best terrain: {name[driving]}. None of our sites has rocks like the target's, so this is a terrain-only analog."
+            headline = f"Highest terrain overlap: {name[driving]}. None of our sites matches the target's geology, so this is a terrain-only analog."
         if not split and top_twin == driving:
             headline += f" The twin model agrees: {name[top_twin]} holds the closest twins for {tw['share'][top_twin]}% of the map."
         log("[picks] " + headline)
         out_targets[tid] = {
             "id": tid, "title": tc["title"], "short": tc["short"], "body": tc["body"], "mission": tc["mission"],
             "goal": tc["goal"], "why": tc["why"], "rocks": tc["rocks"], "tiles": tc["tiles"],
+            "zone_context": tc.get("zone_context", ""),
             "map_center": tc["map_center"], "zoom": tc["zoom"], "delay": tc["delay"],
             "dem": {k: t["meta"].get(k) for k in ("product", "product_url", "copy_url", "res_m", "size_km", "center",
                                                      "where", "check_vs_mola", "check_slope", "elev_min_m", "elev_max_m",

@@ -280,10 +280,13 @@ export function SensorPanel({
         </div>
         <p className="map-caption">
           Default: 1,025 kg rover (Perseverance class), six wheels 40 cm wide like Curiosity&apos;s,
-          10 cm footprint (assumption). Gravity {env.gravity} m/s² on {where}{" "}
-          <TagChip tag="Reference" source={env.source} />. Elevation: 400 m Copernicus DEM cells,
-          interpolated; air pressure: standard atmosphere on Earth, NSSDC mean pressure and 11.1 km
-          scale height on Mars, at the middle of the {t.title} elevation range.
+          10 cm footprint (assumption). The load is split equally between wheels; a lighter twin
+          rover reproduces the static load only, not low-gravity dynamics; ground pressure is not
+          the soil&apos;s bearing capacity; target pressures are theoretical estimates. Gravity{" "}
+          {env.gravity} m/s² on {where} <TagChip tag="Reference" source={env.source} />. Elevation:
+          400 m Copernicus DEM cells, interpolated; air pressure: standard atmosphere on Earth,
+          NSSDC mean pressure and 11.1 km scale height on Mars, at the middle of the {t.title}{" "}
+          elevation range.
         </p>
       </details>
     </section>

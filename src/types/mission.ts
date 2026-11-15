@@ -157,6 +157,8 @@ export interface Target {
     zones: Zones;
   };
   twins: Twins;
+  /** Known geography of the map (not detected by the model), to read the terrain classes. */
+  zone_context: string;
   sites: Record<SiteId, SiteResult>;
   picks: {
     driving: { site: SiteId; why: string };

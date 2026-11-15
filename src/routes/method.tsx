@@ -36,7 +36,7 @@ function Method() {
 
       <div className="method-sections">
         <section>
-          <h2>1. Terrain match: the same ruler on Earth, Mars and the Moon</h2>
+          <h2>1. Terrain overlap score: the same ruler on Earth, Mars and the Moon</h2>
           <p>
             Every 400 m cell of each Algerian box and of each Mars/Moon window gets the same six
             measures (<code>pipeline/terrain.py</code>):
@@ -49,12 +49,18 @@ function Method() {
             ))}
           </ul>
           <p>
-            The terrain match is the average overlap of the six distributions (log scale, 30 bins):
-            0 means nothing in common, 100 means identical. It is <TagChip tag="Measured" />. To
-            check that the ranking does not depend on our choices, it is recomputed{" "}
-            {data.targets[target].robustness.n} ways: each measure left out in turn, fine-scale
-            only, landscape-scale only, a quantile (Wasserstein) distance and coarser histograms.
-            The &ldquo;close / moderate / poor&rdquo; bands (65 and 45) are our{" "}
+            The terrain overlap score is the average overlap of the six distributions (log scale, 30
+            bins): 0 means nothing in common, 100 means identical. It is <TagChip tag="Measured" />,
+            and it is a morphometric score, not a percentage of overall or geological similarity:
+            the six measures are weighted equally (four fine-scale, two landscape-scale), several
+            are correlated because they come from the same elevation data, and it compares each
+            measure&apos;s spread, not how the terrain is arranged. Fine scales use DEMs of 20,
+            25–30 and 40 m, so the 400 m measures compare most directly. All three first places
+            score 59, in the moderate band: none reaches the close band. To check that the ranking
+            does not depend on our choices, it is recomputed {data.targets[target].robustness.n}{" "}
+            ways: each measure left out in turn, fine-scale only, landscape-scale only, a quantile
+            (Wasserstein) distance and coarser histograms. The &ldquo;close / moderate / poor&rdquo;
+            bands (65 and 45) are team-defined interpretation bands, not an external standard{" "}
             <TagChip tag="Judgement" />.
           </p>
           <p>
@@ -63,7 +69,9 @@ function Method() {
             two checks look at the <b>whole</b> Mars/Moon map we have: the machine-learning twin
             model (section 2) and a zone-by-zone ranking (8 km zones every 4 km). When no site holds
             at least 60% of the twins, the headline says &ldquo;it depends on the part of the
-            target&rdquo; and names which site matches which kind of ground.
+            target&rdquo; and names which site matches which terrain class (gentle, intermediate,
+            steep). These classes come from slope only: they are not detected geological units such
+            as a delta or a rim, although the app notes the known geography they overlap.
           </p>
           <p>
             Inside each site we also search the best 4 × 4 km area and rank every cell by how
@@ -74,7 +82,7 @@ function Method() {
         </section>
 
         <section>
-          <h2>2. Machine learning: the twin model</h2>
+          <h2>2. Machine learning: the nearest-neighbour terrain-twin model</h2>
           <p>
             A k-nearest-neighbour model (k = {data.targets[target].twins.k}) is trained on the six
             measures of all 7,500 Algerian cells, each labelled with its site. For every 400 m cell
@@ -82,14 +90,20 @@ function Method() {
             (Euclidean distance on standardised, log-scaled measures) and predicts the site that
             holds most of them. If even the nearest Earth cell is farther than 1.5 × the 99th
             percentile of Earth-to-Earth nearest distances, the cell gets &ldquo;no twin on
-            Earth&rdquo;. No weight is set by hand <TagChip tag="Measured" />.
+            Earth&rdquo;: this cutoff is a heuristic <TagChip tag="Judgement" />. No weight is set
+            by hand. The model is not trained on confirmed Mars or Moon analogues: it assigns each
+            target cell the closest of three Algerian terrain profiles.
           </p>
           <p>
             Checks: the model recognises the right Algerian site on{" "}
             {data.targets[target].twins.site_recognition}% of 4 km blocks it never saw (5-fold
-            spatial cross-validation; chance 33%), and the shares move by at most{" "}
-            {Math.max(...data.target_order.map((id) => data.targets[id].twins.max_change))} points
-            when it is trained on other sets of measures. Whole-map shares:{" "}
+            spatial cross-validation; chance 33%). That validates telling the three sites apart, not
+            an accuracy for Mars or Moon analogues, which have no ground truth. The shares move by
+            at most {Math.max(...data.target_order.map((id) => data.targets[id].twins.max_change))}{" "}
+            points when it is trained on other sets of measures, other values of k (5 to 50) or
+            distance-weighted votes; the no-twin share depends on the cutoff (Moon 5% to 55% for
+            cutoffs of 3 to 1 times the 99th percentile), the leading site does not. Whole-map
+            shares:{" "}
             {data.target_order
               .map((id) => {
                 const sh = data.targets[id].twins.share;
@@ -134,31 +148,42 @@ function Method() {
           <p>
             Each window is centred on the place the mission actually works: 20 km around
             Perseverance&apos;s landing site, Curiosity&apos;s climb on lower Mount Sharp, and the
-            Peak-near-Shackleton region of the lunar south pole (on NASA&apos;s 2022 list of Artemis
-            candidate regions and the planned Chang&apos;e-7 landing area). Earth slopes use the
-            Copernicus 30 m DEM; the Moon window is a 40 m grid, so its fine-scale slopes are
+            south-polar terrain near Peak Near Shackleton: one of NASA&apos;s 13 Artemis III
+            candidate regions in 2022 (not in the updated list of nine from October 2024) and next
+            to the preferred Chang&apos;e-7 area on the Shackleton rim, whose final landing site is
+            not announced. This is a terrain-rehearsal comparison, not a lunar base-site assessment:
+            no sunlight, communication, water-ice or polar-temperature analysis. Earth slopes use
+            the Copernicus 30 m DEM; the Moon window is a 40 m grid, so its fine-scale slopes are
             slightly smoothed. The two landscape-scale measures do not depend on this.
           </p>
         </section>
 
         <section>
-          <h2>4. Rocks: kept out of the score</h2>
+          <h2>4. Geological correspondence (literature-based): kept out of the score</h2>
           <p>
-            For every target and site, one sentence with a source says whether the rocks match,
-            partly match, or do not match <TagChip tag="Reference" />. Geology never changes the
-            terrain number. It only sets the label: <b>Strong analog</b> (close terrain + matching
-            rocks), <b>Partial analog</b>, <b>Terrain only</b> (good for driving tests),{" "}
-            <b>Rocks only</b> (good for rock science) and <b>Weak analog</b>.
+            For every target and site, the team wrote one sentence from a published source saying
+            whether the geology matches, partly matches or does not match{" "}
+            <TagChip tag="Reference" />. It compares depositional processes and setting relevant to
+            a field task, not rock composition: the app does not classify rock chemistry. Example:
+            Ahnet shares Jezero&apos;s river, fan and evaporite processes but not its clays,
+            carbonates or igneous floor; Tassili&apos;s sandstone cliffs are good for practising
+            layered-outcrop mapping but differ from Gale&apos;s lake mudstones and sulfates, so it
+            is &ldquo;partial&rdquo;. Geology never changes the terrain number. It only sets the
+            label: <b>Strong analog</b> (close terrain + matching geology), <b>Partial analog</b>,{" "}
+            <b>Terrain only</b> (good for driving tests), <b>Rocks only</b> (good for geology
+            training) and <b>Weak analog</b>.
           </p>
         </section>
 
         <section>
-          <h2>5. Radar: what may be under the sand</h2>
+          <h2>5. Radar anomaly screening</h2>
           <p>
             A gradient-boosting model ({m.type}) predicts {m.target} from what the surface shows (
             {Object.values(m.predictors).join(", ")}). Where L-band is much brighter than predicted
-            (z &gt; {m.hotspot_z}), something the surface does not explain may be there, as the
-            shuttle radar SIR-A showed with buried river channels in the eastern Sahara.
+            (z &gt; {m.hotspot_z}), the response is anomalous: something the surface does not
+            explain may be there, as the shuttle radar SIR-A showed with buried river channels in
+            the eastern Sahara. The model only identifies anomalous L-band responses; it does not
+            tell what causes them.
           </p>
           <p>
             Accuracy inside each site (spatial-block cross-validation):{" "}
@@ -177,7 +202,11 @@ function Method() {
               {Math.round((rules["contact_share"] ?? 0) * 100)}% of it on strong edges, or under{" "}
               {rules["contact_ratio"]}× the site average);
             </li>
-            <li>radar images aligned around it (local L-band vs C-band offset under 1.5 px);</li>
+            <li>
+              radar images aligned around it (local L-band vs C-band shift under 1.5 px in a 256 px
+              window; this is the rejection test, while the whole-box offsets reported per site are
+              all under 1 px);
+            </li>
             <li>
               on a smooth, flat cover where L-band can see below: slope under{" "}
               {rules["flat_slope_deg"]}°, in the C-band-darkest{" "}
@@ -195,8 +224,9 @@ function Method() {
               )
               .join(", ")}{" "}
             hotspots pass. Many of the rest follow exposed rock layers (for example the folded
-            strata of Ahnet). No hotspot is confirmed; the field test is a ground-penetrating-radar
-            line across the candidates.
+            strata of Ahnet). The checks reduce artefacts but do not establish the physical origin
+            of an anomaly: every candidate is an unverified target for subsurface investigation, and
+            the field test is a ground-penetrating-radar line across them.
           </p>
         </section>
 
@@ -205,16 +235,23 @@ function Method() {
           <p>
             <b>Materials</b> (Site page): for wheels, seals, solar panels, structure, thermal
             blankets, mechanisms and the habitat shell we cite what threatens them on the target{" "}
-            <TagChip tag="Reference" /> and decide whether the site can test it from a ratio of
-            measured numbers: rough ground (90th percentile) and daily temperature swing, site
-            divided by target. 50% or more = test here, 25 to 50% = partly. Habitat wall loads use
-            the pressure difference (1 kPa on 1 m² = 1 kN).
+            <TagChip tag="Reference" />. Two levels are computed: wheels from rough ground (90th
+            percentile) and the chassis from the daily temperature swing, site divided by target
+            (50% or more = test here, 25 to 50% = partly) <TagChip tag="Measured" />. The other five
+            (seals, solar panels, thermal blankets, mechanisms, habitat shell) have no site
+            measurement yet, so their level is our judgement and is tagged{" "}
+            <TagChip tag="Judgement" /> on the page. Habitat wall loads use the pressure difference
+            (1 kPa on 1 m² = 1 kN); the habitat&apos;s &ldquo;partly&rdquo; level is our judgement.
+            These are candidate field tests, not demonstrated material performance.
           </p>
           <p>
-            <b>Crew safety</b>: heat and cold from NASA POWER for the chosen month, drinking water
-            from the NIOSH heat-stress advice (1 cup every 15 to 20 minutes), falls from the share
-            of ground steeper than 15°, flash floods from yearly rain, and time to help from the
-            straight-line distance to the nearest town at 40 km/h <TagChip tag="Judgement" />.
+            <b>Crew planning indicators</b> (a preliminary field-conditions and logistics screening,
+            not a safety assessment): monthly climate averages of daily maximum and minimum
+            temperature from NASA POWER (not a forecast), drinking water from the NIOSH heat-stress
+            advice (1 cup every 15 to 20 minutes), falls from the share of ground steeper than 15°,
+            yearly rain as context (flash-flood risk is not modelled), and an illustrative
+            travel-time proxy from the straight-line distance to the nearest town at an assumed 40
+            km/h, not a verified evacuation route <TagChip tag="Judgement" />.
           </p>
           <p>
             <b>Simulated pressure sensors</b> (Rehearse page): along the planned route the barometer
@@ -223,7 +260,12 @@ function Method() {
             m · g · cos(slope) / wheels for a lighter Earth twin rover (mass × g<sub>target</sub> /
             9.81, JPL&apos;s Scarecrow method). Ground pressure assumes a wheel footprint you can
             change. These are formulas, not recorded sensor data: they show what the field test
-            should log and check.
+            should log and check. Assumptions: the load is split equally between wheels; the 10 cm
+            footprint is ours; ground pressure is not the soil&apos;s bearing capacity; a lighter
+            twin rover reproduces the static load, not low-gravity dynamics; Mars and Moon pressures
+            are theoretical estimates. The A* route is a slope-constrained planning demonstration,
+            not a verified safe traverse or a model of traction and slip. The 11-minute Mars delay
+            is the light time on 14 Nov 2026; it varies from about 3 to 22 minutes.
           </p>
         </section>
 
@@ -252,32 +294,83 @@ function Method() {
               Earth and applied to real Mars/Moon cells.
             </li>
             <li>
-              The Marius Hills target, compared only with typed-in specs. Replaced by the lunar
-              south pole, where permanent bases are planned, with real LOLA heights.
+              The Marius Hills target, compared only with typed-in specs. Replaced by a south-polar
+              terrain window near Peak Near Shackleton, with real LOLA heights.
             </li>
           </ul>
         </section>
 
         <section>
-          <h2>8. Limits</h2>
-          <ul className="plain-list">
-            <li>
-              Three 20 km boxes chosen by the team; other Algerian places may match better. The
-              best-4-km search only looks inside these boxes.
-            </li>
-            <li>
-              Terrain shape and published geology only: no mineral spectra, no grain size, no
-              regolith properties.
-            </li>
-            <li>
-              Gravity, air pressure, radiation and polar light cannot be reproduced at any Earth
-              site (each target lists them).
-            </li>
-            <li>
-              Radar hotspots are candidates, look-alike spots and rover stops are hypotheses,
-              straight-line distance is not road access, climate averages are not a forecast.
-            </li>
-          </ul>
+          <h2>8. Scope and limits</h2>
+          <p>
+            Amanar evaluates three selected Algerian pilot environments to demonstrate a
+            reproducible workflow that can later be extended to larger areas and more terrestrial
+            candidates. It did not search the whole Sahara, and it does not claim to have found
+            Ahnet&apos;s relevance: Ahnet was already discussed as a Mars analogue in published 2025
+            research (Caddeo et al. 2025). Our contribution is the comparative, data-driven
+            mission-planning workflow.
+          </p>
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Area</th>
+                <th>What the prototype establishes</th>
+                <th>What is missing</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Coverage</td>
+                <td>Three 20 × 20 km pilot areas</td>
+                <td>An automated search across the Sahara or Earth</td>
+              </tr>
+              <tr>
+                <td>Geology</td>
+                <td>Literature-based reading of processes and setting</td>
+                <td>Mineral and chemical comparison (spectra, samples)</td>
+              </tr>
+              <tr>
+                <td>Terrain</td>
+                <td>Six elevation-derived measures</td>
+                <td>Soil and rock properties, grain size, regolith</td>
+              </tr>
+              <tr>
+                <td>Twin model</td>
+                <td>Closest of three site terrain profiles</td>
+                <td>A validated set of confirmed terrestrial analogues</td>
+              </tr>
+              <tr>
+                <td>Radar</td>
+                <td>Screened L-band anomaly candidates</td>
+                <td>Ground truth (GPR lines, trenches)</td>
+              </tr>
+              <tr>
+                <td>Lunar comparison</td>
+                <td>Terrain near Shackleton</td>
+                <td>Illumination, communication, water ice, polar temperatures</td>
+              </tr>
+              <tr>
+                <td>Rover</td>
+                <td>Slope-constrained A* traverse</td>
+                <td>Wheel-soil interaction, traction, slip, obstacles</td>
+              </tr>
+              <tr>
+                <td>Sensors</td>
+                <td>Formula-based simulated readings</td>
+                <td>Real sensor measurements</td>
+              </tr>
+              <tr>
+                <td>Crew planning</td>
+                <td>Preliminary climate and terrain indicators</td>
+                <td>Verified road access, emergency procedures, operational safety</td>
+              </tr>
+            </tbody>
+          </table>
+          <p>
+            Gravity, air pressure, radiation and polar light cannot be reproduced at any Earth site
+            (each target lists them). Team-built experimental indicators, not an official NASA
+            assessment.
+          </p>
         </section>
 
         <section>

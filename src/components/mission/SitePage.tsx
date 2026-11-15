@@ -21,7 +21,7 @@ const CHECKS: { key: keyof Hotspot["checks"]; label: string; why: string }[] = [
   {
     key: "not_on_boundary",
     label: "Not tracing a visible boundary",
-    why: "A hotspot that follows a sharp line in the photo is usually a surface contact, not something buried.",
+    why: "A hotspot that follows a sharp line in the photo is usually a surface contact, not a subsurface signal.",
   },
   {
     key: "images_aligned",
@@ -183,13 +183,14 @@ export function SitePage() {
             </p>
           </section>
           <section className="match-panel">
-            <div className="panel-title">Rocks</div>
+            <div className="panel-title">Geological correspondence (literature-based)</div>
             <p className="panel-text">
               <span className={`geo-chip geo-${r.geology.level}`}>{GEO_WORD[r.geology.level]}</span>{" "}
               {r.geology.text} <TagChip tag="Reference" source={r.geology.source} />
             </p>
             <p className="panel-text muted">
-              {t.title}: {t.rocks.text}.
+              {t.title}: {t.rocks.text}. Written by the team from published studies: it compares
+              processes and setting, not rock chemistry.
             </p>
           </section>
         </aside>
@@ -225,20 +226,31 @@ export function SitePage() {
       <h2 className="block-title">Materials: what this site can test for {t.title}</h2>
       <p className="note">
         Each part of a rover or habitat, what threatens it on {t.title}, and whether {site.name} can
-        test it. Levels come from the site&apos;s numbers divided by the target&apos;s (50% or more
-        = test here, 25 to 50% = partly).
+        test it. Two levels are computed from data (wheels: roughness; chassis: daily temperature
+        swing; site divided by target, 50% or more = test here, 25 to 50% = partly). The other five
+        have no site measurement yet: their level is our judgement and is tagged{" "}
+        <TagChip tag="Judgement" />. These are candidate field tests, not demonstrated material
+        performance; pressure numbers are physics under stated assumptions.
       </p>
       <div className="test-list">
         {mats.map((m) => (
           <div key={m.id} className="test-row mat-row">
             <span className={`test-badge test-${m.level}`}>{TEST_WORD[m.level]}</span>
             <div>
-              <b>{m.component}</b> <TagChip tag={m.tag} source={m.source} />
+              <b>{m.component}</b>
               <p>
-                <i>On {t.title}:</i> {m.threat}
+                <i>On {t.title}:</i> {m.threat}{" "}
+                {m.threatSource ? (
+                  <TagChip tag="Reference" source={m.threatSource} />
+                ) : (
+                  <TagChip tag="Judgement" />
+                )}
               </p>
               <p>
                 <i>Here:</i> {m.here}
+              </p>
+              <p className="mat-basis" data-basis={m.basis}>
+                <i>Level:</i> {m.basisText} <TagChip tag={m.tag} source={m.source} />
               </p>
               <p className="mat-meta">
                 Options to compare: {m.options}. Still needs a lab: {m.lab}
@@ -248,7 +260,12 @@ export function SitePage() {
         ))}
       </div>
 
-      <h2 className="block-title">Crew safety at {site.name}</h2>
+      <h2 className="block-title">Crew planning indicators at {site.name}</h2>
+      <p className="note">
+        Preliminary field-conditions and logistics screening from monthly climate averages, the
+        slope map, yearly rain and straight-line distance. Planning indicators only: not a weather
+        forecast, not a safety assessment, and not a reason on its own to call a site safe.
+      </p>
       <div className="safety-head">
         <label className="slider-row inline">
           <span>Month</span>
@@ -279,7 +296,12 @@ export function SitePage() {
         ))}
       </div>
 
-      <h2 className="block-title">What may be under the sand</h2>
+      <h2 className="block-title">Radar anomaly screening</h2>
+      <p className="note">
+        The model flags places where L-band radar is brighter than the surface explains. The four
+        checks remove common artefacts; they do not tell what causes an anomaly. Every candidate is
+        an unverified target for a subsurface survey, not a detected buried feature.
+      </p>
       <div className="two-col">
         <section className="match-panel">
           <div className="panel-title">Radar evidence</div>
@@ -302,8 +324,10 @@ export function SitePage() {
           <p className="panel-text muted">
             Whole-box alignment: L-band vs C-band offset ({radar.coreg.l_vs_c_px.join(", ")}) px,
             L-band vs optical ({radar.coreg.l_vs_optical_px.join(", ")}) px, with{" "}
-            {radar.coreg.pixel_m} m pixels: misalignment is not a general cause. Model accuracy
-            inside this site: R² = {r2} (spatial-block cross-validation).
+            {radar.coreg.pixel_m} m pixels: misalignment is not a general cause. The check that
+            rejects a hotspot is the local shift (over 1.5 px in a 256 px window). Model accuracy
+            inside this site: R² = {r2} (spatial-block cross-validation); on a site it never saw it
+            can fail (Ahnet R² {data.meta.radar_model.r2_leave_one_site_out.ahnet}).
           </p>
         </section>
         <section className="match-panel">
@@ -320,7 +344,7 @@ export function SitePage() {
                   <TagChip tag={h.verdict === "candidate" ? "Hypothesis" : "Measured"} />
                   <small>
                     {h.verdict === "candidate"
-                      ? "Passes all four checks: worth a ground-penetrating radar transect."
+                      ? "Passes all four checks: unverified anomaly, a candidate for a ground-penetrating radar transect."
                       : h.reasons.join("; ")}
                   </small>
                 </div>

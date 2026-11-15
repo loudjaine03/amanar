@@ -240,7 +240,9 @@ export function Rehearse() {
         {custom
           ? "The rover visits the twin spots you found on the Plan page"
           : `The rover visits the three most ${t.title}-like spots it can reach`}
-        , with the real {isMoon ? "Earth–Moon" : "Earth–Mars"} signal delay.
+        , with the {isMoon ? "Earth–Moon" : "Earth–Mars"} signal delay. A digital traverse
+        rehearsal: slope-constrained path planning and formula-based sensor readings, not a verified
+        safe route or a rover physics simulation.
       </p>
       <div className="site-switch-row" role="group" aria-label="Site">
         {t.ranking.map((id) => (
@@ -324,7 +326,8 @@ export function Rehearse() {
               disabled={driving}
             />
             Signal delay: {delay.short} one way
-            {delay.compressed ? " (shown as 1 min = 1 s)" : " (real time)"}{" "}
+            {delay.compressed ? " (shown as 1 min = 1 s)" : " (real time)"}
+            {isMoon ? "" : ": the light time on 14 Nov 2026; it varies from about 3 to 22 min"}{" "}
             <TagChip tag={t.delay.tag} source={t.delay.source} />
           </label>
           <label className="slider-row">

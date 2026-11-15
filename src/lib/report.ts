@@ -7,9 +7,9 @@ export const BAND_WORD: Record<Band, string> = {
   poor: "Poor match",
 };
 export const GEO_WORD: Record<GeoLevel, string> = {
-  match: "Rocks match",
-  partial: "Rocks partly match",
-  no: "Rocks do not match",
+  match: "Geology matches (literature)",
+  partial: "Geology partly matches (literature)",
+  no: "Geology does not match (literature)",
 };
 export const TEST_WORD: Record<TestLevel, string> = {
   field: "TEST HERE",
@@ -18,11 +18,11 @@ export const TEST_WORD: Record<TestLevel, string> = {
   lab: "LAB ONLY",
 };
 export const LABEL_HINT: Record<SiteLabel, string> = {
-  "Strong analog": "Close terrain and matching rocks.",
-  "Partial analog": "Terrain and rocks both help, neither fully.",
-  "Terrain only": "Good for driving and navigation tests, not for rock science.",
-  "Rocks only": "Good for rock science, not for driving tests.",
-  "Weak analog": "Neither the terrain nor the rocks are close.",
+  "Strong analog": "Close terrain and matching geology (literature).",
+  "Partial analog": "Terrain and geology both help, neither fully.",
+  "Terrain only": "Good for driving and navigation tests, not for geology training.",
+  "Rocks only": "Good for geology training, not for driving tests.",
+  "Weak analog": "Neither the terrain nor the geology is close.",
 };
 
 /** Name of a source id, for tooltips and the report. */

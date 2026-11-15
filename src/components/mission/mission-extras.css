@@ -20,18 +20,6 @@
 .dossier-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
 .dossier-print-head { display: none; }
 
-@media print {
-  .mission-app, body > .fixed.inset-0, .no-print { display: none !important; }
-  html, body { background: #fff !important; color: #000 !important; }
-  .dossier-sheet { position: static !important; width: 100% !important; max-width: none !important; height: auto !important; border: 0 !important; box-shadow: none !important; background: #fff !important; color: #000 !important; padding: 0 !important; transform: none !important; animation: none !important; }
-  .dossier-print-head { display: block; margin-bottom: 14px; }
-  .dossier-body { max-height: none !important; overflow: visible !important; }
-  .dossier-entry { background: #fff !important; border-color: #999 !important; break-inside: avoid; }
-  .dossier-entry p, .dossier-entry small, .dossier-none { color: #333 !important; }
-  .dossier-group h3 { color: #000 !important; }
-  .tag-chip { color: #000 !important; }
-}
-
 /* ---- Étape 5 : Stage 01 Benchmark ---- */
 .bench-sub { color: var(--muted-foreground); font-size: 16px; margin: -4px 0 0; }
 .bench-question { margin: 28px 0 0; font-size: 15px; line-height: 1.6; max-width: 70ch; }

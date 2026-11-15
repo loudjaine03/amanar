@@ -3,6 +3,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import {
   ArrowRight,
   Brain,
+  FileText,
   Gem,
   Globe2,
   MapPin,
@@ -18,15 +19,14 @@ import { TagChip } from "./TagChip";
 import { useMissionStore, type AreaKind } from "@/lib/mission-store";
 import {
   GOALS,
-  pickSpots,
+  reachableSpots,
   runPlan,
   type Goal,
   type PlanInput,
   type SiteOutcome,
-  type Spot,
 } from "@/lib/plan";
 import { loadTwinModel, predictCell, type TwinModel } from "@/lib/twins";
-import { isReachable, loadGrid, reachableFrom, type GridFile } from "@/lib/stage3";
+import { loadGrid, type GridFile } from "@/lib/stage3";
 import type { LatLon } from "@/lib/geo";
 import { fmt } from "@/lib/format";
 import { TARGETS, type GeoLevel, type Waypoint } from "@/types/mission";
@@ -120,29 +120,11 @@ export function Plan() {
     };
   }, [gridUrl, grids]);
   const reach = useMemo(() => {
-    if (!top0 || !data || !result) return null;
+    if (!data || !result || !model || model === "error") return null;
     const g = gridUrl ? grids[gridUrl] : undefined;
-    if (!g || g === "missing")
-      return { spots: top0.spots.slice(0, 3), landing: null, checked: false };
-    const limit = result.input.slopeLimit;
-    const si = model && model !== "error" ? model.file.site_order.indexOf(top0.id) : -1;
-    if (si < 0 || !model || model === "error") return null;
-    const rvLanding = data.targets[result.input.target].sites[top0.id].rover?.landing ?? null;
-    const fb = result.fallback[si] ?? false;
-    const starts = [
-      ...(rvLanding ? [rvLanding] : []),
-      ...pickSpots(model, result.hits, si, fb, 6).map((sp) => sp.coords),
-    ];
-    let best: { start: LatLon; ok: Spot[] } | null = null;
-    for (const st of starts) {
-      const mask = reachableFrom(g, limit, st);
-      if (!mask.some((v) => v === 1)) continue;
-      const ok = pickSpots(model, result.hits, si, fb, 3, (_, p) => isReachable(g, mask, p));
-      if (!best || ok.length > best.ok.length) best = { start: st, ok };
-      if (ok.length === 3) break;
-    }
-    return { spots: best?.ok ?? [], landing: best?.start ?? null, checked: true };
-  }, [top0, data, result, gridUrl, grids, model]);
+    if (g === undefined) return reachableSpots(model, data, result, null);
+    return reachableSpots(model, data, result, g === "missing" ? null : g);
+  }, [data, result, gridUrl, grids, model]);
 
   if (!data || model === null) {
     return (
@@ -407,6 +389,11 @@ export function Plan() {
                           Materials, safety and tests at this site <ArrowRight />
                         </Link>
                       </Button>
+                      <Button variant="instrument" asChild>
+                        <Link to="/report">
+                          <FileText /> Export results (PDF)
+                        </Link>
+                      </Button>
                     </div>
                   </>
                 ) : (
@@ -441,9 +428,9 @@ export function Plan() {
                     <dl className="plan-facts">
                       <dt>Usable ground</dt>
                       <dd>{o.usable}%</dd>
-                      <dt>Rocks</dt>
+                      <dt>Geology (lit.)</dt>
                       <dd>{ROCK_WORD[o.geology]}</dd>
-                      <dt>Radar finds</dt>
+                      <dt>Radar anomalies</dt>
                       <dd>{o.radarKm2 >= 0.1 ? `${o.radarKm2} km²` : "none"}</dd>
                       <dt>{MONTHS[s.month - 1]} heat</dt>
                       <dd data-bad={o.monthOk === false}>

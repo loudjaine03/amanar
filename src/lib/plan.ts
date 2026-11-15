@@ -14,6 +14,7 @@ import {
   type TwinModel,
 } from "./twins";
 import type { LatLon } from "./geo";
+import { isReachable, reachableFrom, type GridFile } from "./stage3";
 
 export type Goal = "drive" | "rocks" | "radar" | "crew";
 
@@ -25,8 +26,8 @@ export const GOALS: Record<Goal, { label: string; short: string; rule: string }>
   },
   rocks: {
     label: "Rock and soil science",
-    short: "Rocks",
-    rule: "Sites are ordered by how well their rocks match the target (published geology), then by terrain twins.",
+    short: "Geology",
+    rule: "Sites are ordered by the literature-based geological correspondence (processes and setting, not rock chemistry), then by terrain twins.",
   },
   radar: {
     label: "Radar under dry cover",
@@ -308,15 +309,15 @@ function reasonsFor(o: SiteOutcome, input: PlanInput, title: string): string[] {
   if (input.goal === "rocks")
     r.push(
       o.geology === "match"
-        ? "Rocks match the target (published geology)."
+        ? "Geology matches the target's processes and setting (literature-based)."
         : o.geology === "partial"
-          ? "Rocks partly match the target (published geology)."
-          : "Rocks do not match the target (published geology).",
+          ? "Geology partly matches the target (literature-based)."
+          : "Geology does not match the target (literature-based).",
     );
   if (input.goal === "radar")
     r.push(
       o.radarKm2 >= 0.1
-        ? `${o.radarKm2} km² of radar hotspots passed all four checks.`
+        ? `${o.radarKm2} km² of radar anomalies passed all four checks (unverified candidates).`
         : "No radar hotspot large enough passed all four checks.",
     );
   if (input.goal === "crew" || o.monthOk === false)
@@ -324,8 +325,46 @@ function reasonsFor(o: SiteOutcome, input: PlanInput, title: string): string[] {
       o.tmax === null
         ? "No temperature data for this month."
         : o.monthOk
-          ? `Hottest days in month ${input.month} reach ${o.tmax}°C: under your ${input.heatLimit}°C limit.`
-          : `Hottest days in month ${input.month} reach ${o.tmax}°C: above your ${input.heatLimit}°C limit.`,
+          ? `Average daily maximum in month ${input.month}: ${o.tmax}°C, under your ${input.heatLimit}°C limit (climate average, not a forecast).`
+          : `Average daily maximum in month ${input.month}: ${o.tmax}°C, above your ${input.heatLimit}°C limit (climate average, not a forecast).`,
     );
   return r;
+}
+
+export interface Reach {
+  spots: Spot[];
+  landing: LatLon | null;
+  /** False when the slope grid was not available: spots are then not checked for reachability. */
+  checked: boolean;
+}
+
+/** The first site's spots that a rover can reach on the 125 m slope grid under the slope limit
+ *  (flood fill with the A* planner's rule). Tries the pipeline's landing point, then the best spots. */
+export function reachableSpots(
+  m: TwinModel,
+  data: MissionData,
+  result: PlanResult,
+  grid: GridFile | null,
+): Reach | null {
+  const top = result.sites[0];
+  if (!top || top.excluded) return null;
+  if (!grid) return { spots: top.spots.slice(0, 3), landing: null, checked: false };
+  const si = m.file.site_order.indexOf(top.id);
+  if (si < 0) return null;
+  const limit = result.input.slopeLimit;
+  const rvLanding = data.targets[result.input.target].sites[top.id].rover?.landing ?? null;
+  const fb = result.fallback[si] ?? false;
+  const starts = [
+    ...(rvLanding ? [rvLanding] : []),
+    ...pickSpots(m, result.hits, si, fb, 6).map((sp) => sp.coords),
+  ];
+  let best: { start: LatLon; ok: Spot[] } | null = null;
+  for (const st of starts) {
+    const mask = reachableFrom(grid, limit, st);
+    if (!mask.some((v) => v === 1)) continue;
+    const ok = pickSpots(m, result.hits, si, fb, 3, (_, p) => isReachable(grid, mask, p));
+    if (!best || ok.length > best.ok.length) best = { start: st, ok };
+    if (ok.length === 3) break;
+  }
+  return { spots: best?.ok ?? [], landing: best?.start ?? null, checked: true };
 }

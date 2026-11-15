@@ -116,3 +116,20 @@ describe("plan (src/lib/plan.ts)", () => {
     void ww;
   });
 });
+
+describe("reachable spots (Plan page and PDF report)", () => {
+  it("every kept spot can be driven to from the chosen start under the slope limit", async () => {
+    const { reachableSpots } = await import("@/lib/plan");
+    const { parseGrid, planRoute } = await import("@/lib/stage3");
+    for (const tid of TARGETS) {
+      const r = runPlan(m, data, { ...base, target: tid, slopeLimit: 15 });
+      const top = r.sites[0]!;
+      const g = parseGrid(JSON.parse(readFileSync(`public${data.sites[top.id].grid}`, "utf8")))!;
+      const reach = reachableSpots(m, data, r, g)!;
+      expect(reach.checked).toBe(true);
+      expect(reach.spots.length).toBeGreaterThan(0);
+      for (const sp of reach.spots)
+        expect(planRoute(g, 15, reach.landing!, [sp.coords]).ok).toBe(true);
+    }
+  });
+});

@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Download, ExternalLink, Gem, Mountain, Radar } from "lucide-react";
+import { ArrowRight, Download, ExternalLink, Gem, Mountain, Radar, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DataGate, useMissionData } from "./MissionShell";
 import { TagChip } from "./TagChip";
@@ -52,8 +52,9 @@ export function Compare() {
         <strong>{t.headline}</strong>
         <span>
           Terrain is <TagChip tag="Measured" source={t.dem.source} /> from real{" "}
-          {t.body === "moon" ? "Moon" : "Mars"} elevation data; rocks are{" "}
-          <TagChip tag="Reference" /> from published geology.
+          {t.body === "moon" ? "Moon" : "Mars"} elevation data; geology is{" "}
+          <TagChip tag="Reference" /> a team reading of published studies (processes and setting,
+          not rock chemistry).
         </span>
       </div>
 
@@ -67,7 +68,7 @@ export function Compare() {
         </div>
         <div className="pick">
           <Gem />
-          <small>Rock science</small>
+          <small>Geology (literature)</small>
           <b>{name(t.picks.rocks.site)}</b>
           <p>{t.picks.rocks.why}</p>
         </div>
@@ -79,7 +80,16 @@ export function Compare() {
         </div>
       </div>
 
-      <h2 className="block-title">Ranking by terrain match</h2>
+      <h2 className="block-title">Ranking by terrain overlap score</h2>
+      <p className="note">
+        A morphometric score: how much the spread of six elevation-derived measures at each site
+        overlaps the target&apos;s (0 = nothing in common, 100 = identical). It is not a percentage
+        of overall or geological similarity, and it compares each measure&apos;s spread, not how the
+        terrain is arranged.{" "}
+        {t.ranking.every((id) => t.sites[id].score < 65)
+          ? "None of the three reaches the close band (65): all are moderate or poor, so read the first place as the highest-scoring of three candidates, not a close analog."
+          : ""}
+      </p>
       <div className="rank-list">
         {t.ranking.map((id, i) => {
           const r = t.sites[id];
@@ -155,12 +165,13 @@ export function Compare() {
 
       <h2 className="block-title">Machine-learning twin map: which site matches each part?</h2>
       <p className="note">
-        A nearest-neighbour model (k = {tw.k}) learns the six terrain measures of every 400 m cell
-        of the three Algerian boxes. It then looks at each cell of the whole{" "}
-        {t.body === "moon" ? "Moon" : "Mars"} map ({tw.area_km[0]} × {tw.area_km[1]} km) and finds
-        its {tw.k} closest Earth twins <TagChip tag="Measured" source={t.dem.source} />. Nothing is
-        decided by hand: the site that owns most twins colours the cell; cells with no close twin on
-        Earth stay dark.
+        A nearest-neighbour terrain-twin model (k = {tw.k}) learns the six terrain measures of every
+        400 m cell of the three Algerian boxes, labelled by site. It then looks at each cell of the
+        whole {t.body === "moon" ? "Moon" : "Mars"} map ({tw.area_km[0]} × {tw.area_km[1]} km) and
+        finds its {tw.k} closest Earth cells <TagChip tag="Measured" source={t.dem.source} />: the
+        site that owns most of them colours the cell. It can only choose among these three sites.
+        Cells farther than a heuristic cutoff from every Earth cell stay dark (&ldquo;no close
+        twin&rdquo;) <TagChip tag="Judgement" />.
       </p>
       <div className="zone-wrap">
         <figure className="zone-fig">
@@ -205,7 +216,9 @@ export function Compare() {
             <small>How far to trust it</small>
             <p>
               <b>{tw.site_recognition}%</b> of Earth test blocks are given back to the right site
-              when the model is trained without them (4 km spatial cross-validation).
+              when the model is trained without them (4 km spatial cross-validation). This checks
+              that it can tell the three sites apart; it is not an accuracy for Mars or Moon
+              analogues, which have no ground truth.
             </p>
             <p>
               Shares move by <b>at most {tw.max_change} points</b> when we train on other sets of
@@ -218,8 +231,8 @@ export function Compare() {
             </p>
           </div>
           <p className="map-caption">
-            Ground types are named from the slope of the cells each site owns{" "}
-            <TagChip tag="Judgement" />.
+            Terrain classes are ordered by the slope of the cells each site owns; they are not
+            detected geological units <TagChip tag="Judgement" />. {t.zone_context}
           </p>
         </div>
       </div>
@@ -291,8 +304,12 @@ export function Compare() {
         </table>
       </div>
       <p className="note">
-        Terrain match = the average overlap of the six distributions (0 = nothing in common, 100 =
-        identical). Bands: 65+ close, 45–64 moderate, under 45 poor <TagChip tag="Judgement" />.
+        Terrain overlap score = the average overlap of the six distributions (0 = nothing in common,
+        100 = identical). The six measures are weighted equally: four fine-scale, two
+        landscape-scale; several are correlated because they come from the same elevation data.
+        Bands: 65+ close, 45–64 moderate, under 45 poor, set by the team, not an external standard{" "}
+        <TagChip tag="Judgement" />. Fine-scale measures come from DEMs of 20, 25–30 and 40 m, so
+        the 400 m landscape measures compare most directly.
       </p>
 
       <div className="two-col">
@@ -304,7 +321,7 @@ export function Compare() {
             {fmtNum(t.dem.elev_max_m, "m", 0)}. {demCheck}
           </p>
           <p className="panel-text">
-            Rocks there: {t.rocks.text} <TagChip tag="Reference" source={t.rocks.source} />
+            Geology there: {t.rocks.text} <TagChip tag="Reference" source={t.rocks.source} />
           </p>
           <p className="panel-links">
             <a href={t.dem.product_url} target="_blank" rel="noreferrer">
@@ -331,6 +348,11 @@ export function Compare() {
         <Button variant="mission" asChild>
           <Link to="/site" onClick={() => setSite(winner)}>
             Step 3: open {name(winner)} <ArrowRight />
+          </Link>
+        </Button>
+        <Button variant="instrument" asChild>
+          <Link to="/report">
+            <FileText /> Results report (PDF)
           </Link>
         </Button>
         <Button variant="instrument" onClick={download}>
