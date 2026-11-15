@@ -1,8 +1,15 @@
 # Amanar · Algeria Beyond Earth (Team Hoggar)
 
-NASA Space Apps Challenge 2026, Boumerdes. Challenge: _Identify Earth locations that analog the permanent Moon base locations and Mars._
 
-_Amanar_ is the Tuareg name for Orion, "the guide" of desert nights.
+Amanar is a mission-oriented terrestrial analogue assessment platform designed to identify promising Algerian environments for rehearsing selected Mars and Moon exploration activities.
+
+Using real elevation datasets from Earth, Mars and the Moon, Amanar applies a common set of terrain measurements to compare three selected Algerian study areas: the Ahnet Basin, Tassili n'Ajjer and Hoggar (Atakor).
+
+Its workflow combines quantitative terrain-distribution matching, a nearest-neighbour terrain model, literature-based geological assessment and exploratory L-band radar anomaly screening. The platform then translates these findings into mission-specific testing recommendations, preliminary field-condition assessments and digital rover-traverse rehearsals.
+
+The results demonstrate that no single terrestrial environment reproduces an entire planetary landscape. Instead, different Algerian locations may provide complementary environments for investigating geological processes, testing equipment and rehearsing exploration operations.
+
+Amanar is an experimental decision-support prototype. Its results identify candidate testing environments, not validated equivalents of Martian or lunar conditions. Ground verification and additional geological, environmental and operational data remain necessary.
 
 **Which of three Algerian desert sites is the best place on Earth to rehearse a given Mars or Moon mission task?** We measure terrain: the same six elevation-derived measures are computed on **real Mars and Moon elevation data** and on three Sahara pilot sites; a nearest-neighbour **terrain-twin model** finds which site holds the closest terrain profile for each part of the target; the geology is compared from published studies; and an L-band radar model screens for anomalies worth a subsurface survey.
 
