@@ -1,0 +1,3111 @@
+{
+  "meta": {
+    "mock": false,
+    "generated": "2026-11-14T23:36+00:00",
+    "sources": [
+      {
+        "id": "cop_dem",
+        "name": "Copernicus DEM GLO-30 (ESA)",
+        "url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_DEM_GLO30"
+      },
+      {
+        "id": "palsar2",
+        "name": "JAXA ALOS-2 PALSAR-2 yearly mosaic (L-band)",
+        "url": "https://developers.google.com/earth-engine/datasets/catalog/JAXA_ALOS_PALSAR_YEARLY_SAR_EPOCH"
+      },
+      {
+        "id": "sentinel1",
+        "name": "ESA Sentinel-1 GRD (C-band)",
+        "url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S1_GRD"
+      },
+      {
+        "id": "sentinel2",
+        "name": "ESA Sentinel-2 SR (optical)",
+        "url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED"
+      },
+      {
+        "id": "nasa_power",
+        "name": "NASA POWER climatology (T2M_MAX, T2M_MIN, PRECTOTCORR)",
+        "url": "https://power.larc.nasa.gov/docs/services/api/temporal/climatology/"
+      },
+      {
+        "id": "trek",
+        "name": "NASA Mars Trek and Moon Trek",
+        "url": "https://trek.nasa.gov/"
+      },
+      {
+        "id": "mars2020",
+        "name": "NASA Science: Perseverance view of the delta in Jezero Crater",
+        "url": "https://science.nasa.gov/resource/perseverance-view-of-the-delta-in-jezero-crater/"
+      },
+      {
+        "id": "msl_lakes",
+        "name": "NASA JPL: Curiosity rover team confirms ancient lakes on Mars (2015)",
+        "url": "https://www.jpl.nasa.gov/news/nasas-curiosity-rover-team-confirms-ancient-lakes-on-mars/"
+      },
+      {
+        "id": "msl_sharp",
+        "name": "NASA JPL: Curiosity finds clues to how water helped shape Martian landscape (2014)",
+        "url": "https://www.jpl.nasa.gov/news/nasas-curiosity-rover-finds-clues-to-how-water-helped-shape-martian-landscape/"
+      },
+      {
+        "id": "lroc_pit",
+        "name": "LROC (NASA/GSFC/ASU): Marius Hills pit, lava tube skylight?",
+        "url": "https://lroc.im-ldi.com/images/202"
+      },
+      {
+        "id": "lroc_marius",
+        "name": "LROC (NASA/GSFC/ASU): Diversity of basaltic lunar volcanism, Marius Hills",
+        "url": "https://lroc.im-ldi.com/images/702"
+      },
+      {
+        "id": "ahnet_epsc",
+        "name": "Caddeo et al. (2025), Water in the Ahnet Basin as a Mars analog, EPSC-DPS2025-1671",
+        "url": "https://meetingorganizer.copernicus.org/EPSC-DPS2025/EPSC-DPS2025-1671.html"
+      },
+      {
+        "id": "atakor",
+        "name": "Azzouni-Sekkal et al. (2007), Cenozoic alkaline volcanism of the Atakor massif, GSA Special Paper 418",
+        "url": "https://www.africamuseum.be/publication_docs/Azzouni-Sekkal-2007-GSASP-Atakor-volcanism.pdf"
+      },
+      {
+        "id": "sir_a",
+        "name": "Radar penetration of dry sand: SIR-A buried channels (Smithsonian repository)",
+        "url": "https://repository.si.edu/server/api/core/bitstreams/108399f3-14f6-4c8d-950f-8f83cbcd7bd3/content"
+      },
+      {
+        "id": "ice_mapper",
+        "name": "International Mars Ice Mapper concept (EGU24 abstract)",
+        "url": "https://meetingorganizer.copernicus.org/EGU24/EGU24-10754.html"
+      },
+      {
+        "id": "astropy",
+        "name": "Earth-Mars distance on 14 Nov 2026, computed with astropy",
+        "url": "https://www.astropy.org/"
+      },
+      {
+        "id": "moon_facts",
+        "name": "NASA NSSDC Moon fact sheet (mean Earth-Moon distance)",
+        "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html"
+      },
+      {
+        "id": "nssdc_mars",
+        "name": "NASA NSSDC Mars fact sheet (pressure, temperature, gravity)",
+        "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html"
+      },
+      {
+        "id": "nssdc_moon",
+        "name": "NASA NSSDC Moon fact sheet (pressure, temperature, gravity)",
+        "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html"
+      },
+      {
+        "id": "msl_wheels",
+        "name": "NASA JPL: Curiosity wheel wear status (wheels 50 cm diameter, 40 cm wide, milled aluminium)",
+        "url": "https://www.jpl.nasa.gov/images/pia20334-routine-inspection-of-rover-wheel-wear-and-tear/"
+      },
+      {
+        "id": "scarecrow",
+        "name": "NASA JPL: Mojave Desert tests with the Scarecrow rover (2012)",
+        "url": "https://www.jpl.nasa.gov/news/mojave-desert-tests-prepare-for-nasa-mars-roving/"
+      },
+      {
+        "id": "glenn_tire",
+        "name": "ASME: NASA Glenn superelastic nickel-titanium tire",
+        "url": "https://www.asme.org/topics-resources/content/nasas-alien-tire"
+      },
+      {
+        "id": "insight_dust",
+        "name": "Space.com: InSight mission ends after dust covers its solar panels (2022)",
+        "url": "https://www.space.com/nasa-mars-insight-lander-mission-ends"
+      },
+      {
+        "id": "lunar_dust",
+        "name": "NASA TM-2010-216781: abrasion testing with lunar dust simulants (Apollo visor scratches, suit seal leaks)",
+        "url": "https://ntrs.nasa.gov/citations/20100033103"
+      },
+      {
+        "id": "isa",
+        "name": "Air pressure estimated from elevation with the standard atmosphere formula",
+        "url": null
+      },
+      {
+        "id": "ml",
+        "name": "Team Hoggar models (pipeline/build_all.py, scikit-learn)",
+        "url": null
+      },
+      {
+        "id": "team",
+        "name": "Team Hoggar planning assumption",
+        "url": null
+      }
+    ],
+    "tags": {
+      "Measured": "Computed by our scripts from an identified dataset",
+      "Interpreted": "Our reading of a pattern, or our judgement",
+      "Hypothesis": "Must be checked in the field",
+      "Reference": "Established fact from a cited source, not computed by us"
+    },
+    "ml": {
+      "surprise_r2_block_cv": 0.93,
+      "surprise_r2_leave_one_site_out": {
+        "ahnet": -2.937,
+        "tassili": 0.538,
+        "hoggar": 0.374
+      },
+      "units": 6,
+      "cells": 7500,
+      "cell_size_m": 400
+    }
+  },
+  "scenarios": {
+    "mars_water": {
+      "id": "mars_water",
+      "title": "Follow the lost water",
+      "short": "Mars · Jezero",
+      "body": "mars",
+      "question": "Which Algerian setting can help investigate an ancient river-to-lake system like Jezero's?",
+      "default_objective": "water",
+      "delay": {
+        "one_way_s": 660,
+        "label": "about 11 min one way (197.5 million km on 14 Nov 2026)",
+        "tag": "Measured",
+        "source": "astropy"
+      },
+      "planet_target": {
+        "name": "Jezero Crater, western delta",
+        "body": "mars",
+        "tiles": "https://trek.nasa.gov/tiles/Mars/EQ/Mars_MOLA_blend200ppx_HRSC_ClrShade_clon0dd_200mpp_lzw/1.0.0/default/default028mm/{z}/{y}/{x}.jpg",
+        "center": [
+          18.44,
+          77.45
+        ],
+        "zoom": 6,
+        "specs": [
+          {
+            "key": "slope",
+            "label": "Slope",
+            "value": "< 5° on the basin floor",
+            "tag": "Interpreted",
+            "source": "trek"
+          },
+          {
+            "key": "landform",
+            "label": "Landform",
+            "value": "Delta fan with a feeder channel",
+            "tag": "Interpreted",
+            "source": "mars2020"
+          },
+          {
+            "key": "cover",
+            "label": "Surface cover",
+            "value": "Layered fine sediment",
+            "tag": "Interpreted",
+            "source": "mars2020"
+          },
+          {
+            "key": "dryness",
+            "label": "Dryness",
+            "value": "Hyper-arid",
+            "tag": "Interpreted",
+            "source": "mars2020"
+          }
+        ]
+      },
+      "rules": {
+        "Terrain & slope": "Mean slope: 5° or less = 3, 10° or less = 2, 15° or less = 1, else 0.",
+        "Surface materials": "River, lake or evaporite sediments = 3, water-carved sandstone = 2, volcanic or crystalline rock = 0.",
+        "Dryness": "Annual rain (NASA POWER): under 20 mm = 3, under 50 = 2, under 100 = 1, else 0.",
+        "Subsurface structures": "Share of the box where L-band is brighter than the surface predicts (radar surprise z > 2, our ML model). Best site = 3, others scaled.",
+        "Temperature extremes": "Average monthly swing (T2M_MAX - T2M_MIN) of 15 °C or more = 2, else 1. Capped at 2: no Earth site reaches Mars or Moon extremes.",
+        "Access for operations": "Hub under 250 km straight-line, then share of box under 15°: over 90 % = 3, over 75 % = 2, else 1. Hub 250 km or more = 0."
+      },
+      "weighting": "Terrain & slope and Surface materials count double (they define the analogy); the other four axes count once. Maximum 24.",
+      "candidates": [
+        {
+          "id": "ahnet",
+          "name": "Ahnet Basin",
+          "role": "case study",
+          "verdict": "STRONGEST",
+          "verdict_reason": "Scored 22/24: highest of the 3 sites.",
+          "bounds": [
+            [
+              26.09988,
+              2.19997
+            ],
+            [
+              26.28021,
+              2.40007
+            ]
+          ],
+          "layers": {
+            "optical": "/overlays/ahnet_optical.png",
+            "c_band": "/overlays/ahnet_cband.png",
+            "l_band": "/overlays/ahnet_lband.png",
+            "classes": "/overlays/ahnet_classes.png",
+            "anomalies": "/overlays/ahnet_anomalies.png",
+            "slope": "/overlays/ahnet_slope.png",
+            "surprise": "/overlays/ahnet_surprise.png"
+          },
+          "metrics": [
+            {
+              "key": "mean_slope",
+              "label": "Mean slope",
+              "value": 1.21,
+              "unit": "°",
+              "tag": "Measured",
+              "source": "cop_dem"
+            },
+            {
+              "key": "relief",
+              "label": "Relief (5th to 95th percentile height)",
+              "value": 55.3,
+              "unit": "m",
+              "tag": "Measured",
+              "source": "cop_dem"
+            },
+            {
+              "key": "steep_share",
+              "label": "Share of box steeper than 15°",
+              "value": 0.05,
+              "unit": "% of area",
+              "tag": "Measured",
+              "source": "cop_dem"
+            },
+            {
+              "key": "anomalies",
+              "label": "Radar-surprise hotspots (z > 2)",
+              "value": 2.69,
+              "unit": "% of area",
+              "tag": "Measured",
+              "source": "ml"
+            },
+            {
+              "key": "roughness",
+              "label": "Rock roughness (height variation over 125 m)",
+              "value": 0.66,
+              "unit": "m",
+              "tag": "Measured",
+              "source": "cop_dem"
+            },
+            {
+              "key": "elevation",
+              "label": "Mean elevation",
+              "value": 248.0,
+              "unit": "m",
+              "tag": "Measured",
+              "source": "cop_dem"
+            }
+          ],
+          "fingerprint": [
+            {
+              "axis": "Terrain & slope",
+              "target": 3,
+              "weight": 2,
+              "site": 3,
+              "tag": "Measured",
+              "basis": "mean slope 1.21°"
+            },
+            {
+              "axis": "Surface materials",
+              "target": 3,
+              "weight": 2,
+              "site": 3,
+              "tag": "Interpreted",
+              "basis": "Alluvial, evaporitic and aeolian deposits linked to a former valley network",
+              "source": "ahnet_epsc"
+            },
+            {
+              "axis": "Dryness",
+              "target": 3,
+              "site": 2,
+              "tag": "Measured",
+              "basis": "22.5 mm of rain per year",
+              "weight": 1
+            },
+            {
+              "axis": "Subsurface structures",
+              "target": 3,
+              "site": 3,
+              "tag": "Measured",
+              "basis": "2.69 % of the box are radar-surprise hotspots",
+              "weight": 1
+            },
+            {
+              "axis": "Temperature extremes",
+              "target": 3,
+              "site": 2,
+              "tag": "Measured",
+              "basis": "average monthly swing 32.0 °C",
+              "weight": 1
+            },
+            {
+              "axis": "Access for operations",
+              "target": 3,
+              "site": 3,
+              "tag": "Measured",
+              "basis": "112.6 km to In Salah, 100.0 % under 15°",
+              "weight": 1
+            }
+          ],
+          "anomalies": [
+            {
+              "id": "H1",
+              "coords": [
+                26.2138,
+                2.2404
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +3.3, about 1.10 km²). Candidate only.",
+              "tag": "Interpreted"
+            },
+            {
+              "id": "H2",
+              "coords": [
+                26.2582,
+                2.2742
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +3.3, about 0.58 km²). Candidate only.",
+              "tag": "Interpreted"
+            },
+            {
+              "id": "H3",
+              "coords": [
+                26.1785,
+                2.241
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +2.6, about 0.60 km²). Candidate only.",
+              "tag": "Interpreted"
+            },
+            {
+              "id": "H4",
+              "coords": [
+                26.2698,
+                2.2148
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +2.7, about 0.51 km²). Candidate only.",
+              "tag": "Interpreted"
+            },
+            {
+              "id": "H5",
+              "coords": [
+                26.1984,
+                2.2515
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +3.0, about 0.39 km²). Candidate only.",
+              "tag": "Interpreted"
+            }
+          ],
+          "transfers": [
+            {
+              "text": "Alluvial fans, valley networks and sabkha deposits from a wet-to-arid transition, already proposed as a Mars analog",
+              "tag": "Reference",
+              "source": "ahnet_epsc"
+            },
+            {
+              "text": "L-band radar sees through thin, very dry cover",
+              "tag": "Reference",
+              "source": "sir_a"
+            },
+            {
+              "text": "Slope-aware rover routing on low-gradient ground",
+              "tag": "Interpreted"
+            }
+          ],
+          "breaks": [
+            {
+              "text": "Earth gravity 1 g vs Mars 0.38 g",
+              "tag": "Reference"
+            },
+            {
+              "text": "Thick Earth atmosphere vs thin Martian atmosphere",
+              "tag": "Reference"
+            },
+            {
+              "text": "Different radiation environment (Earth's magnetic field and atmosphere shield the surface)",
+              "tag": "Reference"
+            },
+            {
+              "text": "Quartz sand on Earth vs basaltic material on Mars",
+              "tag": "Interpreted"
+            },
+            {
+              "text": "Instrument gap: our L-band images are not what a Mars orbiter would measure",
+              "tag": "Reference",
+              "source": "ice_mapper"
+            }
+          ],
+          "rover": {
+            "grid": "/grids/ahnet_slope.json",
+            "slope_limit_deg": 15.0,
+            "landing": [
+              26.23344,
+              2.20435
+            ],
+            "waypoints": [
+              {
+                "id": "WP-01",
+                "coords": [
+                  26.2207,
+                  2.20998
+                ],
+                "title": "Flat, bright ground candidate",
+                "inspect": "Are the sediments here rounded and sorted, as flowing water leaves them?",
+                "tool": "Camera (like Mastcam-Z)",
+                "tag": "Hypothesis",
+                "why": "Picked by the Analog Finder (ancient water and sediments): mean slope lower than 97 % of cells; optical brightness in the top 1 % of cells."
+              },
+              {
+                "id": "WP-02",
+                "coords": [
+                  26.27119,
+                  2.23399
+                ],
+                "title": "Flat, radar-surprise ground candidate",
+                "inspect": "Is there coarse or layered material under the sand where L-band is bright?",
+                "tool": "Ground-penetrating radar (like RIMFAX)",
+                "tag": "Hypothesis",
+                "why": "Picked by the Analog Finder (ancient water and sediments): mean slope in the lowest 1 % of cells; radar surprise higher than 97 % of cells."
+              },
+              {
+                "id": "WP-03",
+                "coords": [
+                  26.11972,
+                  2.35405
+                ],
+                "title": "Flat, radar-surprise ground candidate",
+                "inspect": "Can a short core show fine, lake-like layers?",
+                "tool": "Sampling drill (like Perseverance's corer)",
+                "tag": "Hypothesis",
+                "why": "Picked by the Analog Finder (ancient water and sediments): mean slope in the lowest 1 % of cells; radar surprise in the top 1 % of cells."
+              }
+            ],
+            "route_km_default": 30.4
+          },
+          "earth_field_safety": {
+            "label": "Preliminary Earth field accessibility assessment",
+            "nearest_hub": {
+              "name": "In Salah",
+              "coords": [
+                27.19,
+                2.48
+              ],
+              "distance_km": 112.6
+            },
+            "monthly_tmax_c": [
+              36.2,
+              39.4,
+              40.1,
+              46.5,
+              47.7,
+              49.5,
+              50.4,
+              49.3,
+              47.0,
+              44.3,
+              38.2,
+              33.0
+            ],
+            "monthly_tmin_c": [
+              0.7,
+              -0.9,
+              4.2,
+              10.3,
+              15.8,
+              20.6,
+              24.5,
+              24.8,
+              18.1,
+              13.1,
+              6.8,
+              0.5
+            ],
+            "elevation_m": 248.0,
+            "air_pressure_kpa": 98.4,
+            "rain_mm_year": 22.5,
+            "daily_range_c": 32.0,
+            "assumptions": {
+              "heat_c": 40,
+              "slope_deg": 15.0,
+              "hub_km": 250
+            },
+            "source": "nasa_power"
+          }
+        },
+        {
+          "id": "tassili",
+          "name": "Tassili n'Ajjer",
+          "role": "comparison site",
+          "verdict": "PARTIAL",
+          "verdict_reason": "Scored 15/24: at least 50% of the target, but not the highest.",
+          "bounds": [
+            [
+              24.91994,
+              9.06984
+            ],
+            [
+              25.10005,
+              9.27016
+            ]
+          ],
+          "layers": {
+            "optical": "/overlays/tassili_optical.png",
+            "c_band": "/overlays/tassili_cband.png",
+            "l_band": "/overlays/tassili_lband.png",
+            "classes": "/overlays/tassili_classes.png",
+            "anomalies": "/overlays/tassili_anomalies.png",
+            "slope": "/overlays/tassili_slope.png",
+            "surprise": "/overlays/tassili_surprise.png"
+          },
+          "metrics": [
+            {
+              "key": "mean_slope",
+              "label": "Mean slope",
+              "value": 9.03,
+              "unit": "°",
+              "tag": "Measured",
+              "source": "cop_dem"
+            },
+            {
+              "key": "relief",
+              "label": "Relief (5th to 95th percentile height)",
+              "value": 288.3,
+              "unit": "m",
+              "tag": "Measured",
+              "source": "cop_dem"
+            },
+            {
+              "key": "steep_share",
+              "label": "Share of box steeper than 15°",
+              "value": 18.73,
+              "unit": "% of area",
+              "tag": "Measured",
+              "source": "cop_dem"
+            },
+            {
+              "key": "anomalies",
+              "label": "Radar-surprise hotspots (z > 2)",
+              "value": 0.69,
+              "unit": "% of area",
+              "tag": "Measured",
+              "source": "ml"
+            },
+            {
+              "key": "roughness",
+              "label": "Rock roughness (height variation over 125 m)",
+              "value": 5.48,
+              "unit": "m",
+              "tag": "Measured",
+              "source": "cop_dem"
+            },
+            {
+              "key": "elevation",
+              "label": "Mean elevation",
+              "value": 1608.0,
+              "unit": "m",
+              "tag": "Measured",
+              "source": "cop_dem"
+            }
+          ],
+          "fingerprint": [
+            {
+              "axis": "Terrain & slope",
+              "target": 3,
+              "weight": 2,
+              "site": 2,
+              "tag": "Measured",
+              "basis": "mean slope 9.03°"
+            },
+            {
+              "axis": "Surface materials",
+              "target": 3,
+              "weight": 2,
+              "site": 2,
+              "tag": "Interpreted",
+              "basis": "Sandstone plateau cut by dry valleys: water-carved, but rock rather than lake sediment",
+              "source": "team"
+            },
+            {
+              "axis": "Dryness",
+              "target": 3,
+              "site": 2,
+              "tag": "Measured",
+              "basis": "39.3 mm of rain per year",
+              "weight": 1
+            },
+            {
+              "axis": "Subsurface structures",
+              "target": 3,
+              "site": 1,
+              "tag": "Measured",
+              "basis": "0.69 % of the box are radar-surprise hotspots",
+              "weight": 1
+            },
+            {
+              "axis": "Temperature extremes",
+              "target": 3,
+              "site": 2,
+              "tag": "Measured",
+              "basis": "average monthly swing 30.7 °C",
+              "weight": 1
+            },
+            {
+              "axis": "Access for operations",
+              "target": 3,
+              "site": 2,
+              "tag": "Measured",
+              "basis": "60.0 km to Djanet, 81.3 % under 15°",
+              "weight": 1
+            }
+          ],
+          "anomalies": [
+            {
+              "id": "H1",
+              "coords": [
+                25.0033,
+                9.2161
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +3.1, about 0.71 km²). Candidate only.",
+              "tag": "Interpreted"
+            },
+            {
+              "id": "H2",
+              "coords": [
+                24.9682,
+                9.1302
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +3.1, about 0.20 km²). Candidate only.",
+              "tag": "Interpreted"
+            },
+            {
+              "id": "H3",
+              "coords": [
+                24.954,
+                9.2451
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +2.6, about 0.15 km²). Candidate only.",
+              "tag": "Interpreted"
+            },
+            {
+              "id": "H4",
+              "coords": [
+                25.0077,
+                9.1229
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +2.7, about 0.13 km²). Candidate only.",
+              "tag": "Interpreted"
+            },
+            {
+              "id": "H5",
+              "coords": [
+                25.0986,
+                9.1846
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +2.5, about 0.09 km²). Candidate only.",
+              "tag": "Interpreted"
+            }
+          ],
+          "transfers": [
+            {
+              "text": "Dry valleys cut by former flowing water",
+              "tag": "Interpreted"
+            },
+            {
+              "text": "L-band radar sees through thin, very dry cover",
+              "tag": "Reference",
+              "source": "sir_a"
+            },
+            {
+              "text": "Slope-aware rover routing on low-gradient ground",
+              "tag": "Interpreted"
+            }
+          ],
+          "breaks": [
+            {
+              "text": "Earth gravity 1 g vs Mars 0.38 g",
+              "tag": "Reference"
+            },
+            {
+              "text": "Thick Earth atmosphere vs thin Martian atmosphere",
+              "tag": "Reference"
+            },
+            {
+              "text": "Different radiation environment (Earth's magnetic field and atmosphere shield the surface)",
+              "tag": "Reference"
+            },
+            {
+              "text": "Quartz sand on Earth vs basaltic material on Mars",
+              "tag": "Interpreted"
+            },
+            {
+              "text": "Instrument gap: our L-band images are not what a Mars orbiter would measure",
+              "tag": "Reference",
+              "source": "ice_mapper"
+            }
+          ],
+          "rover": {
+            "grid": "/grids/tassili_slope.json",
+            "slope_limit_deg": 15.0,
+            "landing": [
+              25.01731,
+              9.13682
+            ],
+            "waypoints": [
+              {
+                "id": "WP-01",
+                "coords": [
+                  25.00819,
+                  9.12393
+                ],
+                "title": "Flat, radar-surprise ground candidate",
+                "inspect": "Are the sediments here rounded and sorted, as flowing water leaves them?",
+                "tool": "Camera (like Mastcam-Z)",
+                "tag": "Hypothesis",
+                "why": "Picked by the Analog Finder (ancient water and sediments): mean slope lower than 86 % of cells; radar surprise in the top 1 % of cells."
+              },
+              {
+                "id": "WP-02",
+                "coords": [
+                  24.99379,
+                  9.15598
+                ],
+                "title": "Flat, radar-surprise ground candidate",
+                "inspect": "Is there coarse or layered material under the sand where L-band is bright?",
+                "tool": "Ground-penetrating radar (like RIMFAX)",
+                "tag": "Hypothesis",
+                "why": "Picked by the Analog Finder (ancient water and sediments): mean slope lower than 66 % of cells; radar surprise higher than 95 % of cells."
+              },
+              {
+                "id": "WP-03",
+                "coords": [
+                  24.99739,
+                  9.19204
+                ],
+                "title": "Flat, bright ground candidate",
+                "inspect": "Can a short core show fine, lake-like layers?",
+                "tool": "Sampling drill (like Perseverance's corer)",
+                "tag": "Hypothesis",
+                "why": "Picked by the Analog Finder (ancient water and sediments): mean slope lower than 88 % of cells; optical brightness higher than 95 % of cells."
+              }
+            ],
+            "route_km_default": 9.5
+          },
+          "earth_field_safety": {
+            "label": "Preliminary Earth field accessibility assessment",
+            "nearest_hub": {
+              "name": "Djanet",
+              "coords": [
+                24.55,
+                9.48
+              ],
+              "distance_km": 60.0
+            },
+            "monthly_tmax_c": [
+              29.0,
+              32.4,
+              33.7,
+              38.2,
+              39.3,
+              40.9,
+              41.3,
+              40.1,
+              38.9,
+              35.3,
+              30.6,
+              29.3
+            ],
+            "monthly_tmin_c": [
+              -5.0,
+              -7.2,
+              -3.6,
+              3.2,
+              8.6,
+              14.2,
+              17.0,
+              17.5,
+              13.4,
+              6.8,
+              1.4,
+              -5.2
+            ],
+            "elevation_m": 1608.0,
+            "air_pressure_kpa": 83.4,
+            "rain_mm_year": 39.3,
+            "daily_range_c": 30.7,
+            "assumptions": {
+              "heat_c": 40,
+              "slope_deg": 15.0,
+              "hub_km": 250
+            },
+            "source": "nasa_power"
+          }
+        },
+        {
+          "id": "hoggar",
+          "name": "Hoggar (Atakor)",
+          "role": "comparison site",
+          "verdict": "WEAK",
+          "verdict_reason": "Scored 5/24: below 50% of the target.",
+          "bounds": [
+            [
+              23.21,
+              5.49994
+            ],
+            [
+              23.39011,
+              5.70004
+            ]
+          ],
+          "layers": {
+            "optical": "/overlays/hoggar_optical.png",
+            "c_band": "/overlays/hoggar_cband.png",
+            "l_band": "/overlays/hoggar_lband.png",
+            "classes": "/overlays/hoggar_classes.png",
+            "anomalies": "/overlays/hoggar_anomalies.png",
+            "slope": "/overlays/hoggar_slope.png",
+            "surprise": "/overlays/hoggar_surprise.png"
+          },
+          "metrics": [
+            {
+              "key": "mean_slope",
+              "label": "Mean slope",
+              "value": 13.57,
+              "unit": "°",
+              "tag": "Measured",
+              "source": "cop_dem"
+            },
+            {
+              "key": "relief",
+              "label": "Relief (5th to 95th percentile height)",
+              "value": 551.0,
+              "unit": "m",
+              "tag": "Measured",
+              "source": "cop_dem"
+            },
+            {
+              "key": "steep_share",
+              "label": "Share of box steeper than 15°",
+              "value": 36.83,
+              "unit": "% of area",
+              "tag": "Measured",
+              "source": "cop_dem"
+            },
+            {
+              "key": "anomalies",
+              "label": "Radar-surprise hotspots (z > 2)",
+              "value": 0.3,
+              "unit": "% of area",
+              "tag": "Measured",
+              "source": "ml"
+            },
+            {
+              "key": "roughness",
+              "label": "Rock roughness (height variation over 125 m)",
+              "value": 8.25,
+              "unit": "m",
+              "tag": "Measured",
+              "source": "cop_dem"
+            },
+            {
+              "key": "elevation",
+              "label": "Mean elevation",
+              "value": 2197.0,
+              "unit": "m",
+              "tag": "Measured",
+              "source": "cop_dem"
+            }
+          ],
+          "fingerprint": [
+            {
+              "axis": "Terrain & slope",
+              "target": 3,
+              "weight": 2,
+              "site": 1,
+              "tag": "Measured",
+              "basis": "mean slope 13.57°"
+            },
+            {
+              "axis": "Surface materials",
+              "target": 3,
+              "weight": 2,
+              "site": 0,
+              "tag": "Interpreted",
+              "basis": "Volcanic and crystalline rock: not a river-lake sediment setting",
+              "source": "atakor"
+            },
+            {
+              "axis": "Dryness",
+              "target": 3,
+              "site": 0,
+              "tag": "Measured",
+              "basis": "129.4 mm of rain per year",
+              "weight": 1
+            },
+            {
+              "axis": "Subsurface structures",
+              "target": 3,
+              "site": 0,
+              "tag": "Measured",
+              "basis": "0.3 % of the box are radar-surprise hotspots",
+              "weight": 1
+            },
+            {
+              "axis": "Temperature extremes",
+              "target": 3,
+              "site": 2,
+              "tag": "Measured",
+              "basis": "average monthly swing 28.2 °C",
+              "weight": 1
+            },
+            {
+              "axis": "Access for operations",
+              "target": 3,
+              "site": 1,
+              "tag": "Measured",
+              "basis": "57.3 km to Tamanrasset, 63.2 % under 15°",
+              "weight": 1
+            }
+          ],
+          "anomalies": [
+            {
+              "id": "H1",
+              "coords": [
+                23.3281,
+                5.6328
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +3.3, about 0.09 km²). Candidate only.",
+              "tag": "Interpreted"
+            },
+            {
+              "id": "H2",
+              "coords": [
+                23.2283,
+                5.5049
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +3.3, about 0.09 km²). Candidate only.",
+              "tag": "Interpreted"
+            },
+            {
+              "id": "H3",
+              "coords": [
+                23.2547,
+                5.5143
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +3.3, about 0.08 km²). Candidate only.",
+              "tag": "Interpreted"
+            },
+            {
+              "id": "H4",
+              "coords": [
+                23.2479,
+                5.6714
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +3.4, about 0.07 km²). Candidate only.",
+              "tag": "Interpreted"
+            },
+            {
+              "id": "H5",
+              "coords": [
+                23.256,
+                5.6762
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +3.5, about 0.06 km²). Candidate only.",
+              "tag": "Interpreted"
+            }
+          ],
+          "transfers": [
+            {
+              "text": "L-band radar sees through thin, very dry cover",
+              "tag": "Reference",
+              "source": "sir_a"
+            },
+            {
+              "text": "Slope-aware rover routing on low-gradient ground",
+              "tag": "Interpreted"
+            }
+          ],
+          "breaks": [
+            {
+              "text": "Earth gravity 1 g vs Mars 0.38 g",
+              "tag": "Reference"
+            },
+            {
+              "text": "Thick Earth atmosphere vs thin Martian atmosphere",
+              "tag": "Reference"
+            },
+            {
+              "text": "Different radiation environment (Earth's magnetic field and atmosphere shield the surface)",
+              "tag": "Reference"
+            },
+            {
+              "text": "Quartz sand on Earth vs basaltic material on Mars",
+              "tag": "Interpreted"
+            },
+            {
+              "text": "Instrument gap: our L-band images are not what a Mars orbiter would measure",
+              "tag": "Reference",
+              "source": "ice_mapper"
+            }
+          ],
+          "rover": {
+            "grid": "/grids/hoggar_slope.json",
+            "slope_limit_deg": 15.0,
+            "landing": [
+              23.30962,
+              5.6719
+            ],
+            "waypoints": [
+              {
+                "id": "WP-01",
+                "coords": [
+                  23.32347,
+                  5.66602
+                ],
+                "title": "Flat, radar-surprise ground candidate",
+                "inspect": "Are the sediments here rounded and sorted, as flowing water leaves them?",
+                "tool": "Camera (like Mastcam-Z)",
+                "tag": "Hypothesis",
+                "why": "Picked by the Analog Finder (ancient water and sediments): radar surprise higher than 69 % of cells; mean slope lower than 43 % of cells."
+              },
+              {
+                "id": "WP-02",
+                "coords": [
+                  23.29465,
+                  5.66602
+                ],
+                "title": "Flat, radar-surprise ground candidate",
+                "inspect": "Is there coarse or layered material under the sand where L-band is bright?",
+                "tool": "Ground-penetrating radar (like RIMFAX)",
+                "tag": "Hypothesis",
+                "why": "Picked by the Analog Finder (ancient water and sediments): radar surprise higher than 89 % of cells; mean slope lower than 59 % of cells."
+              },
+              {
+                "id": "WP-03",
+                "coords": [
+                  23.26223,
+                  5.66202
+                ],
+                "title": "Flat, radar-surprise ground candidate",
+                "inspect": "Can a short core show fine, lake-like layers?",
+                "tool": "Sampling drill (like Perseverance's corer)",
+                "tag": "Hypothesis",
+                "why": "Picked by the Analog Finder (ancient water and sediments): radar surprise higher than 79 % of cells; mean slope lower than 51 % of cells."
+              }
+            ],
+            "route_km_default": 9.5
+          },
+          "earth_field_safety": {
+            "label": "Preliminary Earth field accessibility assessment",
+            "nearest_hub": {
+              "name": "Tamanrasset",
+              "coords": [
+                22.79,
+                5.52
+              ],
+              "distance_km": 57.3
+            },
+            "monthly_tmax_c": [
+              29.5,
+              31.6,
+              32.3,
+              36.6,
+              38.1,
+              39.0,
+              39.7,
+              38.0,
+              36.4,
+              34.0,
+              30.5,
+              28.6
+            ],
+            "monthly_tmin_c": [
+              -4.9,
+              -5.3,
+              -2.4,
+              5.2,
+              8.9,
+              16.1,
+              17.9,
+              17.0,
+              15.0,
+              7.7,
+              3.4,
+              -2.5
+            ],
+            "elevation_m": 2197.0,
+            "air_pressure_kpa": 77.6,
+            "rain_mm_year": 129.4,
+            "daily_range_c": 28.2,
+            "assumptions": {
+              "heat_c": 40,
+              "slope_deg": 15.0,
+              "hub_km": 250
+            },
+            "source": "nasa_power"
+          }
+        }
+      ]
+    },
+    "mars_layers": {
+      "id": "mars_layers",
+      "title": "Read the layered rocks",
+      "short": "Mars · Gale",
+      "body": "mars",
+      "question": "Which Algerian setting can rehearse a rover climbing through layered sedimentary rock, like Curiosity at Mount Sharp?",
+      "default_objective": "layers",
+      "delay": {
+        "one_way_s": 660,
+        "label": "about 11 min one way (197.5 million km on 14 Nov 2026)",
+        "tag": "Measured",
+        "source": "astropy"
+      },
+      "planet_target": {
+        "name": "Gale Crater, base of Mount Sharp",
+        "body": "mars",
+        "tiles": "https://trek.nasa.gov/tiles/Mars/EQ/Mars_MOLA_blend200ppx_HRSC_ClrShade_clon0dd_200mpp_lzw/1.0.0/default/default028mm/{z}/{y}/{x}.jpg",
+        "center": [
+          -4.7,
+          137.4
+        ],
+        "zoom": 6,
+        "specs": [
+          {
+            "key": "slope",
+            "label": "Slope",
+            "value": "Gentle crater floor rising onto the mound's lower slopes",
+            "tag": "Interpreted",
+            "source": "trek"
+          },
+          {
+            "key": "landform",
+            "label": "Landform",
+            "value": "A mound about 5 km high whose flanks expose hundreds of rock layers",
+            "tag": "Reference",
+            "source": "msl_sharp"
+          },
+          {
+            "key": "cover",
+            "label": "Surface cover",
+            "value": "Finely laminated mudstones laid down in ancient lakes",
+            "tag": "Reference",
+            "source": "msl_lakes"
+          },
+          {
+            "key": "dryness",
+            "label": "Dryness",
+            "value": "Hyper-arid today; the rocks record long-lived lakes",
+            "tag": "Reference",
+            "source": "msl_lakes"
+          }
+        ]
+      },
+      "rules": {
+        "Terrain & slope": "One point each for: relief 100 to 600 m, mean slope 3 to 12°, under 25 % of the box steeper than 15°.",
+        "Surface materials": "Thick layered sedimentary rock exposed = 3, layered sediments with little exposure = 2, volcanic or crystalline = 0.",
+        "Dryness": "Annual rain (NASA POWER): under 20 mm = 3, under 50 = 2, under 100 = 1, else 0.",
+        "Subsurface structures": "Share of the box where L-band is brighter than the surface predicts (radar surprise z > 2, our ML model). Best site = 3, others scaled.",
+        "Temperature extremes": "Average monthly swing (T2M_MAX - T2M_MIN) of 15 °C or more = 2, else 1. Capped at 2: no Earth site reaches Mars or Moon extremes.",
+        "Access for operations": "Hub under 250 km straight-line, then share of box under 15°: over 90 % = 3, over 75 % = 2, else 1. Hub 250 km or more = 0."
+      },
+      "weighting": "Terrain & slope and Surface materials count double (they define the analogy); the other four axes count once. Maximum 24.",
+      "candidates": [
+        {
+          "id": "ahnet",
+          "name": "Ahnet Basin",
+          "role": "comparison site",
+          "verdict": "PARTIAL",
+          "verdict_reason": "Scored 16/24: at least 50% of the target, but not the highest.",
+          "bounds": [
+            [
+              26.09988,
+              2.19997
+            ],
+            [
+              26.28021,
+              2.40007
+            ]
+          ],
+          "layers": {
+            "optical": "/overlays/ahnet_optical.png",
+            "c_band": "/overlays/ahnet_cband.png",
+            "l_band": "/overlays/ahnet_lband.png",
+            "classes": "/overlays/ahnet_classes.png",
+            "anomalies": "/overlays/ahnet_anomalies.png",
+            "slope": "/overlays/ahnet_slope.png",
+            "surprise": "/overlays/ahnet_surprise.png"
+          },
+          "metrics": [
+            {
+              "key": "mean_slope",
+              "label": "Mean slope",
+              "value": 1.21,
+              "unit": "°",
+              "tag": "Measured",
+              "source": "cop_dem"
+            },
+            {
+              "key": "relief",
+              "label": "Relief (5th to 95th percentile height)",
+              "value": 55.3,
+              "unit": "m",
+              "tag": "Measured",
+              "source": "cop_dem"
+            },
+            {
+              "key": "steep_share",
+              "label": "Share of box steeper than 15°",
+              "value": 0.05,
+              "unit": "% of area",
+              "tag": "Measured",
+              "source": "cop_dem"
+            },
+            {
+              "key": "anomalies",
+              "label": "Radar-surprise hotspots (z > 2)",
+              "value": 2.69,
+              "unit": "% of area",
+              "tag": "Measured",
+              "source": "ml"
+            },
+            {
+              "key": "roughness",
+              "label": "Rock roughness (height variation over 125 m)",
+              "value": 0.66,
+              "unit": "m",
+              "tag": "Measured",
+              "source": "cop_dem"
+            },
+            {
+              "key": "elevation",
+              "label": "Mean elevation",
+              "value": 248.0,
+              "unit": "m",
+              "tag": "Measured",
+              "source": "cop_dem"
+            }
+          ],
+          "fingerprint": [
+            {
+              "axis": "Terrain & slope",
+              "target": 3,
+              "weight": 2,
+              "site": 1,
+              "tag": "Measured",
+              "basis": "relief 55.3 m, mean slope 1.21°, 0.05 % over 15°"
+            },
+            {
+              "axis": "Surface materials",
+              "target": 3,
+              "weight": 2,
+              "site": 2,
+              "tag": "Interpreted",
+              "basis": "Folded sedimentary layers well exposed from above, but with little relief to climb",
+              "source": "ahnet_epsc"
+            },
+            {
+              "axis": "Dryness",
+              "target": 3,
+              "site": 2,
+              "tag": "Measured",
+              "basis": "22.5 mm of rain per year",
+              "weight": 1
+            },
+            {
+              "axis": "Subsurface structures",
+              "target": 3,
+              "site": 3,
+              "tag": "Measured",
+              "basis": "2.69 % of the box are radar-surprise hotspots",
+              "weight": 1
+            },
+            {
+              "axis": "Temperature extremes",
+              "target": 3,
+              "site": 2,
+              "tag": "Measured",
+              "basis": "average monthly swing 32.0 °C",
+              "weight": 1
+            },
+            {
+              "axis": "Access for operations",
+              "target": 3,
+              "site": 3,
+              "tag": "Measured",
+              "basis": "112.6 km to In Salah, 100.0 % under 15°",
+              "weight": 1
+            }
+          ],
+          "anomalies": [
+            {
+              "id": "H1",
+              "coords": [
+                26.2138,
+                2.2404
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +3.3, about 1.10 km²). Candidate only.",
+              "tag": "Interpreted"
+            },
+            {
+              "id": "H2",
+              "coords": [
+                26.2582,
+                2.2742
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +3.3, about 0.58 km²). Candidate only.",
+              "tag": "Interpreted"
+            },
+            {
+              "id": "H3",
+              "coords": [
+                26.1785,
+                2.241
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +2.6, about 0.60 km²). Candidate only.",
+              "tag": "Interpreted"
+            },
+            {
+              "id": "H4",
+              "coords": [
+                26.2698,
+                2.2148
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +2.7, about 0.51 km²). Candidate only.",
+              "tag": "Interpreted"
+            },
+            {
+              "id": "H5",
+              "coords": [
+                26.1984,
+                2.2515
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +3.0, about 0.39 km²). Candidate only.",
+              "tag": "Interpreted"
+            }
+          ],
+          "transfers": [
+            {
+              "text": "Reading a stack of layers on a slope, bottom to top, the way Curiosity climbs Mount Sharp",
+              "tag": "Interpreted",
+              "source": "msl_sharp"
+            },
+            {
+              "text": "Rover driving between outcrops on moderate slopes",
+              "tag": "Interpreted"
+            }
+          ],
+          "breaks": [
+            {
+              "text": "Earth gravity 1 g vs Mars 0.38 g",
+              "tag": "Reference"
+            },
+            {
+              "text": "Thick Earth atmosphere vs thin Martian atmosphere",
+              "tag": "Reference"
+            },
+            {
+              "text": "Different radiation environment (Earth's magnetic field and atmosphere shield the surface)",
+              "tag": "Reference"
+            },
+            {
+              "text": "Quartz-rich sandstone on Earth vs clay- and sulfate-bearing mudstone in Gale",
+              "tag": "Interpreted",
+              "source": "msl_lakes"
+            },
+            {
+              "text": "Instrument gap: our L-band images are not what a Mars orbiter would measure",
+              "tag": "Reference",
+              "source": "ice_mapper"
+            }
+          ],
+          "rover": {
+            "grid": "/grids/ahnet_slope.json",
+            "slope_limit_deg": 15.0,
+            "landing": [
+              26.12749,
+              2.24937
+            ],
+            "waypoints": [
+              {
+                "id": "WP-01",
+                "coords": [
+                  26.12693,
+                  2.23399
+                ],
+                "title": "Mid-slope outcrop zone candidate",
+                "inspect": "Which layer is at the bottom here, and does it change upslope?",
+                "tool": "Camera (like Mastcam)",
+                "tag": "Hypothesis",
+                "why": "Picked by the Analog Finder (layered rock and outcrop science): relief in the middle range (percentile 35); mean slope in the middle range (percentile 41)."
+              },
+              {
+                "id": "WP-02",
+                "coords": [
+                  26.10168,
+                  2.38606
+                ],
+                "title": "Mid-slope outcrop zone candidate",
+                "inspect": "What is each layer made of?",
+                "tool": "Laser spectrometer (like ChemCam)",
+                "tag": "Hypothesis",
+                "why": "Picked by the Analog Finder (layered rock and outcrop science): relief in the middle range (percentile 34); mean slope in the middle range (percentile 53)."
+              },
+              {
+                "id": "WP-03",
+                "coords": [
+                  26.26398,
+                  2.262
+                ],
+                "title": "Mid-slope outcrop zone candidate",
+                "inspect": "Is there a fine-grained, lake-like layer worth drilling?",
+                "tool": "Drill and mineral lab (like CheMin)",
+                "tag": "Hypothesis",
+                "why": "Picked by the Analog Finder (layered rock and outcrop science): relief in the middle range (percentile 37); mean slope in the middle range (percentile 40)."
+              }
+            ],
+            "route_km_default": 41.6
+          },
+          "earth_field_safety": {
+            "label": "Preliminary Earth field accessibility assessment",
+            "nearest_hub": {
+              "name": "In Salah",
+              "coords": [
+                27.19,
+                2.48
+              ],
+              "distance_km": 112.6
+            },
+            "monthly_tmax_c": [
+              36.2,
+              39.4,
+              40.1,
+              46.5,
+              47.7,
+              49.5,
+              50.4,
+              49.3,
+              47.0,
+              44.3,
+              38.2,
+              33.0
+            ],
+            "monthly_tmin_c": [
+              0.7,
+              -0.9,
+              4.2,
+              10.3,
+              15.8,
+              20.6,
+              24.5,
+              24.8,
+              18.1,
+              13.1,
+              6.8,
+              0.5
+            ],
+            "elevation_m": 248.0,
+            "air_pressure_kpa": 98.4,
+            "rain_mm_year": 22.5,
+            "daily_range_c": 32.0,
+            "assumptions": {
+              "heat_c": 40,
+              "slope_deg": 15.0,
+              "hub_km": 250
+            },
+            "source": "nasa_power"
+          }
+        },
+        {
+          "id": "tassili",
+          "name": "Tassili n'Ajjer",
+          "role": "case study",
+          "verdict": "STRONGEST",
+          "verdict_reason": "Scored 19/24: highest of the 3 sites.",
+          "bounds": [
+            [
+              24.91994,
+              9.06984
+            ],
+            [
+              25.10005,
+              9.27016
+            ]
+          ],
+          "layers": {
+            "optical": "/overlays/tassili_optical.png",
+            "c_band": "/overlays/tassili_cband.png",
+            "l_band": "/overlays/tassili_lband.png",
+            "classes": "/overlays/tassili_classes.png",
+            "anomalies": "/overlays/tassili_anomalies.png",
+            "slope": "/overlays/tassili_slope.png",
+            "surprise": "/overlays/tassili_surprise.png"
+          },
+          "metrics": [
+            {
+              "key": "mean_slope",
+              "label": "Mean slope",
+              "value": 9.03,
+              "unit": "°",
+              "tag": "Measured",
+              "source": "cop_dem"
+            },
+            {
+              "key": "relief",
+              "label": "Relief (5th to 95th percentile height)",
+              "value": 288.3,
+              "unit": "m",
+              "tag": "Measured",
+              "source": "cop_dem"
+            },
+            {
+              "key": "steep_share",
+              "label": "Share of box steeper than 15°",
+              "value": 18.73,
+              "unit": "% of area",
+              "tag": "Measured",
+              "source": "cop_dem"
+            },
+            {
+              "key": "anomalies",
+              "label": "Radar-surprise hotspots (z > 2)",
+              "value": 0.69,
+              "unit": "% of area",
+              "tag": "Measured",
+              "source": "ml"
+            },
+            {
+              "key": "roughness",
+              "label": "Rock roughness (height variation over 125 m)",
+              "value": 5.48,
+              "unit": "m",
+              "tag": "Measured",
+              "source": "cop_dem"
+            },
+            {
+              "key": "elevation",
+              "label": "Mean elevation",
+              "value": 1608.0,
+              "unit": "m",
+              "tag": "Measured",
+              "source": "cop_dem"
+            }
+          ],
+          "fingerprint": [
+            {
+              "axis": "Terrain & slope",
+              "target": 3,
+              "weight": 2,
+              "site": 3,
+              "tag": "Measured",
+              "basis": "relief 288.3 m, mean slope 9.03°, 18.73 % over 15°"
+            },
+            {
+              "axis": "Surface materials",
+              "target": 3,
+              "weight": 2,
+              "site": 3,
+              "tag": "Interpreted",
+              "basis": "Thick sandstone layers exposed in cliffs and buttes",
+              "source": "team"
+            },
+            {
+              "axis": "Dryness",
+              "target": 3,
+              "site": 2,
+              "tag": "Measured",
+              "basis": "39.3 mm of rain per year",
+              "weight": 1
+            },
+            {
+              "axis": "Subsurface structures",
+              "target": 3,
+              "site": 1,
+              "tag": "Measured",
+              "basis": "0.69 % of the box are radar-surprise hotspots",
+              "weight": 1
+            },
+            {
+              "axis": "Temperature extremes",
+              "target": 3,
+              "site": 2,
+              "tag": "Measured",
+              "basis": "average monthly swing 30.7 °C",
+              "weight": 1
+            },
+            {
+              "axis": "Access for operations",
+              "target": 3,
+              "site": 2,
+              "tag": "Measured",
+              "basis": "60.0 km to Djanet, 81.3 % under 15°",
+              "weight": 1
+            }
+          ],
+          "anomalies": [
+            {
+              "id": "H1",
+              "coords": [
+                25.0033,
+                9.2161
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +3.1, about 0.71 km²). Candidate only.",
+              "tag": "Interpreted"
+            },
+            {
+              "id": "H2",
+              "coords": [
+                24.9682,
+                9.1302
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +3.1, about 0.20 km²). Candidate only.",
+              "tag": "Interpreted"
+            },
+            {
+              "id": "H3",
+              "coords": [
+                24.954,
+                9.2451
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +2.6, about 0.15 km²). Candidate only.",
+              "tag": "Interpreted"
+            },
+            {
+              "id": "H4",
+              "coords": [
+                25.0077,
+                9.1229
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +2.7, about 0.13 km²). Candidate only.",
+              "tag": "Interpreted"
+            },
+            {
+              "id": "H5",
+              "coords": [
+                25.0986,
+                9.1846
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +2.5, about 0.09 km²). Candidate only.",
+              "tag": "Interpreted"
+            }
+          ],
+          "transfers": [
+            {
+              "text": "Sandstone buttes and cliffs expose layers over hundreds of metres of relief",
+              "tag": "Interpreted"
+            },
+            {
+              "text": "Reading a stack of layers on a slope, bottom to top, the way Curiosity climbs Mount Sharp",
+              "tag": "Interpreted",
+              "source": "msl_sharp"
+            },
+            {
+              "text": "Rover driving between outcrops on moderate slopes",
+              "tag": "Interpreted"
+            }
+          ],
+          "breaks": [
+            {
+              "text": "Earth gravity 1 g vs Mars 0.38 g",
+              "tag": "Reference"
+            },
+            {
+              "text": "Thick Earth atmosphere vs thin Martian atmosphere",
+              "tag": "Reference"
+            },
+            {
+              "text": "Different radiation environment (Earth's magnetic field and atmosphere shield the surface)",
+              "tag": "Reference"
+            },
+            {
+              "text": "Quartz-rich sandstone on Earth vs clay- and sulfate-bearing mudstone in Gale",
+              "tag": "Interpreted",
+              "source": "msl_lakes"
+            },
+            {
+              "text": "Instrument gap: our L-band images are not what a Mars orbiter would measure",
+              "tag": "Reference",
+              "source": "ice_mapper"
+            }
+          ],
+          "rover": {
+            "grid": "/grids/tassili_slope.json",
+            "slope_limit_deg": 15.0,
+            "landing": [
+              25.06684,
+              9.09926
+            ],
+            "waypoints": [
+              {
+                "id": "WP-01",
+                "coords": [
+                  25.05142,
+                  9.10389
+                ],
+                "title": "Mid-slope outcrop zone candidate",
+                "inspect": "Which layer is at the bottom here, and does it change upslope?",
+                "tool": "Camera (like Mastcam)",
+                "tag": "Hypothesis",
+                "why": "Picked by the Analog Finder (layered rock and outcrop science): relief in the middle range (percentile 50); mean slope in the middle range (percentile 61)."
+              },
+              {
+                "id": "WP-02",
+                "coords": [
+                  25.00099,
+                  9.09188
+                ],
+                "title": "Mid-slope outcrop zone candidate",
+                "inspect": "What is each layer made of?",
+                "tool": "Laser spectrometer (like ChemCam)",
+                "tag": "Hypothesis",
+                "why": "Picked by the Analog Finder (layered rock and outcrop science): relief in the middle range (percentile 59); mean slope in the middle range (percentile 48)."
+              },
+              {
+                "id": "WP-03",
+                "coords": [
+                  25.00459,
+                  9.25614
+                ],
+                "title": "Mid-slope outcrop zone candidate",
+                "inspect": "Is there a fine-grained, lake-like layer worth drilling?",
+                "tool": "Drill and mineral lab (like CheMin)",
+                "tag": "Hypothesis",
+                "why": "Picked by the Analog Finder (layered rock and outcrop science): relief in the middle range (percentile 52); mean slope in the middle range (percentile 45)."
+              }
+            ],
+            "route_km_default": 32.2
+          },
+          "earth_field_safety": {
+            "label": "Preliminary Earth field accessibility assessment",
+            "nearest_hub": {
+              "name": "Djanet",
+              "coords": [
+                24.55,
+                9.48
+              ],
+              "distance_km": 60.0
+            },
+            "monthly_tmax_c": [
+              29.0,
+              32.4,
+              33.7,
+              38.2,
+              39.3,
+              40.9,
+              41.3,
+              40.1,
+              38.9,
+              35.3,
+              30.6,
+              29.3
+            ],
+            "monthly_tmin_c": [
+              -5.0,
+              -7.2,
+              -3.6,
+              3.2,
+              8.6,
+              14.2,
+              17.0,
+              17.5,
+              13.4,
+              6.8,
+              1.4,
+              -5.2
+            ],
+            "elevation_m": 1608.0,
+            "air_pressure_kpa": 83.4,
+            "rain_mm_year": 39.3,
+            "daily_range_c": 30.7,
+            "assumptions": {
+              "heat_c": 40,
+              "slope_deg": 15.0,
+              "hub_km": 250
+            },
+            "source": "nasa_power"
+          }
+        },
+        {
+          "id": "hoggar",
+          "name": "Hoggar (Atakor)",
+          "role": "comparison site",
+          "verdict": "WEAK",
+          "verdict_reason": "Scored 5/24: below 50% of the target.",
+          "bounds": [
+            [
+              23.21,
+              5.49994
+            ],
+            [
+              23.39011,
+              5.70004
+            ]
+          ],
+          "layers": {
+            "optical": "/overlays/hoggar_optical.png",
+            "c_band": "/overlays/hoggar_cband.png",
+            "l_band": "/overlays/hoggar_lband.png",
+            "classes": "/overlays/hoggar_classes.png",
+            "anomalies": "/overlays/hoggar_anomalies.png",
+            "slope": "/overlays/hoggar_slope.png",
+            "surprise": "/overlays/hoggar_surprise.png"
+          },
+          "metrics": [
+            {
+              "key": "mean_slope",
+              "label": "Mean slope",
+              "value": 13.57,
+              "unit": "°",
+              "tag": "Measured",
+              "source": "cop_dem"
+            },
+            {
+              "key": "relief",
+              "label": "Relief (5th to 95th percentile height)",
+              "value": 551.0,
+              "unit": "m",
+              "tag": "Measured",
+              "source": "cop_dem"
+            },
+            {
+              "key": "steep_share",
+              "label": "Share of box steeper than 15°",
+              "value": 36.83,
+              "unit": "% of area",
+              "tag": "Measured",
+              "source": "cop_dem"
+            },
+            {
+              "key": "anomalies",
+              "label": "Radar-surprise hotspots (z > 2)",
+              "value": 0.3,
+              "unit": "% of area",
+              "tag": "Measured",
+              "source": "ml"
+            },
+            {
+              "key": "roughness",
+              "label": "Rock roughness (height variation over 125 m)",
+              "value": 8.25,
+              "unit": "m",
+              "tag": "Measured",
+              "source": "cop_dem"
+            },
+            {
+              "key": "elevation",
+              "label": "Mean elevation",
+              "value": 2197.0,
+              "unit": "m",
+              "tag": "Measured",
+              "source": "cop_dem"
+            }
+          ],
+          "fingerprint": [
+            {
+              "axis": "Terrain & slope",
+              "target": 3,
+              "weight": 2,
+              "site": 1,
+              "tag": "Measured",
+              "basis": "relief 551.0 m, mean slope 13.57°, 36.83 % over 15°"
+            },
+            {
+              "axis": "Surface materials",
+              "target": 3,
+              "weight": 2,
+              "site": 0,
+              "tag": "Interpreted",
+              "basis": "Volcanic and crystalline rock, not sedimentary layers",
+              "source": "atakor"
+            },
+            {
+              "axis": "Dryness",
+              "target": 3,
+              "site": 0,
+              "tag": "Measured",
+              "basis": "129.4 mm of rain per year",
+              "weight": 1
+            },
+            {
+              "axis": "Subsurface structures",
+              "target": 3,
+              "site": 0,
+              "tag": "Measured",
+              "basis": "0.3 % of the box are radar-surprise hotspots",
+              "weight": 1
+            },
+            {
+              "axis": "Temperature extremes",
+              "target": 3,
+              "site": 2,
+              "tag": "Measured",
+              "basis": "average monthly swing 28.2 °C",
+              "weight": 1
+            },
+            {
+              "axis": "Access for operations",
+              "target": 3,
+              "site": 1,
+              "tag": "Measured",
+              "basis": "57.3 km to Tamanrasset, 63.2 % under 15°",
+              "weight": 1
+            }
+          ],
+          "anomalies": [
+            {
+              "id": "H1",
+              "coords": [
+                23.3281,
+                5.6328
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +3.3, about 0.09 km²). Candidate only.",
+              "tag": "Interpreted"
+            },
+            {
+              "id": "H2",
+              "coords": [
+                23.2283,
+                5.5049
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +3.3, about 0.09 km²). Candidate only.",
+              "tag": "Interpreted"
+            },
+            {
+              "id": "H3",
+              "coords": [
+                23.2547,
+                5.5143
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +3.3, about 0.08 km²). Candidate only.",
+              "tag": "Interpreted"
+            },
+            {
+              "id": "H4",
+              "coords": [
+                23.2479,
+                5.6714
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +3.4, about 0.07 km²). Candidate only.",
+              "tag": "Interpreted"
+            },
+            {
+              "id": "H5",
+              "coords": [
+                23.256,
+                5.6762
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +3.5, about 0.06 km²). Candidate only.",
+              "tag": "Interpreted"
+            }
+          ],
+          "transfers": [
+            {
+              "text": "Reading a stack of layers on a slope, bottom to top, the way Curiosity climbs Mount Sharp",
+              "tag": "Interpreted",
+              "source": "msl_sharp"
+            },
+            {
+              "text": "Rover driving between outcrops on moderate slopes",
+              "tag": "Interpreted"
+            }
+          ],
+          "breaks": [
+            {
+              "text": "Earth gravity 1 g vs Mars 0.38 g",
+              "tag": "Reference"
+            },
+            {
+              "text": "Thick Earth atmosphere vs thin Martian atmosphere",
+              "tag": "Reference"
+            },
+            {
+              "text": "Different radiation environment (Earth's magnetic field and atmosphere shield the surface)",
+              "tag": "Reference"
+            },
+            {
+              "text": "Quartz-rich sandstone on Earth vs clay- and sulfate-bearing mudstone in Gale",
+              "tag": "Interpreted",
+              "source": "msl_lakes"
+            },
+            {
+              "text": "Instrument gap: our L-band images are not what a Mars orbiter would measure",
+              "tag": "Reference",
+              "source": "ice_mapper"
+            }
+          ],
+          "rover": {
+            "grid": "/grids/hoggar_slope.json",
+            "slope_limit_deg": 15.0,
+            "landing": [
+              23.31638,
+              5.6694
+            ],
+            "waypoints": [
+              {
+                "id": "WP-01",
+                "coords": [
+                  23.30186,
+                  5.67403
+                ],
+                "title": "Mid-slope outcrop zone candidate",
+                "inspect": "Which layer is at the bottom here, and does it change upslope?",
+                "tool": "Camera (like Mastcam)",
+                "tag": "Hypothesis",
+                "why": "Picked by the Analog Finder (layered rock and outcrop science): relief in the middle range (percentile 54); mean slope in the middle range (percentile 42)."
+              },
+              {
+                "id": "WP-02",
+                "coords": [
+                  23.28385,
+                  5.67002
+                ],
+                "title": "Mid-slope outcrop zone candidate",
+                "inspect": "What is each layer made of?",
+                "tool": "Laser spectrometer (like ChemCam)",
+                "tag": "Hypothesis",
+                "why": "Picked by the Analog Finder (layered rock and outcrop science): relief in the middle range (percentile 59); mean slope in the middle range (percentile 39)."
+              },
+              {
+                "id": "WP-03",
+                "coords": [
+                  23.27304,
+                  5.65802
+                ],
+                "title": "Mid-slope outcrop zone candidate",
+                "inspect": "Is there a fine-grained, lake-like layer worth drilling?",
+                "tool": "Drill and mineral lab (like CheMin)",
+                "tag": "Hypothesis",
+                "why": "Picked by the Analog Finder (layered rock and outcrop science): relief in the middle range (percentile 82); mean slope in the middle range (percentile 71)."
+              }
+            ],
+            "route_km_default": 6.0
+          },
+          "earth_field_safety": {
+            "label": "Preliminary Earth field accessibility assessment",
+            "nearest_hub": {
+              "name": "Tamanrasset",
+              "coords": [
+                22.79,
+                5.52
+              ],
+              "distance_km": 57.3
+            },
+            "monthly_tmax_c": [
+              29.5,
+              31.6,
+              32.3,
+              36.6,
+              38.1,
+              39.0,
+              39.7,
+              38.0,
+              36.4,
+              34.0,
+              30.5,
+              28.6
+            ],
+            "monthly_tmin_c": [
+              -4.9,
+              -5.3,
+              -2.4,
+              5.2,
+              8.9,
+              16.1,
+              17.9,
+              17.0,
+              15.0,
+              7.7,
+              3.4,
+              -2.5
+            ],
+            "elevation_m": 2197.0,
+            "air_pressure_kpa": 77.6,
+            "rain_mm_year": 129.4,
+            "daily_range_c": 28.2,
+            "assumptions": {
+              "heat_c": 40,
+              "slope_deg": 15.0,
+              "hub_km": 250
+            },
+            "source": "nasa_power"
+          }
+        }
+      ]
+    },
+    "moon_volcanic": {
+      "id": "moon_volcanic",
+      "title": "Volcanic domes and lava tubes",
+      "short": "Moon · Marius Hills",
+      "body": "moon",
+      "question": "Which Algerian setting can rehearse work on volcanic domes and a lava-tube skylight, like the Marius Hills?",
+      "default_objective": "volcanic",
+      "delay": {
+        "one_way_s": 1.3,
+        "label": "about 1.3 s one way (mean distance 384,400 km)",
+        "tag": "Reference",
+        "source": "moon_facts"
+      },
+      "planet_target": {
+        "name": "Marius Hills pit",
+        "body": "moon",
+        "tiles": "https://trek.nasa.gov/tiles/Moon/EQ/LRO_WAC_Mosaic_Global_303ppd_v02/1.0.0/default/default028mm/{z}/{y}/{x}.jpg",
+        "center": [
+          14.09,
+          -56.77
+        ],
+        "zoom": 6,
+        "specs": [
+          {
+            "key": "slope",
+            "label": "Slope",
+            "value": "Steep-sided shields and cones above flat mare plains",
+            "tag": "Interpreted",
+            "source": "lroc_marius"
+          },
+          {
+            "key": "landform",
+            "label": "Landform",
+            "value": "A pit about 58 × 49 m and 40 m deep in a sinuous rille, likely a lava-tube skylight",
+            "tag": "Reference",
+            "source": "lroc_pit"
+          },
+          {
+            "key": "cover",
+            "label": "Surface cover",
+            "value": "Regolith over blocky basaltic lava flows",
+            "tag": "Reference",
+            "source": "lroc_marius"
+          },
+          {
+            "key": "dryness",
+            "label": "Dryness",
+            "value": "Airless, no liquid water",
+            "tag": "Interpreted",
+            "source": "team"
+          }
+        ]
+      },
+      "rules": {
+        "Terrain & slope": "Relief: 300 m or more = 3, 150 m or more = 2, 50 m or more = 1, else 0.",
+        "Surface materials": "Basaltic lava and volcanic domes = 3, other volcanic rock = 2, no volcanic rock = 0.",
+        "Dryness": "Annual rain (NASA POWER): under 20 mm = 3, under 50 = 2, under 100 = 1, else 0.",
+        "Subsurface structures": "Share of the box where L-band is brighter than the surface predicts (radar surprise z > 2, our ML model). Best site = 3, others scaled.",
+        "Temperature extremes": "Average monthly swing (T2M_MAX - T2M_MIN) of 15 °C or more = 2, else 1. Capped at 2: no Earth site reaches Mars or Moon extremes.",
+        "Access for operations": "Hub under 250 km straight-line, then share of box under 15°: over 90 % = 3, over 75 % = 2, else 1. Hub 250 km or more = 0."
+      },
+      "weighting": "Terrain & slope and Surface materials count double (they define the analogy); the other four axes count once. Maximum 24.",
+      "candidates": [
+        {
+          "id": "ahnet",
+          "name": "Ahnet Basin",
+          "role": "comparison site",
+          "verdict": "PARTIAL",
+          "verdict_reason": "Scored 12/24: at least 50% of the target, but not the highest.",
+          "bounds": [
+            [
+              26.09988,
+              2.19997
+            ],
+            [
+              26.28021,
+              2.40007
+            ]
+          ],
+          "layers": {
+            "optical": "/overlays/ahnet_optical.png",
+            "c_band": "/overlays/ahnet_cband.png",
+            "l_band": "/overlays/ahnet_lband.png",
+            "classes": "/overlays/ahnet_classes.png",
+            "anomalies": "/overlays/ahnet_anomalies.png",
+            "slope": "/overlays/ahnet_slope.png",
+            "surprise": "/overlays/ahnet_surprise.png"
+          },
+          "metrics": [
+            {
+              "key": "mean_slope",
+              "label": "Mean slope",
+              "value": 1.21,
+              "unit": "°",
+              "tag": "Measured",
+              "source": "cop_dem"
+            },
+            {
+              "key": "relief",
+              "label": "Relief (5th to 95th percentile height)",
+              "value": 55.3,
+              "unit": "m",
+              "tag": "Measured",
+              "source": "cop_dem"
+            },
+            {
+              "key": "steep_share",
+              "label": "Share of box steeper than 15°",
+              "value": 0.05,
+              "unit": "% of area",
+              "tag": "Measured",
+              "source": "cop_dem"
+            },
+            {
+              "key": "anomalies",
+              "label": "Radar-surprise hotspots (z > 2)",
+              "value": 2.69,
+              "unit": "% of area",
+              "tag": "Measured",
+              "source": "ml"
+            },
+            {
+              "key": "roughness",
+              "label": "Rock roughness (height variation over 125 m)",
+              "value": 0.66,
+              "unit": "m",
+              "tag": "Measured",
+              "source": "cop_dem"
+            },
+            {
+              "key": "elevation",
+              "label": "Mean elevation",
+              "value": 248.0,
+              "unit": "m",
+              "tag": "Measured",
+              "source": "cop_dem"
+            }
+          ],
+          "fingerprint": [
+            {
+              "axis": "Terrain & slope",
+              "target": 3,
+              "weight": 2,
+              "site": 1,
+              "tag": "Measured",
+              "basis": "relief 55.3 m"
+            },
+            {
+              "axis": "Surface materials",
+              "target": 3,
+              "weight": 2,
+              "site": 0,
+              "tag": "Interpreted",
+              "basis": "Sedimentary basin: no volcanic rock in this box",
+              "source": "ahnet_epsc"
+            },
+            {
+              "axis": "Dryness",
+              "target": 3,
+              "site": 2,
+              "tag": "Measured",
+              "basis": "22.5 mm of rain per year",
+              "weight": 1
+            },
+            {
+              "axis": "Subsurface structures",
+              "target": 3,
+              "site": 3,
+              "tag": "Measured",
+              "basis": "2.69 % of the box are radar-surprise hotspots",
+              "weight": 1
+            },
+            {
+              "axis": "Temperature extremes",
+              "target": 3,
+              "site": 2,
+              "tag": "Measured",
+              "basis": "average monthly swing 32.0 °C",
+              "weight": 1
+            },
+            {
+              "axis": "Access for operations",
+              "target": 3,
+              "site": 3,
+              "tag": "Measured",
+              "basis": "112.6 km to In Salah, 100.0 % under 15°",
+              "weight": 1
+            }
+          ],
+          "anomalies": [
+            {
+              "id": "H1",
+              "coords": [
+                26.2138,
+                2.2404
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +3.3, about 1.10 km²). Candidate only.",
+              "tag": "Interpreted"
+            },
+            {
+              "id": "H2",
+              "coords": [
+                26.2582,
+                2.2742
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +3.3, about 0.58 km²). Candidate only.",
+              "tag": "Interpreted"
+            },
+            {
+              "id": "H3",
+              "coords": [
+                26.1785,
+                2.241
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +2.6, about 0.60 km²). Candidate only.",
+              "tag": "Interpreted"
+            },
+            {
+              "id": "H4",
+              "coords": [
+                26.2698,
+                2.2148
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +2.7, about 0.51 km²). Candidate only.",
+              "tag": "Interpreted"
+            },
+            {
+              "id": "H5",
+              "coords": [
+                26.1984,
+                2.2515
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +3.0, about 0.39 km²). Candidate only.",
+              "tag": "Interpreted"
+            }
+          ],
+          "transfers": [
+            {
+              "text": "Steep volcanic relief for mobility and navigation tests",
+              "tag": "Interpreted"
+            },
+            {
+              "text": "Short signal delay: near-real-time driving from Earth can be rehearsed",
+              "tag": "Interpreted",
+              "source": "moon_facts"
+            }
+          ],
+          "breaks": [
+            {
+              "text": "Earth gravity 1 g vs Moon 0.17 g",
+              "tag": "Reference"
+            },
+            {
+              "text": "Earth atmosphere vs almost no atmosphere on the Moon",
+              "tag": "Reference"
+            },
+            {
+              "text": "Different radiation environment (no global magnetic field or atmosphere on the Moon)",
+              "tag": "Reference"
+            },
+            {
+              "text": "Weathered rock and wind-blown sand on Earth vs impact-made regolith on the Moon",
+              "tag": "Interpreted"
+            },
+            {
+              "text": "Instrument gap: no lava-tube void has been found in our boxes; L-band hotspots are candidates only",
+              "tag": "Interpreted"
+            }
+          ],
+          "rover": {
+            "grid": "/grids/ahnet_slope.json",
+            "slope_limit_deg": 15.0,
+            "landing": [
+              26.19286,
+              2.26938
+            ],
+            "waypoints": [
+              {
+                "id": "WP-01",
+                "coords": [
+                  26.20627,
+                  2.266
+                ],
+                "title": "High-relief, dark ground candidate",
+                "inspect": "Can the rover cross this volcanic relief safely?",
+                "tool": "Stereo navigation camera",
+                "tag": "Hypothesis",
+                "why": "Picked by the Analog Finder (volcanic terrain and lava-tube scouting): optical brightness lower than 63 % of cells; relief higher than 20 % of cells."
+              },
+              {
+                "id": "WP-02",
+                "coords": [
+                  26.19906,
+                  2.30202
+                ],
+                "title": "High-relief, dark ground candidate",
+                "inspect": "Does radar show a void or a buried flow front under this spot?",
+                "tool": "Ground-penetrating radar (like Yutu-2's)",
+                "tag": "Hypothesis",
+                "why": "Picked by the Analog Finder (volcanic terrain and lava-tube scouting): optical brightness lower than 68 % of cells; relief higher than 16 % of cells."
+              },
+              {
+                "id": "WP-03",
+                "coords": [
+                  26.23873,
+                  2.258
+                ],
+                "title": "High-relief, dark ground candidate",
+                "inspect": "Is the dark rock basalt, and how weathered is it?",
+                "tool": "Spectrometer and sample bag",
+                "tag": "Hypothesis",
+                "why": "Picked by the Analog Finder (volcanic terrain and lava-tube scouting): optical brightness lower than 48 % of cells; relief higher than 32 % of cells."
+              }
+            ],
+            "route_km_default": 12.1
+          },
+          "earth_field_safety": {
+            "label": "Preliminary Earth field accessibility assessment",
+            "nearest_hub": {
+              "name": "In Salah",
+              "coords": [
+                27.19,
+                2.48
+              ],
+              "distance_km": 112.6
+            },
+            "monthly_tmax_c": [
+              36.2,
+              39.4,
+              40.1,
+              46.5,
+              47.7,
+              49.5,
+              50.4,
+              49.3,
+              47.0,
+              44.3,
+              38.2,
+              33.0
+            ],
+            "monthly_tmin_c": [
+              0.7,
+              -0.9,
+              4.2,
+              10.3,
+              15.8,
+              20.6,
+              24.5,
+              24.8,
+              18.1,
+              13.1,
+              6.8,
+              0.5
+            ],
+            "elevation_m": 248.0,
+            "air_pressure_kpa": 98.4,
+            "rain_mm_year": 22.5,
+            "daily_range_c": 32.0,
+            "assumptions": {
+              "heat_c": 40,
+              "slope_deg": 15.0,
+              "hub_km": 250
+            },
+            "source": "nasa_power"
+          }
+        },
+        {
+          "id": "tassili",
+          "name": "Tassili n'Ajjer",
+          "role": "comparison site",
+          "verdict": "WEAK",
+          "verdict_reason": "Scored 11/24: below 50% of the target.",
+          "bounds": [
+            [
+              24.91994,
+              9.06984
+            ],
+            [
+              25.10005,
+              9.27016
+            ]
+          ],
+          "layers": {
+            "optical": "/overlays/tassili_optical.png",
+            "c_band": "/overlays/tassili_cband.png",
+            "l_band": "/overlays/tassili_lband.png",
+            "classes": "/overlays/tassili_classes.png",
+            "anomalies": "/overlays/tassili_anomalies.png",
+            "slope": "/overlays/tassili_slope.png",
+            "surprise": "/overlays/tassili_surprise.png"
+          },
+          "metrics": [
+            {
+              "key": "mean_slope",
+              "label": "Mean slope",
+              "value": 9.03,
+              "unit": "°",
+              "tag": "Measured",
+              "source": "cop_dem"
+            },
+            {
+              "key": "relief",
+              "label": "Relief (5th to 95th percentile height)",
+              "value": 288.3,
+              "unit": "m",
+              "tag": "Measured",
+              "source": "cop_dem"
+            },
+            {
+              "key": "steep_share",
+              "label": "Share of box steeper than 15°",
+              "value": 18.73,
+              "unit": "% of area",
+              "tag": "Measured",
+              "source": "cop_dem"
+            },
+            {
+              "key": "anomalies",
+              "label": "Radar-surprise hotspots (z > 2)",
+              "value": 0.69,
+              "unit": "% of area",
+              "tag": "Measured",
+              "source": "ml"
+            },
+            {
+              "key": "roughness",
+              "label": "Rock roughness (height variation over 125 m)",
+              "value": 5.48,
+              "unit": "m",
+              "tag": "Measured",
+              "source": "cop_dem"
+            },
+            {
+              "key": "elevation",
+              "label": "Mean elevation",
+              "value": 1608.0,
+              "unit": "m",
+              "tag": "Measured",
+              "source": "cop_dem"
+            }
+          ],
+          "fingerprint": [
+            {
+              "axis": "Terrain & slope",
+              "target": 3,
+              "weight": 2,
+              "site": 2,
+              "tag": "Measured",
+              "basis": "relief 288.3 m"
+            },
+            {
+              "axis": "Surface materials",
+              "target": 3,
+              "weight": 2,
+              "site": 0,
+              "tag": "Interpreted",
+              "basis": "Sandstone plateau: no volcanic rock in this box",
+              "source": "team"
+            },
+            {
+              "axis": "Dryness",
+              "target": 3,
+              "site": 2,
+              "tag": "Measured",
+              "basis": "39.3 mm of rain per year",
+              "weight": 1
+            },
+            {
+              "axis": "Subsurface structures",
+              "target": 3,
+              "site": 1,
+              "tag": "Measured",
+              "basis": "0.69 % of the box are radar-surprise hotspots",
+              "weight": 1
+            },
+            {
+              "axis": "Temperature extremes",
+              "target": 3,
+              "site": 2,
+              "tag": "Measured",
+              "basis": "average monthly swing 30.7 °C",
+              "weight": 1
+            },
+            {
+              "axis": "Access for operations",
+              "target": 3,
+              "site": 2,
+              "tag": "Measured",
+              "basis": "60.0 km to Djanet, 81.3 % under 15°",
+              "weight": 1
+            }
+          ],
+          "anomalies": [
+            {
+              "id": "H1",
+              "coords": [
+                25.0033,
+                9.2161
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +3.1, about 0.71 km²). Candidate only.",
+              "tag": "Interpreted"
+            },
+            {
+              "id": "H2",
+              "coords": [
+                24.9682,
+                9.1302
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +3.1, about 0.20 km²). Candidate only.",
+              "tag": "Interpreted"
+            },
+            {
+              "id": "H3",
+              "coords": [
+                24.954,
+                9.2451
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +2.6, about 0.15 km²). Candidate only.",
+              "tag": "Interpreted"
+            },
+            {
+              "id": "H4",
+              "coords": [
+                25.0077,
+                9.1229
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +2.7, about 0.13 km²). Candidate only.",
+              "tag": "Interpreted"
+            },
+            {
+              "id": "H5",
+              "coords": [
+                25.0986,
+                9.1846
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +2.5, about 0.09 km²). Candidate only.",
+              "tag": "Interpreted"
+            }
+          ],
+          "transfers": [
+            {
+              "text": "Steep volcanic relief for mobility and navigation tests",
+              "tag": "Interpreted"
+            },
+            {
+              "text": "Short signal delay: near-real-time driving from Earth can be rehearsed",
+              "tag": "Interpreted",
+              "source": "moon_facts"
+            }
+          ],
+          "breaks": [
+            {
+              "text": "Earth gravity 1 g vs Moon 0.17 g",
+              "tag": "Reference"
+            },
+            {
+              "text": "Earth atmosphere vs almost no atmosphere on the Moon",
+              "tag": "Reference"
+            },
+            {
+              "text": "Different radiation environment (no global magnetic field or atmosphere on the Moon)",
+              "tag": "Reference"
+            },
+            {
+              "text": "Weathered rock and wind-blown sand on Earth vs impact-made regolith on the Moon",
+              "tag": "Interpreted"
+            },
+            {
+              "text": "Instrument gap: no lava-tube void has been found in our boxes; L-band hotspots are candidates only",
+              "tag": "Interpreted"
+            }
+          ],
+          "rover": {
+            "grid": "/grids/tassili_slope.json",
+            "slope_limit_deg": 15.0,
+            "landing": [
+              24.98354,
+              9.16937
+            ],
+            "waypoints": [
+              {
+                "id": "WP-01",
+                "coords": [
+                  24.96857,
+                  9.17601
+                ],
+                "title": "High-relief, dark ground candidate",
+                "inspect": "Can the rover cross this volcanic relief safely?",
+                "tool": "Stereo navigation camera",
+                "tag": "Hypothesis",
+                "why": "Picked by the Analog Finder (volcanic terrain and lava-tube scouting): optical brightness lower than 79 % of cells; relief higher than 71 % of cells."
+              },
+              {
+                "id": "WP-02",
+                "coords": [
+                  24.94696,
+                  9.19604
+                ],
+                "title": "High-relief, dark ground candidate",
+                "inspect": "Does radar show a void or a buried flow front under this spot?",
+                "tool": "Ground-penetrating radar (like Yutu-2's)",
+                "tag": "Hypothesis",
+                "why": "Picked by the Analog Finder (volcanic terrain and lava-tube scouting): relief higher than 95 % of cells; optical brightness lower than 70 % of cells."
+              },
+              {
+                "id": "WP-03",
+                "coords": [
+                  24.93255,
+                  9.26415
+                ],
+                "title": "High-relief, dark ground candidate",
+                "inspect": "Is the dark rock basalt, and how weathered is it?",
+                "tool": "Spectrometer and sample bag",
+                "tag": "Hypothesis",
+                "why": "Picked by the Analog Finder (volcanic terrain and lava-tube scouting): optical brightness lower than 81 % of cells; relief higher than 81 % of cells."
+              }
+            ],
+            "route_km_default": 24.5
+          },
+          "earth_field_safety": {
+            "label": "Preliminary Earth field accessibility assessment",
+            "nearest_hub": {
+              "name": "Djanet",
+              "coords": [
+                24.55,
+                9.48
+              ],
+              "distance_km": 60.0
+            },
+            "monthly_tmax_c": [
+              29.0,
+              32.4,
+              33.7,
+              38.2,
+              39.3,
+              40.9,
+              41.3,
+              40.1,
+              38.9,
+              35.3,
+              30.6,
+              29.3
+            ],
+            "monthly_tmin_c": [
+              -5.0,
+              -7.2,
+              -3.6,
+              3.2,
+              8.6,
+              14.2,
+              17.0,
+              17.5,
+              13.4,
+              6.8,
+              1.4,
+              -5.2
+            ],
+            "elevation_m": 1608.0,
+            "air_pressure_kpa": 83.4,
+            "rain_mm_year": 39.3,
+            "daily_range_c": 30.7,
+            "assumptions": {
+              "heat_c": 40,
+              "slope_deg": 15.0,
+              "hub_km": 250
+            },
+            "source": "nasa_power"
+          }
+        },
+        {
+          "id": "hoggar",
+          "name": "Hoggar (Atakor)",
+          "role": "case study",
+          "verdict": "STRONGEST",
+          "verdict_reason": "Scored 15/24: highest of the 3 sites.",
+          "bounds": [
+            [
+              23.21,
+              5.49994
+            ],
+            [
+              23.39011,
+              5.70004
+            ]
+          ],
+          "layers": {
+            "optical": "/overlays/hoggar_optical.png",
+            "c_band": "/overlays/hoggar_cband.png",
+            "l_band": "/overlays/hoggar_lband.png",
+            "classes": "/overlays/hoggar_classes.png",
+            "anomalies": "/overlays/hoggar_anomalies.png",
+            "slope": "/overlays/hoggar_slope.png",
+            "surprise": "/overlays/hoggar_surprise.png"
+          },
+          "metrics": [
+            {
+              "key": "mean_slope",
+              "label": "Mean slope",
+              "value": 13.57,
+              "unit": "°",
+              "tag": "Measured",
+              "source": "cop_dem"
+            },
+            {
+              "key": "relief",
+              "label": "Relief (5th to 95th percentile height)",
+              "value": 551.0,
+              "unit": "m",
+              "tag": "Measured",
+              "source": "cop_dem"
+            },
+            {
+              "key": "steep_share",
+              "label": "Share of box steeper than 15°",
+              "value": 36.83,
+              "unit": "% of area",
+              "tag": "Measured",
+              "source": "cop_dem"
+            },
+            {
+              "key": "anomalies",
+              "label": "Radar-surprise hotspots (z > 2)",
+              "value": 0.3,
+              "unit": "% of area",
+              "tag": "Measured",
+              "source": "ml"
+            },
+            {
+              "key": "roughness",
+              "label": "Rock roughness (height variation over 125 m)",
+              "value": 8.25,
+              "unit": "m",
+              "tag": "Measured",
+              "source": "cop_dem"
+            },
+            {
+              "key": "elevation",
+              "label": "Mean elevation",
+              "value": 2197.0,
+              "unit": "m",
+              "tag": "Measured",
+              "source": "cop_dem"
+            }
+          ],
+          "fingerprint": [
+            {
+              "axis": "Terrain & slope",
+              "target": 3,
+              "weight": 2,
+              "site": 3,
+              "tag": "Measured",
+              "basis": "relief 551.0 m"
+            },
+            {
+              "axis": "Surface materials",
+              "target": 3,
+              "weight": 2,
+              "site": 3,
+              "tag": "Interpreted",
+              "basis": "Alkali basalts (about 80 % of Atakor lavas) plus phonolite and trachyte domes",
+              "source": "atakor"
+            },
+            {
+              "axis": "Dryness",
+              "target": 3,
+              "site": 0,
+              "tag": "Measured",
+              "basis": "129.4 mm of rain per year",
+              "weight": 1
+            },
+            {
+              "axis": "Subsurface structures",
+              "target": 3,
+              "site": 0,
+              "tag": "Measured",
+              "basis": "0.3 % of the box are radar-surprise hotspots",
+              "weight": 1
+            },
+            {
+              "axis": "Temperature extremes",
+              "target": 3,
+              "site": 2,
+              "tag": "Measured",
+              "basis": "average monthly swing 28.2 °C",
+              "weight": 1
+            },
+            {
+              "axis": "Access for operations",
+              "target": 3,
+              "site": 1,
+              "tag": "Measured",
+              "basis": "57.3 km to Tamanrasset, 63.2 % under 15°",
+              "weight": 1
+            }
+          ],
+          "anomalies": [
+            {
+              "id": "H1",
+              "coords": [
+                23.3281,
+                5.6328
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +3.3, about 0.09 km²). Candidate only.",
+              "tag": "Interpreted"
+            },
+            {
+              "id": "H2",
+              "coords": [
+                23.2283,
+                5.5049
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +3.3, about 0.09 km²). Candidate only.",
+              "tag": "Interpreted"
+            },
+            {
+              "id": "H3",
+              "coords": [
+                23.2547,
+                5.5143
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +3.3, about 0.08 km²). Candidate only.",
+              "tag": "Interpreted"
+            },
+            {
+              "id": "H4",
+              "coords": [
+                23.2479,
+                5.6714
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +3.4, about 0.07 km²). Candidate only.",
+              "tag": "Interpreted"
+            },
+            {
+              "id": "H5",
+              "coords": [
+                23.256,
+                5.6762
+              ],
+              "note": "L-band brighter than the surface predicts (mean z = +3.5, about 0.06 km²). Candidate only.",
+              "tag": "Interpreted"
+            }
+          ],
+          "transfers": [
+            {
+              "text": "Basalt flows, cones and phonolite domes of the Atakor volcanic field",
+              "tag": "Reference",
+              "source": "atakor"
+            },
+            {
+              "text": "Steep volcanic relief for mobility and navigation tests",
+              "tag": "Interpreted"
+            },
+            {
+              "text": "Short signal delay: near-real-time driving from Earth can be rehearsed",
+              "tag": "Interpreted",
+              "source": "moon_facts"
+            }
+          ],
+          "breaks": [
+            {
+              "text": "Earth gravity 1 g vs Moon 0.17 g",
+              "tag": "Reference"
+            },
+            {
+              "text": "Earth atmosphere vs almost no atmosphere on the Moon",
+              "tag": "Reference"
+            },
+            {
+              "text": "Different radiation environment (no global magnetic field or atmosphere on the Moon)",
+              "tag": "Reference"
+            },
+            {
+              "text": "Weathered rock and wind-blown sand on Earth vs impact-made regolith on the Moon",
+              "tag": "Interpreted"
+            },
+            {
+              "text": "Instrument gap: no lava-tube void has been found in our boxes; L-band hotspots are candidates only",
+              "tag": "Interpreted"
+            }
+          ],
+          "rover": {
+            "grid": "/grids/hoggar_slope.json",
+            "slope_limit_deg": 15.0,
+            "landing": [
+              23.31413,
+              5.6694
+            ],
+            "waypoints": [
+              {
+                "id": "WP-01",
+                "coords": [
+                  23.30186,
+                  5.68203
+                ],
+                "title": "High-relief, dark ground candidate",
+                "inspect": "Can the rover cross this volcanic relief safely?",
+                "tool": "Stereo navigation camera",
+                "tag": "Hypothesis",
+                "why": "Picked by the Analog Finder (volcanic terrain and lava-tube scouting): optical brightness lower than 93 % of cells; relief higher than 89 % of cells."
+              },
+              {
+                "id": "WP-02",
+                "coords": [
+                  23.29105,
+                  5.65402
+                ],
+                "title": "High-relief, dark ground candidate",
+                "inspect": "Does radar show a void or a buried flow front under this spot?",
+                "tool": "Ground-penetrating radar (like Yutu-2's)",
+                "tag": "Hypothesis",
+                "why": "Picked by the Analog Finder (volcanic terrain and lava-tube scouting): relief higher than 84 % of cells; optical brightness lower than 81 % of cells."
+              },
+              {
+                "id": "WP-03",
+                "coords": [
+                  23.26223,
+                  5.67002
+                ],
+                "title": "High-relief, dark ground candidate",
+                "inspect": "Is the dark rock basalt, and how weathered is it?",
+                "tool": "Spectrometer and sample bag",
+                "tag": "Hypothesis",
+                "why": "Picked by the Analog Finder (volcanic terrain and lava-tube scouting): relief higher than 93 % of cells; optical brightness lower than 88 % of cells."
+              }
+            ],
+            "route_km_default": 10.0
+          },
+          "earth_field_safety": {
+            "label": "Preliminary Earth field accessibility assessment",
+            "nearest_hub": {
+              "name": "Tamanrasset",
+              "coords": [
+                22.79,
+                5.52
+              ],
+              "distance_km": 57.3
+            },
+            "monthly_tmax_c": [
+              29.5,
+              31.6,
+              32.3,
+              36.6,
+              38.1,
+              39.0,
+              39.7,
+              38.0,
+              36.4,
+              34.0,
+              30.5,
+              28.6
+            ],
+            "monthly_tmin_c": [
+              -4.9,
+              -5.3,
+              -2.4,
+              5.2,
+              8.9,
+              16.1,
+              17.9,
+              17.0,
+              15.0,
+              7.7,
+              3.4,
+              -2.5
+            ],
+            "elevation_m": 2197.0,
+            "air_pressure_kpa": 77.6,
+            "rain_mm_year": 129.4,
+            "daily_range_c": 28.2,
+            "assumptions": {
+              "heat_c": 40,
+              "slope_deg": 15.0,
+              "hub_km": 250
+            },
+            "source": "nasa_power"
+          }
+        }
+      ]
+    }
+  }
+}

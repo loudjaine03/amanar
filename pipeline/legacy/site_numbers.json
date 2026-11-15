@@ -1,0 +1,50 @@
+{
+  "ahnet": {
+    "mean_slope": 1.21,
+    "relief": 55.3,
+    "steep_share": 0.05,
+    "anomalies": 1.23,
+    "bounds": [
+      [
+        26.09988,
+        2.19997
+      ],
+      [
+        26.28021,
+        2.40007
+      ]
+    ]
+  },
+  "hoggar": {
+    "mean_slope": 13.57,
+    "relief": 551.0,
+    "steep_share": 36.83,
+    "anomalies": 0.86,
+    "bounds": [
+      [
+        23.21,
+        5.49994
+      ],
+      [
+        23.39011,
+        5.70004
+      ]
+    ]
+  },
+  "tassili": {
+    "mean_slope": 9.03,
+    "relief": 288.3,
+    "steep_share": 18.73,
+    "anomalies": 0.5,
+    "bounds": [
+      [
+        24.91994,
+        9.06984
+      ],
+      [
+        25.10005,
+        9.27016
+      ]
+    ]
+  }
+}
