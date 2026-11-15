@@ -34,3 +34,6 @@ dist-ssr
 pipeline/data/
 pipeline/out/
 pipeline/*.tif
+
+pipeline/__pycache__/
+pipeline/planetary/__pycache__/

@@ -5,7 +5,12 @@ export type Bounds = [[number, number], [number, number]];
 
 /** rasterio donne (west, south, east, north) ; Leaflet veut [[south, west], [north, east]].
  *  À utiliser PARTOUT pour éviter le bug classique. */
-export const rasterioToLeaflet = (west: number, south: number, east: number, north: number): Bounds => [
+export const rasterioToLeaflet = (
+  west: number,
+  south: number,
+  east: number,
+  north: number,
+): Bounds => [
   [south, west],
   [north, east],
 ];
@@ -40,7 +45,8 @@ export function routeKm(pts: LatLon[]): number {
     const [a1, o1] = [rad(p1[0]), rad(p1[1])];
     const [a2, o2] = [rad(p2[0]), rad(p2[1])];
     km +=
-      2 * 6371 *
+      2 *
+      6371 *
       Math.asin(
         Math.sqrt(
           Math.sin((a2 - a1) / 2) ** 2 + Math.cos(a1) * Math.cos(a2) * Math.sin((o2 - o1) / 2) ** 2,

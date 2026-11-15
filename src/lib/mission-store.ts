@@ -1,123 +1,93 @@
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
-import type { MatchLayer } from './match';
-import type { LatLon } from './geo';
-import type { Scenario, MissionData, DossierItem, DossierStage, FieldAccessResult } from '@/types/mission';
-import type { FinderInput } from './finder';
-import { CURIOSITY, type RoverSpec } from './hardware';
+import { create } from "zustand";
+import type { LatLon } from "./geo";
+import type { MissionData, SiteId, TargetId, Waypoint } from "@/types/mission";
+import type { Goal } from "./plan";
 
-/** A traverse proposed by the Analog Finder, used by Stage 03 instead of the default waypoints. */
+export type AreaKind = "all" | "window" | "spot";
+/** A drive planned on the Plan page: used by Rehearse instead of the default route. */
 export interface CustomRoute {
-  scenario: Scenario;
-  site: string;
-  points: { coords: LatLon; label: string }[];
+  target: TargetId;
+  site: SiteId;
+  landing: LatLon;
+  waypoints: Waypoint[];
 }
+
+export type SiteLayer = "like" | "satellite" | "l_band" | "slope";
 
 interface MissionState {
-  scenario: Scenario;
-  selectedSite: string | null;
+  target: TargetId;
+  /** Site chosen by the user; null = the best terrain match for the current target. */
+  site: SiteId | null;
   missionData: MissionData | null;
-  benchmarkAdded: boolean;
-  auditAdded: boolean;
-  routeStats: { lengthKm: number; maxSlopeDeg: number } | null;
-  safetyResult: FieldAccessResult | null;
+  loadError: string | null;
+  layer: SiteLayer;
+  showHotspots: boolean;
   month: number;
-  landing: LatLon | null;
-  route: LatLon[] | null;
-  marsMode: boolean;
   heatLimit: number;
   slopeLimit: number;
-  layer: MatchLayer;
-  opacity: number;
-  showAnomalies: boolean;
-  dossierItems: DossierItem[];
-  language: 'en' | 'fr';
-  demoModeActive: boolean;
-  apiStatus: 'offline' | 'live';
-  dossierOpen: boolean;
-  finderInput: FinderInput | null;
+  landing: LatLon | null;
+  delayMode: boolean;
+  goal: Goal;
+  areaKind: AreaKind;
+  /** Clicked cell [row, col] on the target map, per target. */
+  spot: Partial<Record<TargetId, [number, number]>>;
+  hubLimit: number;
   customRoute: CustomRoute | null;
-  roverSpec: RoverSpec;
-  insideKPa: number;
-  setRoverSpec: (r: RoverSpec) => void;
-  setInsideKPa: (p: number) => void;
-  setFinderInput: (input: FinderInput) => void;
-  setCustomRoute: (route: CustomRoute | null) => void;
-  setScenario: (scenario: Scenario) => void;
-  setLanguage: (language: 'en' | 'fr') => void;
-  setLanding: (landing: LatLon | null) => void;
-  setMarsMode: (marsMode: boolean) => void;
-  setHeatLimit: (heatLimit: number) => void;
-  setSlopeLimit: (slopeLimit: number) => void;
-  setMonth: (month: number) => void;
-  setLayer: (layer: MatchLayer) => void;
-  setOpacity: (opacity: number) => void;
-  setShowAnomalies: (show: boolean) => void;
-  setDossierOpen: (open: boolean) => void;
-  /** Ajoute une ligne au dossier ; si l'id existe déjà, elle est remplacée (pas de doublon). */
-  addDossierItem: (item: DossierItem) => void;
-  clearDossier: () => void;
-  /** Remplace toutes les lignes d'une étape (utile quand on change de cible). */
-  setStageItems: (stage: DossierStage, items: DossierItem[]) => void;
+  setGoal: (g: Goal) => void;
+  setAreaKind: (a: AreaKind) => void;
+  setSpot: (t: TargetId, rc: [number, number]) => void;
+  setHubLimit: (km: number) => void;
+  setCustomRoute: (r: CustomRoute | null) => void;
+  setTarget: (t: TargetId) => void;
+  setSite: (s: SiteId | null) => void;
+  setLayer: (l: SiteLayer) => void;
+  setShowHotspots: (b: boolean) => void;
+  setMonth: (m: number) => void;
+  setHeatLimit: (h: number) => void;
+  setSlopeLimit: (s: number) => void;
+  setLanding: (p: LatLon | null) => void;
+  setDelayMode: (b: boolean) => void;
 }
-export const useMissionStore = create<MissionState>()(
-  persist(
-    (set) => ({
-      scenario: 'mars_water',
-      selectedSite: null,
-      missionData: null,
-      benchmarkAdded: false,
-      auditAdded: false,
-      routeStats: null,
-      safetyResult: null,
-      month: 1,
-      landing: null,
-      route: null,
-      marsMode: true,
-      heatLimit: 40,
-      slopeLimit: 15,
-      layer: 'l_band',
-      opacity: 0.8,
-      showAnomalies: true,
-      dossierItems: [],
-      language: 'en',
-      demoModeActive: false,
-      apiStatus: 'offline',
-      dossierOpen: false,
-      finderInput: null,
-      customRoute: null,
-      roverSpec: CURIOSITY,
-      insideKPa: 101.3,
-      setRoverSpec: (roverSpec) => set({ roverSpec }),
-      setInsideKPa: (insideKPa) => set({ insideKPa }),
-      setFinderInput: (finderInput) => set({ finderInput }),
-      setCustomRoute: (customRoute) => set({ customRoute, landing: null }),
-      setScenario: (scenario) => set({ scenario, landing: null }),
-      setLanguage: (language) => set({ language }),
-      setLanding: (landing) => set({ landing }),
-      setMarsMode: (marsMode) => set({ marsMode }),
-      setHeatLimit: (heatLimit) => set({ heatLimit }),
-      setSlopeLimit: (slopeLimit) => set({ slopeLimit }),
-      setMonth: (month) => set({ month }),
-      setLayer: (layer) => set({ layer }),
-      setOpacity: (opacity) => set({ opacity }),
-      setShowAnomalies: (showAnomalies) => set({ showAnomalies }),
-      setDossierOpen: (dossierOpen) => set({ dossierOpen }),
-      addDossierItem: (item) =>
-        set((st) => ({
-          dossierItems: st.dossierItems.some((i) => i.id === item.id)
-            ? st.dossierItems.map((i) => (i.id === item.id ? item : i))
-            : [...st.dossierItems, item],
-        })),
-      clearDossier: () => set({ dossierItems: [] }),
-      setStageItems: (stage, items) =>
-        set((st) => ({ dossierItems: [...st.dossierItems.filter((i) => i.stage !== stage), ...items] })),
-    }),
-    {
-      name: 'abe-mission',
-      storage: createJSONStorage(() => localStorage),
-      skipHydration: true,
-      partialize: ({ dossierItems, language }) => ({ dossierItems, language }),
-    },
-  ),
-);
+
+export const useMissionStore = create<MissionState>()((set) => ({
+  target: "jezero",
+  site: null,
+  missionData: null,
+  loadError: null,
+  layer: "like",
+  showHotspots: true,
+  month: 1,
+  heatLimit: 40,
+  slopeLimit: 15,
+  landing: null,
+  delayMode: true,
+  goal: "drive",
+  areaKind: "window",
+  spot: {},
+  hubLimit: 250,
+  customRoute: null,
+  setGoal: (goal) => set({ goal }),
+  setAreaKind: (areaKind) => set({ areaKind }),
+  setSpot: (t, rc) => set((s) => ({ spot: { ...s.spot, [t]: rc }, areaKind: "spot" })),
+  setHubLimit: (hubLimit) => set({ hubLimit }),
+  setCustomRoute: (customRoute) => set({ customRoute, landing: null }),
+  setTarget: (target) => set({ target, site: null, landing: null }),
+  setSite: (site) => set({ site, landing: null }),
+  setLayer: (layer) => set({ layer }),
+  setShowHotspots: (showHotspots) => set({ showHotspots }),
+  setMonth: (month) => set({ month }),
+  setHeatLimit: (heatLimit) => set({ heatLimit }),
+  setSlopeLimit: (slopeLimit) => set({ slopeLimit }),
+  setLanding: (landing) => set({ landing }),
+  setDelayMode: (delayMode) => set({ delayMode }),
+}));
+
+/** The site shown on the Site and Rehearse pages: the user's choice, else the best terrain match. */
+export function currentSite(
+  data: MissionData | null,
+  target: TargetId,
+  site: SiteId | null,
+): SiteId | null {
+  if (!data) return null;
+  return site ?? data.targets[target]?.ranking[0] ?? null;
+}

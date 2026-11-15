@@ -73,8 +73,14 @@ export function astar(grid: SlopeGrid, start: Cell, goal: Cell): Cell[] {
   open.push([h(start[0], start[1]), s]);
 
   const moves: Cell[] = [
-    [1, 0], [-1, 0], [0, 1], [0, -1],
-    [1, 1], [1, -1], [-1, 1], [-1, -1],
+    [1, 0],
+    [-1, 0],
+    [0, 1],
+    [0, -1],
+    [1, 1],
+    [1, -1],
+    [-1, 1],
+    [-1, -1],
   ];
 
   while (open.size) {

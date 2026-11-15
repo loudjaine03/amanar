@@ -1,10 +1,10 @@
-import { lazy, Suspense } from 'react';
-import { useHydrated } from '@tanstack/react-router';
-import type { GridFile } from '@/lib/stage3';
-import type { Bounds, LatLon, Waypoint } from '@/types/mission';
+import { lazy, Suspense } from "react";
+import { useHydrated } from "@tanstack/react-router";
+import type { GridFile } from "@/lib/stage3";
+import type { Bounds, LatLon, Waypoint } from "@/types/mission";
 
 // Leaflet n'existe que dans le navigateur : chargement à la demande, jamais sur le serveur.
-const Inner = lazy(() => import('./ValidateMapInner'));
+const Inner = lazy(() => import("./ValidateMapInner"));
 
 export function ValidateMap(props: {
   bounds: Bounds;

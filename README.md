@@ -1,78 +1,80 @@
-﻿# Amanar · Algeria Beyond Earth (Team Hoggar)
+# Amanar · Algeria Beyond Earth (Team Hoggar)
+
+NASA Space Apps Challenge 2026, Boumerdes. Challenge: *Identify Earth locations that analog the permanent Moon base locations and Mars.*
 
 *Amanar* is the Tuareg name for Orion, "the guide" of desert nights.
 
+**Which Algerian desert site is the best place on Earth to rehearse a Mars or Moon mission?** We measure it: the same six terrain measures are computed on **real Mars and Moon elevation data** and on three Sahara sites, then the rocks are checked against published geology, and an L-band radar model looks for what may be under the sand.
 
-You choose a destination: **Jezero** (Mars, ancient river delta), **Gale** (Mars, layered rocks of Mount Sharp) or the **Marius Hills** (Moon, volcanic domes and a lava-tube pit). The app then shows which of three Algerian Sahara sites is the best place on Earth to rehearse that mission, explains why, and shows where the analogy breaks.
+## Result
 
-| Destination | Best Algerian analog (our scores) | Why |
-| --- | --- | --- |
-| Mars · Jezero | **Ahnet Basin** 22/24 | flat, hyper-arid sedimentary basin with alluvial and evaporite deposits; most radar-surprise hotspots |
-| Mars · Gale | **Tassili n'Ajjer** 19/24 | thick sandstone layers exposed in cliffs and buttes, moderate relief a rover can climb |
-| Moon · Marius Hills | **Hoggar (Atakor)** 15/24 | basaltic lava flows and phonolite domes, high volcanic relief |
+| Destination | Real elevation data used | Terrain match, landing area (/100) | ML twin map, whole map (share of cells) | Rocks |
+| --- | --- | --- | --- | --- |
+| **Mars · Jezero** (Perseverance) | USGS/NASA Mars 2020 CTX DTM, 20 m | Tassili 59 · Ahnet 35 · Hoggar 34 | Tassili 39% (delta, rougher floor) · Hoggar 34% (rim, inlet canyon) · Ahnet 24% (smooth floor) | Ahnet matches |
+| **Mars · Gale** (Curiosity) | NASA-AMMOS MMGIS DEM, 20 m | Tassili 59 · Hoggar 52 · Ahnet 31 | Hoggar 53% (steeper mound) · Ahnet 23% (floor plains) · Tassili 13% · no twin 11% | Tassili matches |
+| **Moon · south pole** (Artemis region, Chang'e-7) | NASA LRO LOLA heights, 40 m | Hoggar 59 · Tassili 45 · Ahnet 11 | Hoggar 67% · Tassili 9% · no twin on Earth 24% | none fully; Hoggar closest |
 
-## The five steps
+No single site does everything: the answer depends on the target, on the part of the target, and on what you want to test. That is why the app starts with your choices.
 
-1. **Target**: the destination on NASA Mars Trek / Moon Trek, four tagged specs, the signal delay.
-2. **Find (AI)** (`/finder`): a form (destination, what you want to test, where; more options for rover slope, month, heat, distance, priority). It ranks 7,500 cells of about 400 m, explains every pick, finds look-alike places, and sends the best reachable spots to the rover.
-3. **Compare**: the three sites in three tabs. *Map*: satellite photo, L-band radar, AI radar surprise, AI terrain types, optical/radar swipe, hotspots. *Score*: the six-axis Analogy Fingerprint. *Limits*: what transfers and where it breaks.
-4. **Hardware** (jury suggestion: materials and pressure):
-   - *Environment gap*: temperature, air pressure, gravity, dust, rough rock, target vs site, each marked TEST HERE, HERE + LAB or LAB ONLY.
-   - *Materials*: wheels, structure, seals, solar panels and optics, thermal blankets, mechanisms, habitat shell: candidate materials, the threat on the target (Curiosity's wheel damage, InSight's dust, Apollo's seal leaks), what the site can test and what needs a lab.
-   - *Pressure*: site air pressure vs target; habitat wall load and the uncrewed over-pressure test that reproduces it on Earth; wheel ground pressure and the lighter Earth test rover that matches it (900 kg on Mars ≈ 342 kg on Earth, like JPL's Scarecrow).
-   - *Sensor kit*: wheel load cells, cone penetrometer, barometer, habitat pressure transducer, dust sensor.
-5. **Rehearse**: A* rover traverse with the real signal delay (11 min Mars, compressed; 1.3 s Moon, real time), a **simulated sensor panel** (elevation, air pressure, slope, wheel load and ground pressure along the route) and **crew safety**: route slope, heat and night cold for the chosen month, distance to help, the workable season (months under the heat limit) and a crew checklist (water and shade, communications, evacuation, sandstorms and wadi floods, first aid, permits).
+## The four steps in the app
 
-Everything you log goes to the **Mission Dossier** (Markdown or PDF).
+1. **Plan**: choose the destination, what to test (driving, rock science, radar under sand, crew training), which part of the target (landing area, whole map or a spot you click), your rover's slope limit, the month, a heat limit and the distance from town. The kNN twin model runs live in your browser on the Earth ground you allow and ranks the three sites, with the reasons, the best spots on a map, and the model's vote for the spot you clicked.
+2. **Compare**: ranking by measured terrain match, the ML twin map of the whole target, the rocks check, the best site for each kind of test, same-colour slope maps, the six measures side by side, the stability checks, and where the analogy breaks. A Markdown report can be downloaded.
+3. **Site**: the look-alike map, target-like spots, what this site can test (slopes, wheel wear, relief, radar, heating), **materials** (what threatens each rover/habitat part on the target and whether this site can test it, from measured ratios), **crew safety** by month (heat, water, cold, falls, flash floods, time to help), radar hotspots with their four checks, and field conditions.
+4. **Rehearse**: an A* rover route through the Plan's spots (or the default ones), driven with the real signal delay (11 min for Mars, compressed; 1.3 s for the Moon, real time), **simulated pressure sensors** along the route (barometer, tilt, wheel load cells, ground pressure, with elevation and slope profiles and an Earth twin rover from the target's gravity), and a crew-access check by month.
 
-## Machine learning (honest version)
+## How the comparison works
 
-All models run offline in `pipeline/build_all.py` (scikit-learn). The website only reads the results.
+- **Terrain match (Measured).** For every 400 m cell: mean slope, share steeper than 15°, roughness (125 m), relief within 1 km, slope over 400 m and relief within 4 km (`pipeline/terrain.py`, identical for Earth, Mars and the Moon). The score is the average overlap of the six distributions (0 to 100).
+- **Mars/Moon data checks.** The Jezero DTM matches NASA's MOLA altimeter (r = 0.995, 28 m RMS). Our lunar slopes give Shackleton's inner wall 31°, as published (~30°, Zuber et al. 2012); the slope column shipped with that file is about twice too steep and is not used.
+- **Machine learning: the twin model (Measured).** A k-nearest-neighbour model (k = 15) is trained on the six measures of the 7,500 Algerian cells, labelled by site, and applied to every 400 m cell of the Mars/Moon maps; a cell with no Earth cell close enough gets "no twin". It recognises the right site on 87% of unseen 4 km Earth blocks (spatial cross-validation) and its shares move by at most 2 points with other measure sets. The same model runs in the browser on the Plan page (`src/lib/twins.ts`; a test checks it reproduces the scikit-learn predictions).
+- **Rocks (Reference).** One cited sentence per target and site: match, partial or no. Geology never changes the terrain number; it sets the label (Strong analog, Partial analog, Terrain only, Rocks only, Weak analog).
+- **Radar surprise (Measured, then checked).** A gradient-boosting model predicts JAXA PALSAR-2 L-band from optical, C-band and terrain. R² inside each site (spatial-block CV): Ahnet 0.63, Tassili 0.74, Hoggar 0.53; it fails on an unseen site (Ahnet −2.9), so hotspots are compared inside each site only. Every hotspot is then checked: away from the box edge, not tracing a visible boundary, radar images aligned (whole-box offsets under 1 pixel), and on a smooth flat cover where L-band can see below. Ahnet 21 of 155, Tassili 11 of 47, Hoggar 1 of 31 pass. Many of the rest follow exposed rock layers. Nothing is confirmed until a ground-penetrating-radar line is driven.
 
-- **Radar surprise** (self-supervised regression): a gradient-boosting model predicts L-band backscatter from what the surface shows (optical, C-band, slope, roughness, relief). Predictions are out-of-fold on 2.5 km spatial blocks. Where L-band is much brighter than predicted (z > 2), something the surface does not explain is there: a *candidate* buried structure. R² per site: Ahnet 0.63, Tassili 0.74, Hoggar 0.53. Leave-one-site-out fails on Ahnet (R² < 0) because its sand sheet is unlike the rocky sites, so hotspots are only compared inside each site.
-- **Terrain units** (unsupervised): Gaussian mixture on the 7,500 cells, number of units chosen with BIC (6).
-- **Analog Finder**: transparent weighted percentiles for destination + objective, the team's materials judgement (30 %), and the operations weight you choose; nearest neighbours for "find places like this". No labelled analog database exists, so nothing is claimed to be "trained to find analogs".
+## What changed after the review (15 Nov)
 
-## Evidence tags
+- Your choices are back (Plan page), and the ranking for them comes from a real ML model run live, not from hand-set weights.
+- Materials, crew safety and simulated pressure sensors are back, computed from each site's data.
 
-Every number carries one: **Measured** (computed by our scripts from an identified dataset), **Interpreted** (our reading or judgement), **Hypothesis** (must be checked in the field), **Reference** (fact from a cited source). Values nobody computed show `TBD`, and a MOCK DATA banner appears if the data file is incomplete.
-
-## Scoring (team assumptions, shown in the app)
-
-Six axes, 0 to 3: terrain, materials, dryness, subsurface, temperature, access. Terrain and materials count double (max 24). Top total = STRONGEST, at least 50 % = PARTIAL, else WEAK. The terrain rule depends on the destination (flat for Jezero, moderate relief for Gale, high relief for Marius Hills). Full rules: Stage 02 > "How each axis is scored", and `pipeline/content.py`.
+- Real Mars and Moon elevation data in the comparison (they were typed-in specs before).
+- The lunar target is now the **south pole**, where permanent bases are planned (it was the equatorial Marius Hills).
+- The ranking is measured; the hand-scored "materials" axis that counted double is gone, and so are the temperature and dryness axes that gave every site the same score.
+- R² is reported inside each site (the pooled 0.93 was inflated by the differences between sites).
+- The clustering "terrain types" (which mostly re-discovered the sites) are replaced by the look-alike map.
+- Radar hotspots go through four artefact checks; spot picks stay out of the 800 m box border.
+- Hardware tests are now computed for each site and target, inside the Site page.
+- Simpler interface: four steps instead of five, English only, larger text.
 
 ## Run it
 
 ```sh
 npm install
 npm run dev        # http://localhost:8080
-npm test           # 91 unit tests (data contract, scoring, A*, Finder, hardware physics, dossier)
-npm run build      # production build
+npm test           # 62 tests: data contract, browser ML = pipeline ML, plan rules, materials, pressure physics, A*, report
+npm run build
 ```
 
-On Windows PowerShell use `npm.cmd` if scripts are blocked.
-
-## Rebuild the data (only if you change a stack or a rule)
+## Rebuild the data
 
 ```sh
 pip install -r pipeline/requirements.txt
-python pipeline/build_all.py
+python pipeline/compare.py                       # a few seconds, offline: everything the website reads
+python pipeline/build_all.py                     # only if you have the Earth Engine stacks (see pipeline/README.md)
+python pipeline/planetary/prepare_targets.py --jezero … --gale … --moon … --mola …   # only to re-cut the Mars/Moon windows
 ```
-
-Inputs: `pipeline/{ahnet,tassili,hoggar}_stack.tif` (Earth Engine export, see `pipeline/01_export_stack.js`), `pipeline/power_*.json` (NASA POWER), `pipeline/content.py` (texts, targets, rules). Outputs: `public/mission_data.json`, `public/ml/`, `public/overlays/`, `public/grids/`, `pipeline/out/report.txt`. Never edit the generated JSON by hand: edit `content.py` and rerun.
 
 ## Limits
 
-Gravity, atmosphere, radiation, materials and instruments differ (listed for every site). Hotspots are candidates, waypoints are hypotheses, straight-line distance is not road access, climate averages are not a forecast. Team-built experimental indicators, not an official NASA assessment.
+Three 20 km boxes chosen by the team (other places may match better). Terrain shape and published geology only: no mineral spectra or regolith properties. Gravity, air pressure, radiation and polar light cannot be reproduced on Earth. Hotspots are candidates, spots and waypoints are hypotheses, straight-line distance is not road access, climate averages are not a forecast. Team-built experimental indicators, not an official NASA assessment.
 
 ## Data and acknowledgements
 
-- JAXA: ALOS-2 PALSAR-2 yearly mosaic (L-band). JAXA owns the PALSAR-2 data.
-- ESA / Copernicus: Sentinel-1, Sentinel-2, Copernicus DEM GLO-30.
-- NASA: POWER climatology, Mars Trek, Moon Trek, NSSDC Mars and Moon fact sheets; JPL (Curiosity, Scarecrow), LROC (Marius Hills), NASA Science (Perseverance), NASA TM-2010-216781 (lunar dust); ASME on the NASA Glenn shape-memory tyre.
-- Caddeo et al. 2025 (EPSC-DPS2025-1671) on the Ahnet Basin; Azzouni-Sekkal et al. 2007 (GSA SP 418) on the Atakor.
-- Esri World Imagery (basemap).
+- **Mars**: USGS Astrogeology / NASA Mars 2020 Terrain Relative Navigation CTX DTM (Fergason et al. 2020); NASA MGS MOLA MEGDR (PDS); NASA-AMMOS MMGIS (JPL) reference DEM of Gale crater; NASA Mars Trek.
+- **Moon**: NASA LRO LOLA heights from the NASA App Development Challenge lunar data file; NASA Moon Trek.
+- **Earth**: JAXA ALOS-2 PALSAR-2 (JAXA owns the PALSAR-2 data); ESA/Copernicus Sentinel-1, Sentinel-2 and DEM GLO-30; NASA POWER; Esri World Imagery.
+- **Literature**: Farley et al. 2022 (Jezero floor); NASA JPL (Curiosity lakes); Zuber et al. 2012 (Shackleton); NASA Artemis III candidate regions (2022, 2024); Caddeo et al. 2025 (Ahnet); UNESCO WHC (Tassili); Azzouni-Sekkal et al. 2007 (Atakor). Full list in the app (Method page).
+- Copies used for the planetary windows: the Jezero DTM grid from github.com/RoshTzsche/MarsWalk and the lunar data file from github.com/1piyalib/rover_pathfinder; checksums in `pipeline/planetary/targets.json`.
 
-AI use: code assistance and drafting with AI tools; all data processing runs in our own scripts, and every number is traceable to a dataset or a cited source.
+**AI use**: the app was scaffolded with Lovable, and code, analysis scripts and text were written and reviewed with AI assistants (including Claude by Anthropic). All numbers come from our scripts and the cited datasets.
 
 Team Hoggar: _names here_ · App: _link here_ · Demo video: _link here_

@@ -1,17 +1,27 @@
-import { useMemo, useEffect } from 'react';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import { CircleMarker, ImageOverlay, MapContainer, Polyline, Rectangle, TileLayer, Tooltip, useMap, useMapEvents } from 'react-leaflet';
-import type { GridFile } from '@/lib/stage3';
-import type { Bounds, LatLon, Waypoint } from '@/types/mission';
+import { useMemo, useEffect } from "react";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import {
+  CircleMarker,
+  ImageOverlay,
+  MapContainer,
+  Polyline,
+  Rectangle,
+  TileLayer,
+  Tooltip,
+  useMap,
+  useMapEvents,
+} from "react-leaflet";
+import type { GridFile } from "@/lib/stage3";
+import type { Bounds, LatLon, Waypoint } from "@/types/mission";
 
 /** Dessine la grille de pente en image : vert/jaune = praticable, rouge = plus raide que la limite (mur). */
 function slopeImage(grid: GridFile, limit: number): string {
-  const canvas = document.createElement('canvas');
+  const canvas = document.createElement("canvas");
   canvas.width = grid.cols;
   canvas.height = grid.rows;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return '';
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return "";
   const img = ctx.createImageData(grid.cols, grid.rows);
   grid.slope.forEach((s, i) => {
     const o = i * 4;
@@ -19,11 +29,19 @@ function slopeImage(grid: GridFile, limit: number): string {
       img.data.set([239, 68, 68, 150], o);
     } else {
       const t = Math.min(s / limit, 1);
-      img.data.set([Math.round(34 + 216 * t), Math.round(197 + 7 * t), Math.round(94 - 73 * t), Math.round(55 + 70 * t)], o);
+      img.data.set(
+        [
+          Math.round(34 + 216 * t),
+          Math.round(197 + 7 * t),
+          Math.round(94 - 73 * t),
+          Math.round(55 + 70 * t),
+        ],
+        o,
+      );
     }
   });
   ctx.putImageData(img, 0, 0);
-  return canvas.toDataURL('image/png');
+  return canvas.toDataURL("image/png");
 }
 
 function ClickToPick({ onPick }: { onPick: (p: LatLon) => void }) {
@@ -40,7 +58,8 @@ function FitBounds({ bounds, padding }: { bounds: Bounds; padding: number }) {
       map.fitBounds(L.latLngBounds(bounds), { padding: [padding, padding] });
     };
     const t = setTimeout(fit, 120);
-    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(() => map.invalidateSize()) : null;
+    const ro =
+      typeof ResizeObserver !== "undefined" ? new ResizeObserver(() => map.invalidateSize()) : null;
     ro?.observe(map.getContainer());
     return () => {
       clearTimeout(t);
@@ -73,7 +92,7 @@ export default function ValidateMapInner({
   const url = useMemo(() => slopeImage(grid, limit), [grid, limit]);
   return (
     <MapContainer
-      key={bounds.flat().join(',')}
+      key={bounds.flat().join(",")}
       bounds={L.latLngBounds(bounds)}
       boundsOptions={{ padding: [10, 10] }}
       className="match-map"
@@ -89,19 +108,42 @@ export default function ValidateMapInner({
         maxZoom={15}
       />
       {url && <ImageOverlay url={url} bounds={bounds} opacity={0.7} />}
-      <Rectangle bounds={bounds} pathOptions={{ color: '#2dd4bf', weight: 1.5, dashArray: '6 5', fill: false }} />
+      <Rectangle
+        bounds={bounds}
+        pathOptions={{ color: "#2dd4bf", weight: 1.5, dashArray: "6 5", fill: false }}
+      />
       <ClickToPick onPick={onPick} />
-      {route.length > 1 && <Polyline positions={route} pathOptions={{ color: '#ffffff', weight: 3, dashArray: '2 7', lineCap: 'round' }} />}
-      <CircleMarker center={start} radius={7} pathOptions={{ color: '#22c55e', weight: 2, fillOpacity: 0.9 }}>
+      {route.length > 1 && (
+        <Polyline
+          positions={route}
+          pathOptions={{ color: "#ffffff", weight: 3, dashArray: "2 7", lineCap: "round" }}
+        />
+      )}
+      <CircleMarker
+        center={start}
+        radius={7}
+        pathOptions={{ color: "#22c55e", weight: 2, fillOpacity: 0.9 }}
+      >
         <Tooltip direction="top">Start</Tooltip>
       </CircleMarker>
       {waypoints.map((w) => (
-        <CircleMarker key={w.id} center={w.coords} radius={6} pathOptions={{ color: '#38bdf8', weight: 2, fillOpacity: 0.8 }}>
-          <Tooltip permanent direction="right">{w.id}</Tooltip>
+        <CircleMarker
+          key={w.id}
+          center={w.coords}
+          radius={6}
+          pathOptions={{ color: "#38bdf8", weight: 2, fillOpacity: 0.8 }}
+        >
+          <Tooltip permanent direction="right">
+            {w.id}
+          </Tooltip>
         </CircleMarker>
       ))}
       {rover && (
-        <CircleMarker center={rover} radius={9} pathOptions={{ color: '#f97316', weight: 3, fillColor: '#fdba74', fillOpacity: 1 }}>
+        <CircleMarker
+          center={rover}
+          radius={9}
+          pathOptions={{ color: "#f97316", weight: 3, fillColor: "#fdba74", fillOpacity: 1 }}
+        >
           <Tooltip direction="top">Rover</Tooltip>
         </CircleMarker>
       )}

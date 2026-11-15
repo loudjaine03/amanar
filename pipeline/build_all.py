@@ -1,35 +1,33 @@
 """
-build_all.py  --  Team Hoggar / Algeria Beyond Earth
+build_all.py  --  Team Hoggar / Amanar  (step 1 of 2)
 
-ONE command that turns the three Earth Engine stacks into everything the website reads:
+Turns the three Earth Engine stacks into the Earth-side files:
 
-    python pipeline/build_all.py
+    python pipeline/build_all.py          (needs pipeline/<site>_stack.tif, about 30 s)
+    python pipeline/compare.py            (step 2: compares with Mars / Moon, writes mission_data.json)
 
 Inputs (pipeline/):  <site>_stack.tif   7 bands: 1 L_HH, 2 L_HV, 3 C_VV, 4 B4, 5 B3, 6 B2, 7 DEM (EPSG:4326, 25 m)
                      power_<site>.json  NASA POWER climatology (T2M_MAX, T2M_MIN, PRECTOTCORR)
-                     content.py         the human decisions (texts, targets, rules, objectives)
-Outputs (public/):   overlays/<site>_{optical,lband,cband,slope,anomalies,classes,surprise}.png
-                     grids/<site>_slope.json            160 x 160 rover grid (90th percentile slope per block)
-                     ml/cells.json, ml/model.json       Analog Finder data (7,500 cells of ~400 m)
-                     mission_data.json                  3 scenarios x 3 sites, scores, verdicts, waypoints
-                     pipeline/out/report.txt            model validation and checks
+Outputs:             public/overlays/<site>_{optical,lband,cband,slope,anomalies,surprise}.png
+                     public/grids/<site>_slope.json      160 x 160 rover grid (90th percentile slope per block)
+                     public/ml/cells.json                7,500 cells of ~400 m (terrain, optical and radar measures)
+                     pipeline/sites.json                 site metrics, climate, hub, radar-model validation
+                     pipeline/out/report.txt
 
-Machine learning (all offline, scikit-learn):
-  1. Radar surprise (self-supervised regression). A gradient-boosting model learns to predict L-band
-     backscatter from what the surface shows (optical, C-band, slope, roughness, relief). Where L-band is
-     much brighter than predicted, something the surface does not explain is there: a candidate buried
-     structure (SIR-A style). Predictions are out-of-fold (spatial blocks) so a pixel never predicts itself.
-     Validated by spatial-block cross-validation and leave-one-site-out.
-  2. Terrain units (unsupervised). A Gaussian mixture groups all cells of the three sites into units.
-  3. Analog Finder (in the browser). Ranks cells for a destination + objective with transparent weighted
-     percentiles, and finds look-alike cells (nearest neighbours). Waypoints below come from it.
-Nothing here is labelled ground truth: hotspots and units are Interpreted, waypoints are Hypotheses.
+Radar surprise (self-supervised regression, scikit-learn): a gradient-boosting model learns to predict L-band
+backscatter from what the surface shows (optical, C-band, slope, roughness, relief). Where L-band is much brighter
+than predicted, something the surface does not explain may be there (SIR-A style). Predictions are out-of-fold on
+2.5 km spatial blocks. R2 is reported INSIDE each site; a pooled R2 is inflated by the differences between sites and
+is not used. compare.py then checks every hotspot for known artefacts.
+
+The terrain measures use the same definitions as pipeline/terrain.py (also used for Mars and the Moon).
+Set AMANAR_PUBLIC=<dir> to write the public files somewhere else (used by the smoke test).
 """
 import json
 import math
+import os
 import sys
 from datetime import datetime, timezone
-from heapq import heappop, heappush
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -39,17 +37,18 @@ import numpy as np  # noqa: E402
 import rasterio  # noqa: E402
 from PIL import Image  # noqa: E402
 from scipy import ndimage as ndi  # noqa: E402
-from scipy.stats import rankdata  # noqa: E402
 from sklearn.ensemble import HistGradientBoostingRegressor  # noqa: E402
 from sklearn.inspection import permutation_importance  # noqa: E402
 from sklearn.metrics import r2_score  # noqa: E402
-from sklearn.mixture import GaussianMixture  # noqa: E402
 
 import content as C  # noqa: E402
+from terrain import edges, local_std  # noqa: E402,F401  (same helpers as the Mars/Moon side)
 
 ROOT = HERE.parent
-PUB = ROOT / "public"
-OUT_OV, OUT_GRID, OUT_ML, OUT_REP = PUB / "overlays", PUB / "grids", PUB / "ml", HERE / "out"
+PUB = Path(os.environ.get("AMANAR_PUBLIC", ROOT / "public"))
+OUT_OV, OUT_GRID, OUT_ML = PUB / "overlays", PUB / "grids", PUB / "ml"
+OUT_REP = Path(os.environ.get("AMANAR_REPORT", HERE / "out"))
+SITES_JSON = Path(os.environ.get("AMANAR_SITES", HERE / "sites.json"))
 STEEP = 15.0      # team assumption, same as the app's default rover slope limit
 GRID = 160        # rover grid cells per side
 CELLS = 50        # Analog Finder cells per side (about 400 m)
@@ -75,10 +74,6 @@ def haversine_km(a, b):
     return 2 * 6371 * math.asin(math.sqrt(h))
 
 
-def local_std(x, size):
-    m = ndi.uniform_filter(x, size)
-    m2 = ndi.uniform_filter(x * x, size)
-    return np.sqrt(np.maximum(m2 - m * m, 0))
 
 
 def stretch(a, lo=2, hi=98):
@@ -94,8 +89,6 @@ def fill(a):
     return a
 
 
-def edges(n, k):
-    return np.linspace(0, n, k + 1).round().astype(int)
 
 
 def cell_center(bounds, rows, cols, r, c):
@@ -114,7 +107,7 @@ def latlon_to_cell(bounds, rows, cols, p):
 # 1. per-site rasters
 # ------------------------------------------------------------------------------------------------
 def load_site(site):
-    path = HERE / f"{site}_stack.tif"
+    path = Path(os.environ.get("AMANAR_STACKS", HERE)) / f"{site}_stack.tif"
     if not path.exists():
         sys.exit(f"Missing {path.name}. Export it with 01_export_stack.js (Earth Engine) and put it in pipeline/.")
     with rasterio.open(path) as ds:
@@ -236,7 +229,7 @@ def surprise_model(sites):
                              "red": "redness", "tex": "optical texture", "slope": "slope", "rough": "roughness",
                              "relief": "relief (1 km)", "cvv": "C-band VV"},
         "samples": int(len(y)),
-        "r2_block_cv": round(r2_block, 3),
+        "r2_pooled_not_used": round(r2_block, 3),   # inflated by between-site differences: never shown
         "r2_block_cv_by_site": r2_block_site,
         "r2_leave_one_site_out": loso,
         "importance": [{"f": p, "v": round(float(v), 4)} for p, v in imp],
@@ -272,297 +265,14 @@ def build_cells(sites):
     keys = list(C.FEATURES)
     vals = {k: np.array([row[k] for row in rows]) for k in keys}
     site_of = np.array([row["site"] for row in rows])
-    pct = {k: np.round((rankdata(vals[k]) - 1) / (len(rows) - 1) * 100).astype(int) for k in C.FINDER_FEATURES}
-    return vals, pct, site_of
-
-
-UNIT_FEATURES = ["slope_mean", "relief", "rough", "bright", "red", "lhh", "cvv", "lmc", "surprise"]
-UNIT_COLOURS = [(29, 158, 117), (239, 159, 39), (127, 119, 221), (226, 75, 74), (56, 189, 248), (240, 220, 90), (180, 120, 80)]
-
-
-def terrain_units(vals, site_of, site_ids):
-    X = np.stack([vals[k] for k in UNIT_FEATURES], 1)
-    mu, sd = X.mean(0), X.std(0) + 1e-9
-    Z = (X - mu) / sd
-    bics = {}
-    fits = {}
-    for k in range(3, 8):
-        gm = GaussianMixture(k, covariance_type="full", n_init=3, random_state=SEED).fit(Z)
-        bics[k] = gm.bic(Z)
-        fits[k] = gm
-    # BIC keeps falling with k on 7,500 cells; we stop where the gain becomes small (< 2 %): readable units
-    ks = sorted(bics)
-    k_best = ks[-1]
-    for a, b in zip(ks, ks[1:]):
-        if (bics[a] - bics[b]) / abs(bics[a]) < 0.02:
-            k_best = a
-            break
-    k_best = min(k_best, 6)
-    gm = fits[k_best]
-    lab = gm.predict(Z)
-    # order units by mean slope so colours are stable
-    order = np.argsort([X[lab == u, 0].mean() for u in range(k_best)])
-    remap = {int(old): new for new, old in enumerate(order)}
-    lab = np.array([remap[int(u)] for u in lab])
-    units = []
-    base_names = []
-    for u in range(k_best):
-        zf = dict(zip(UNIT_FEATURES, Z[lab == u].mean(0)))
-        terrain = "Flat" if zf["slope_mean"] < -0.5 else "Steep" if zf["slope_mean"] > 0.8 else "Sloping"
-        surface = "bright" if zf["bright"] > 0.5 else "dark" if zf["bright"] < -0.5 else "mid-tone"
-        radar = "radar-bright" if zf["lhh"] > 0.6 else "radar-dark" if zf["lhh"] < -0.6 else "radar-moderate"
-        base_names.append(f"{terrain}, {surface}, {radar}")
-    EXTRA = {"red": ("redder", "paler"), "rough": ("rougher", "smoother"), "surprise": ("more radar surprise", "less radar surprise"),
-             "lmc": ("L-band over C-band", "C-band over L-band"), "relief": ("more relief", "less relief"),
-             "bright": ("brighter", "darker"), "cvv": ("C-band brighter", "C-band darker")}
-    names = []
-    for u in range(k_best):
-        same = [v for v in range(k_best) if base_names[v] == base_names[u]]
-        name = base_names[u]
-        if len(same) > 1:
-            zu = Z[lab == u].mean(0)
-            zg = np.mean([Z[lab == v].mean(0) for v in same], 0)
-            diff = {k: zu[j] - zg[j] for j, k in enumerate(UNIT_FEATURES) if k in EXTRA}
-            k = max(diff, key=lambda q: abs(diff[q]))
-            name += ", " + EXTRA[k][0 if diff[k] > 0 else 1]
-        while name in names:
-            name += "*"
-        names.append(name)
-        share = {sid: round(float((lab[site_of == i] == u).mean() * 100), 1) for i, sid in enumerate(site_ids)}
-        cent = {k: round(float(X[lab == u, j].mean()), 3) for j, k in enumerate(UNIT_FEATURES)}
-        units.append({"id": u, "name": name, "color": "#%02x%02x%02x" % UNIT_COLOURS[u], "share": share, "centroid": cent})
-    log(f"[units] BIC by k: " + ", ".join(f"{k}:{bics[k]:.0f}" for k in ks) + f"  -> k = {k_best}")
-    for un in units:
-        log(f"[units] {un['id']} {un['name']:40s} share {un['share']}")
-    return lab, units, {"k": k_best, "bic": {str(k): round(float(v), 1) for k, v in bics.items()}, "features": UNIT_FEATURES}
-
-
-# ------------------------------------------------------------------------------------------------
-# 4. Analog Finder scoring (same formula as src/lib/finder.ts)
-# ------------------------------------------------------------------------------------------------
-def pref_score(p, want):
-    if want == "low":
-        return 1 - p / 100
-    if want == "high":
-        return p / 100
-    lo, hi = want
-    if lo <= p <= hi:
-        return 1.0
-    d = lo - p if p < lo else p - hi
-    return max(0.0, 1 - d / 50)
-
-
-def science_scores(pct, prefs):
-    tot = sum(pr["w"] for pr in prefs)
-    out = np.zeros(len(next(iter(pct.values()))))
-    for pr in prefs:
-        p = pct[pr["f"]].astype(float)
-        if pr["want"] == "low":
-            s = 1 - p / 100
-        elif pr["want"] == "high":
-            s = p / 100
-        else:
-            lo, hi = pr["want"]
-            d = np.where(p < lo, lo - p, np.where(p > hi, p - hi, 0))
-            s = np.clip(1 - d / 50, 0, 1)
-        out += pr["w"] * s
-    return out / tot
-
-
-# ------------------------------------------------------------------------------------------------
-# 5. rover waypoints (Hypotheses picked by the Finder) + A* check (same algorithm as src/lib/astar.ts)
-# ------------------------------------------------------------------------------------------------
-def astar(grid, limit, start, goal):
-    rows, cols = grid.shape
-
-    def ok(r, c):
-        return 0 <= r < rows and 0 <= c < cols and grid[r, c] <= limit
-    if not ok(*start) or not ok(*goal):
-        return []
-    g = {start: 0.0}
-    came = {}
-    h = lambda r, c: math.hypot(r - goal[0], c - goal[1])  # noqa: E731
-    open_ = [(h(*start), start)]
-    while open_:
-        f, cur = heappop(open_)
-        if cur == goal:
-            break
-        if f - h(*cur) > g[cur] + 1e-9:
-            continue
-        r, c = cur
-        for dr, dc in ((1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (1, -1), (-1, 1), (-1, -1)):
-            nr, nc = r + dr, c + dc
-            if not ok(nr, nc) or (dr and dc and (not ok(r + dr, c) or not ok(r, c + dc))):
-                continue
-            ng = g[cur] + math.hypot(dr, dc) * (1 + grid[nr, nc] / 5)
-            if ng < g.get((nr, nc), math.inf):
-                g[(nr, nc)] = ng
-                came[(nr, nc)] = cur
-                heappush(open_, (ng + h(nr, nc), (nr, nc)))
-    if start != goal and goal not in came:
-        return []
-    path, k = [goal], goal
-    while k != start:
-        k = came[k]
-        path.append(k)
-    return path[::-1]
-
-
-ADJ = {
-    "surprise": ("radar-surprise", "radar-quiet"), "lmc": ("L-band-bright", "L-band-dark"),
-    "slope_mean": ("steep", "flat"), "steep": ("steep", "gentle"), "bright": ("bright", "dark"),
-    "relief": ("high-relief", "low-relief"), "rough": ("rough", "smooth"), "red": ("reddish", "pale"),
-    "cvv": ("C-band-bright", "C-band-dark"),
-}
-TITLE = {
-    "surprise": ("Radar-surprise hotspot", "Radar-quiet patch"),
-    "lmc": ("L-band brighter than C-band", "L-band darker than C-band"),
-    "slope_mean": ("Steeper ground", "Flat ground"),
-    "steep": ("Steep patch", "Gentle ground"),
-    "bright": ("Bright surface", "Dark surface"),
-    "relief": ("High-relief ground", "Low-relief ground"),
-    "rough": ("Rough surface", "Smooth surface"),
-    "red": ("Reddish surface", "Pale surface"),
-    "cvv": ("C-band bright, rough at small scale", "C-band dark, smooth at small scale"),
-}
-INSPECT = {
-    "mars_water": ["Are the sediments here rounded and sorted, as flowing water leaves them?",
-                   "Is there coarse or layered material under the sand where L-band is bright?",
-                   "Can a short core show fine, lake-like layers?"],
-    "mars_layers": ["Which layer is at the bottom here, and does it change upslope?",
-                    "What is each layer made of?",
-                    "Is there a fine-grained, lake-like layer worth drilling?"],
-    "moon_volcanic": ["Can the rover cross this volcanic relief safely?",
-                      "Does radar show a void or a buried flow front under this spot?",
-                      "Is the dark rock basalt, and how weathered is it?"],
-}
-
-
-def merged(prefs):
-    """Destination and objective can both ask for the same feature: merge them (weights add)."""
-    out = {}
-    for pr in prefs:
-        key = (pr["f"], json.dumps(pr["want"]))
-        out.setdefault(key, {"f": pr["f"], "want": pr["want"], "w": 0})["w"] += pr["w"]
-    return list(out.values())
-
-
-def fact(f, want, v):
-    lab = C.FEATURES[f][0].lower()
-    if want == "high":
-        return f"{lab} in the top 1 % of cells" if v >= 99 else f"{lab} higher than {v} % of cells"
-    if want == "low":
-        return f"{lab} in the lowest 1 % of cells" if v <= 1 else f"{lab} lower than {100 - v} % of cells"
-    return f"{lab} in the middle range (percentile {v})"
-
-
-def describe(pct_row, prefs, used_titles):
-    contrib = sorted(merged(prefs), key=lambda pr: -pr["w"] * pref_score(pct_row[pr["f"]], pr["want"]))
-    adjs, feats = [], []
-    for pr in contrib:
-        if isinstance(pr["want"], list):
-            a = "moderate-relief" if pr["f"] == "relief" else "moderate-slope" if pr["f"] == "slope_mean" else ADJ[pr["f"]][0]
-        else:
-            a = ADJ[pr["f"]][0 if pr["want"] == "high" else 1]
-        if a not in adjs:
-            adjs.append(a)
-            feats.append(pr["f"])
-        if len(adjs) == 2:
-            break
-    order = ["slope_mean", "steep", "relief", "rough", "bright", "red", "surprise", "lmc", "cvv"]
-    adjs = [a for _, a in sorted(zip(feats, adjs), key=lambda t: order.index(t[0]))]
-    if all(a.startswith("moderate") for a in adjs):
-        title = "Mid-slope outcrop zone"
-    else:
-        title = (", ".join(adjs) + " ground").capitalize()
-    seen, facts = set(), []
-    for pr in contrib:
-        if pr["f"] in seen:
-            continue
-        seen.add(pr["f"])
-        facts.append(fact(pr["f"], pr["want"], pct_row[pr["f"]]))
-        if len(facts) == 2:
-            break
-    return title, "; ".join(facts)
-
-
-def make_waypoints(sc_id, site, grid, cells_idx, vals, pct, bounds):
-    sc = C.SCENARIOS[sc_id]
-    prefs = C.DESTINATION_PROFILES[sc_id] + C.OBJECTIVES[sc["default_objective"]]["prefs"]
-    passable = grid <= STEEP
-    lab, n = ndi.label(passable)                           # 4-connected = reachable without corner cutting
-    if n == 0:
-        return None
-    main = 1 + int(np.argmax(ndi.sum(passable, lab, range(1, n + 1))))
-    scores = science_scores({k: v[cells_idx] for k, v in pct.items()}, prefs)
-    order = np.argsort(-scores)
-    picked = []
-    for min_km in (3.0, 1.5):
-        picked = []
-        for j in order:
-            r, c = divmod(int(j), CELLS)
-            ll = cell_center(bounds, CELLS, CELLS, r, c)
-            gr, gc = latlon_to_cell(bounds, GRID, GRID, ll)
-            if lab[gr, gc] != main:
-                continue
-            if all(haversine_km(ll, q["ll"]) >= min_km for q in picked):
-                picked.append({"j": int(j), "ll": ll, "g": (gr, gc), "score": float(scores[j])})
-            if len(picked) == 3:
-                break
-        if len(picked) == 3:
-            break
-    # landing: flat ground in the same connected area, at least 1.5 km from every waypoint, close to the first one
-    local = ndi.uniform_filter(np.where(passable, grid, 90.0), 3)
-    best, best_cost = None, math.inf
-    for gr in range(1, GRID - 1, 2):
-        for gc in range(1, GRID - 1, 2):
-            if lab[gr, gc] != main or local[gr, gc] > 6:
-                continue
-            ll = cell_center(bounds, GRID, GRID, gr, gc)
-            d = [haversine_km(ll, q["ll"]) for q in picked]
-            if min(d) < 1.5:
-                continue
-            cost = local[gr, gc] + 0.4 * min(d)
-            if cost < best_cost:
-                best, best_cost = (gr, gc, ll), cost
-    if best is None:
-        return None
-    landing = best[2]
-    # visit order: greedy nearest neighbour from the landing point
-    route, cur, rest = [], landing, picked[:]
-    while rest:
-        nxt = min(rest, key=lambda q: haversine_km(cur, q["ll"]))
-        route.append(nxt)
-        rest.remove(nxt)
-        cur = nxt["ll"]
-    # check with the same A* as the app, at the default slope limit
-    stops = [(best[0], best[1])] + [q["g"] for q in route]
-    km = 0.0
-    for a, b in zip(stops, stops[1:]):
-        path = astar(grid, STEEP, a, b)
-        if not path:
-            log(f"[waypoints] {sc_id}/{site}: no A* route {a}->{b} (should not happen)")
-            return None
-        pts = [cell_center(bounds, GRID, GRID, r, c) for r, c in path]
-        km += sum(haversine_km(p, q) for p, q in zip(pts, pts[1:]))
-    wps, used = [], []
-    for i, q in enumerate(route):
-        row = {k: int(v[cells_idx[q["j"]]]) for k, v in pct.items()}
-        title, why = describe(row, prefs, used)
-        used.append(title)
-        wps.append({"id": f"WP-0{i + 1}", "coords": q["ll"], "title": title + " candidate",
-                    "inspect": INSPECT[sc_id][i], "tool": sc["tools"][i], "tag": "Hypothesis",
-                    "why": f"Picked by the Analog Finder ({C.OBJECTIVES[sc['default_objective']]['label'].lower()}): {why}."})
-    log(f"[waypoints] {sc_id:13s} {site:8s} landing {landing}  route {km:.1f} km at {STEEP:.0f}°")
-    return {"grid": f"/grids/{site}_slope.json", "slope_limit_deg": STEEP, "landing": landing,
-            "waypoints": wps, "route_km_default": round(km, 1)}
+    return vals, site_of
 
 
 # ------------------------------------------------------------------------------------------------
 # 6. climate
 # ------------------------------------------------------------------------------------------------
 def load_power(site):
-    path = HERE / f"power_{site}.json"
+    path = Path(os.environ.get("AMANAR_STACKS", HERE)) / f"power_{site}.json"
     if not path.exists():
         return None
     raw = json.loads(path.read_text(encoding="utf-8"))
@@ -584,7 +294,7 @@ def save(img, name):
     img.save(OUT_OV / name, optimize=True)
 
 
-def overlays(s, hot, unit_grid, units):
+def overlays(s, hot):
     sid, f = s["id"], s["f"]
     lhh, cvv, b4, b3, b2, _ = s["raw"]
     save(Image.fromarray(np.dstack([stretch(b4), stretch(b3), stretch(b2)])), f"{sid}_optical.png")
@@ -606,10 +316,6 @@ def overlays(s, hot, unit_grid, units):
     rgba[..., 2] = np.where(pos, 40, 255)
     rgba[..., 3] = (a * np.where(pos, 230, 150)).astype("uint8")
     save(Image.fromarray(rgba, "RGBA"), f"{sid}_surprise.png")
-    # terrain units at cell resolution
-    col = np.array([tuple(int(u["color"][i:i + 2], 16) for i in (1, 3, 5)) + (165,) for u in units], "uint8")
-    img = Image.fromarray(col[unit_grid], "RGBA").resize((CELLS * 10, CELLS * 10), Image.NEAREST)
-    save(img, f"{sid}_classes.png")
 
 
 def hotspots(s):
@@ -639,49 +345,6 @@ def hotspots(s):
 
 
 # ------------------------------------------------------------------------------------------------
-# 8. scoring
-# ------------------------------------------------------------------------------------------------
-def score_terrain(sc_id, m):
-    if sc_id == "mars_water":
-        d = m["mean_slope"]
-        return 3 if d <= 5 else 2 if d <= 10 else 1 if d <= 15 else 0, f"mean slope {m['mean_slope']}°"
-    if sc_id == "mars_layers":
-        pts = int(100 <= m["relief"] <= 600) + int(3 <= m["mean_slope"] <= 12) + int(m["steep_share"] < 25)
-        return pts, f"relief {m['relief']} m, mean slope {m['mean_slope']}°, {m['steep_share']} % over 15°"
-    r = m["relief"]
-    return 3 if r >= 300 else 2 if r >= 150 else 1 if r >= 50 else 0, f"relief {m['relief']} m"
-
-
-def score_dryness(rain):
-    return 3 if rain < 20 else 2 if rain < 50 else 1 if rain < 100 else 0
-
-
-def score_access(steep_share, hub_km):
-    if hub_km >= 250:
-        return 0
-    flat = 100 - steep_share
-    return 3 if flat > 90 else 2 if flat > 75 else 1
-
-
-PARTIAL_SHARE = 0.5   # same constant as src/lib/match.ts
-
-
-def verdicts(totals, max_total, n_sites):
-    best = max(totals.values())
-    n_best = sum(1 for t in totals.values() if t == best)
-    out = {}
-    for sid, t in totals.items():
-        txt = f"{t}/{max_total}"
-        if t == best:
-            out[sid] = ("STRONGEST", f"Scored {txt}: {'joint highest' if n_best > 1 else 'highest'} of the {n_sites} sites.")
-        elif t / max_total >= PARTIAL_SHARE:
-            out[sid] = ("PARTIAL", f"Scored {txt}: at least {int(PARTIAL_SHARE * 100)}% of the target, but not the highest.")
-        else:
-            out[sid] = ("WEAK", f"Scored {txt}: below {int(PARTIAL_SHARE * 100)}% of the target.")
-    return out
-
-
-# ------------------------------------------------------------------------------------------------
 # main
 # ------------------------------------------------------------------------------------------------
 def main():
@@ -699,32 +362,46 @@ def main():
         log(f"[load] {sid}: {s['shape'][1]} x {s['shape'][0]} px, bounds {s['bounds']}")
 
     model_info = surprise_model(sites)
-    vals, pct, site_of = build_cells(sites)
-    unit_lab, units, unit_info = terrain_units(vals, site_of, ids)
+    vals, site_of = build_cells(sites)
 
-    # per-site numbers, grids, overlays
-    nums = {}
+    out_sites = []
     for i, s in enumerate(sites):
         sid, f = s["id"], s["f"]
         hot, hot_pct, hs = hotspots(s)
         dem = f["elev"]
-        nums[sid] = {
+        metrics = {
             "mean_slope": round(float(f["slope"].mean()), 2),
             "relief": round(float(np.percentile(dem, 95) - np.percentile(dem, 5)), 1),
             "steep_share": round(float((f["slope"] > STEEP).mean() * 100), 2),
-            "anomalies": round(hot_pct, 2),
-            "hotspots": hs,
             "rough": round(float(f["rough"].mean()), 2),
             "elev": round(float(dem.mean()), 0),
+            "hot_share": round(hot_pct, 2),
         }
         g = s["grid"]
         (OUT_GRID / f"{sid}_slope.json").write_text(json.dumps(
             {"cols": GRID, "rows": GRID, "bounds": s["bounds"], "maxSlope": STEEP,
              "slope": [round(float(v), 1) for v in g.ravel()]}, separators=(",", ":")))
-        overlays(s, hot, unit_lab[site_of == i].reshape(CELLS, CELLS), units)
-        log(f"[site] {sid}: {nums[sid] | {'hotspots': len(hs)}}")
+        overlays(s, hot)
+        pw = load_power(sid)
+        if not pw:
+            missing.append(f"power_{sid}.json")
+            pw = {"monthly_tmax_c": [None] * 12, "monthly_tmin_c": [None] * 12, "rain_mm_year": None, "daily_range_c": None}
+        (so, we), (no, ea) = s["bounds"]
+        name, coords = C.SITES[sid]["hub"]
+        hub = {"name": name, "coords": coords, "distance_km": round(haversine_km([(so + no) / 2, (we + ea) / 2], coords), 1)}
+        out_sites.append({
+            "id": sid, "name": C.SITES[sid]["name"], "bounds": s["bounds"],
+            "layers": {"optical": f"/overlays/{sid}_optical.png", "c_band": f"/overlays/{sid}_cband.png",
+                       "l_band": f"/overlays/{sid}_lband.png", "anomalies": f"/overlays/{sid}_anomalies.png",
+                       "slope": f"/overlays/{sid}_slope.png", "surprise": f"/overlays/{sid}_surprise.png"},
+            "metrics": metrics,
+            "hotspots": [{"id": h["id"], "coords": h["coords"], "note": h["note"]} for h in hs],
+            "climate": pw, "hub": hub,
+            "air_pressure_kpa": round(101.325 * (1 - 2.25577e-5 * metrics["elev"]) ** 5.25588, 1),
+            "grid": f"/grids/{sid}_slope.json",
+        })
+        log(f"[site] {sid}: {metrics}  hub {hub}  climate {pw}")
 
-    # cells.json (Analog Finder data)
     dec = {"slope_mean": 1, "slope_p90": 1, "steep": 1, "relief": 0, "rough": 2, "bright": 4, "red": 3,
            "lhh": 1, "cvv": 1, "lmc": 1, "surprise": 2, "elev": 0}
     cells = {
@@ -732,141 +409,16 @@ def main():
         "sites": [{"id": s["id"], "name": C.SITES[s["id"]]["name"], "bounds": s["bounds"], "start": i * CELLS * CELLS}
                   for i, s in enumerate(sites)],
         "values": {k: [round(float(v), dec[k]) if dec[k] else int(round(float(v))) for v in vals[k]] for k in C.FEATURES},
-        "pct": {k: [int(v) for v in pct[k]] for k in C.FINDER_FEATURES},
-        "unit": [int(u) for u in unit_lab],
     }
     (OUT_ML / "cells.json").write_text(json.dumps(cells, separators=(",", ":")))
-
-    model = {
+    SITES_JSON.write_text(json.dumps({
         "generated": datetime.now(timezone.utc).isoformat(timespec="minutes"),
-        "cell_size_m": 400,
-        "features": {k: {"label": v[0], "unit": v[1], "source": v[2], "desc": v[3]} for k, v in C.FEATURES.items()},
-        "finder_features": C.FINDER_FEATURES,
-        "objectives": C.OBJECTIVES,
-        "destinations": C.DESTINATION_PROFILES,
-        "surprise_model": model_info,
-        "units": units,
-        "units_model": {"type": "GaussianMixture (scikit-learn, full covariance)", **unit_info},
-    }
-    (OUT_ML / "model.json").write_text(json.dumps(model, indent=1, ensure_ascii=False))
-
-    # climate + hubs
-    climate, hubs = {}, {}
-    for s in sites:
-        sid = s["id"]
-        pw = load_power(sid)
-        if not pw:
-            missing.append(f"power_{sid}.json")
-        climate[sid] = pw
-        (so, we), (no, ea) = s["bounds"]
-        name, coords = C.SITES[sid]["hub"]
-        hubs[sid] = {"name": name, "coords": coords, "distance_km": round(haversine_km([(so + no) / 2, (we + ea) / 2], coords), 1)}
-        log(f"[climate] {sid}: {pw}  hub {hubs[sid]}")
-
-    best_hot = max(n["anomalies"] for n in nums.values())
-    scenarios = {}
-    for sc_id in C.SCENARIO_ORDER:
-        sc = C.SCENARIOS[sc_id]
-        cands, totals = [], {}
-        for i, s in enumerate(sites):
-            sid = s["id"]
-            m = nums[sid]
-            pw = climate[sid] or {"monthly_tmax_c": [None] * 12, "monthly_tmin_c": [None] * 12, "rain_mm_year": None, "daily_range_c": None}
-            hub = hubs[sid]
-            t_s, t_basis = score_terrain(sc_id, m)
-            mat, mat_note, mat_src = sc["materials"][sid]
-            fp = [
-                {"axis": "Terrain & slope", "target": 3, "weight": 2, "site": t_s, "tag": "Measured", "basis": t_basis},
-                {"axis": "Surface materials", "target": 3, "weight": 2, "site": mat, "tag": "Interpreted", "basis": mat_note, "source": mat_src},
-                {"axis": "Dryness", "target": 3, "site": None if pw["rain_mm_year"] is None else score_dryness(pw["rain_mm_year"]),
-                 "tag": "Measured", "basis": f"{pw['rain_mm_year']} mm of rain per year"},
-                {"axis": "Subsurface structures", "target": 3, "site": 0 if best_hot <= 0 else round(3 * m["anomalies"] / best_hot),
-                 "tag": "Measured", "basis": f"{m['anomalies']} % of the box are radar-surprise hotspots"},
-                {"axis": "Temperature extremes", "target": 3, "site": None if pw["daily_range_c"] is None else (2 if pw["daily_range_c"] >= 15 else 1),
-                 "tag": "Measured", "basis": f"average monthly swing {pw['daily_range_c']} °C"},
-                {"axis": "Access for operations", "target": 3, "site": score_access(m["steep_share"], hub["distance_km"]),
-                 "tag": "Measured", "basis": f"{hub['distance_km']} km to {hub['name']}, {round(100 - m['steep_share'], 1)} % under 15°"},
-            ]
-            if any(a["site"] is None for a in fp):
-                missing.append(f"{sc_id}/{sid}: incomplete scores")
-            else:
-                for a in fp:
-                    a.setdefault("weight", 1)
-                totals[sid] = sum(a["weight"] * a["site"] for a in fp)
-            cells_idx = np.flatnonzero(site_of == i)
-            rover = make_waypoints(sc_id, sid, s["grid"], cells_idx, vals, pct, s["bounds"])
-            if rover is None:
-                missing.append(f"{sc_id}/{sid}: no rover route")
-            cands.append({
-                "id": sid, "name": C.SITES[sid]["name"], "role": "comparison site",
-                "verdict": None, "verdict_reason": None,
-                "bounds": s["bounds"],
-                "layers": {k: f"/overlays/{sid}_{v}.png" for k, v in
-                           [("optical", "optical"), ("c_band", "cband"), ("l_band", "lband"), ("classes", "classes"),
-                            ("anomalies", "anomalies"), ("slope", "slope"), ("surprise", "surprise")]},
-                "metrics": [
-                    {"key": "mean_slope", "label": "Mean slope", "value": m["mean_slope"], "unit": "°", "tag": "Measured", "source": "cop_dem"},
-                    {"key": "relief", "label": "Relief (5th to 95th percentile height)", "value": m["relief"], "unit": "m", "tag": "Measured", "source": "cop_dem"},
-                    {"key": "steep_share", "label": "Share of box steeper than 15°", "value": m["steep_share"], "unit": "% of area", "tag": "Measured", "source": "cop_dem"},
-                    {"key": "anomalies", "label": "Radar-surprise hotspots (z > 2)", "value": m["anomalies"], "unit": "% of area", "tag": "Measured", "source": "ml"},
-                    {"key": "roughness", "label": "Rock roughness (height variation over 125 m)", "value": m["rough"], "unit": "m", "tag": "Measured", "source": "cop_dem"},
-                    {"key": "elevation", "label": "Mean elevation", "value": m["elev"], "unit": "m", "tag": "Measured", "source": "cop_dem"},
-                ],
-                "fingerprint": fp,
-                "anomalies": m["hotspots"],
-                "transfers": sc["site_transfers"].get(sid, []) + sc["transfers"],
-                "breaks": sc["breaks"],
-                "rover": rover,
-                "earth_field_safety": {
-                    "label": "Preliminary Earth field accessibility assessment",
-                    "nearest_hub": hub,
-                    "monthly_tmax_c": pw["monthly_tmax_c"],
-                    "monthly_tmin_c": pw["monthly_tmin_c"],
-                    "elevation_m": m["elev"],
-                    "air_pressure_kpa": round(101.325 * (1 - 2.25577e-5 * m["elev"]) ** 5.25588, 1),
-                    "rain_mm_year": pw["rain_mm_year"],
-                    "daily_range_c": pw["daily_range_c"],
-                    "assumptions": {"heat_c": 40, "slope_deg": STEEP, "hub_km": 250},
-                    "source": "nasa_power",
-                },
-            })
-        if len(totals) == len(sites):
-            max_total = sum(3 * a["weight"] for a in cands[0]["fingerprint"])
-            v = verdicts(totals, max_total, len(sites))
-            for c in cands:
-                c["verdict"], c["verdict_reason"] = v[c["id"]]
-                if c["verdict"] == "STRONGEST":
-                    c["role"] = "case study"
-        scenarios[sc_id] = {
-            "id": sc_id, "title": sc["title"], "short": sc["short"], "body": sc["body"], "question": sc["question"],
-            "default_objective": sc["default_objective"], "delay": sc["delay"], "planet_target": sc["planet_target"],
-            "rules": {"Terrain & slope": sc["terrain_rule"], "Surface materials": sc["materials_rule"], **C.COMMON_RULES},
-            "weighting": C.WEIGHTING,
-            "candidates": cands,
-        }
-        log(f"[score] {sc_id:13s} " + "  ".join(f"{c['id']} {totals.get(c['id'])}/24 {c['verdict']}" for c in cands))
-
-    data = {
-        "meta": {
-            "mock": bool(missing),
-            "generated": datetime.now(timezone.utc).isoformat(timespec="minutes"),
-            "sources": C.SOURCES,
-            "tags": C.TAGS,
-            "ml": {"surprise_r2_block_cv": model_info["r2_block_cv"], "surprise_r2_leave_one_site_out": model_info["r2_leave_one_site_out"],
-                   "units": unit_info["k"], "cells": int(len(site_of)), "cell_size_m": 400},
-        },
-        "scenarios": scenarios,
-    }
-    (PUB / "mission_data.json").write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
-    log("")
+        "note": "Written by pipeline/build_all.py (site rasters, radar model, overlays). Read by pipeline/compare.py.",
+        "surprise_model": model_info, "sites": out_sites}, indent=1, ensure_ascii=False), encoding="utf-8")
     if missing:
-        log("STILL MOCK (meta.mock = true). Missing:")
-        for x in missing:
-            log("  -", x)
-    else:
-        log("All real data in: meta.mock = false.")
+        log("Missing inputs:", ", ".join(missing))
     (OUT_REP / "report.txt").write_text("\n".join(REPORT) + "\n", encoding="utf-8")
-    log("Wrote public/mission_data.json, public/ml/*.json, public/overlays/*.png, public/grids/*.json, pipeline/out/report.txt")
+    log("Wrote overlays, grids, cells.json and pipeline/sites.json. Next: python pipeline/compare.py")
 
 
 if __name__ == "__main__":

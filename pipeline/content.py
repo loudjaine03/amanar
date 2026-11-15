@@ -1,251 +1,189 @@
 """
-content.py  --  Team Hoggar / Algeria Beyond Earth
+content.py  --  Team Hoggar / Amanar
 
-Everything a PERSON decided lives here: the science texts, the planetary targets, the
-materials judgements, the scoring rules, the Analog Finder objectives. build_all.py reads this
-file and adds every number from the data. Edit this file, never the generated JSON.
+Everything a PERSON decided lives here: target descriptions, the geology checks (each with a source),
+what transfers and what does not, test definitions, and the plain-language labels.
+The NUMBERS come from data (build_all.py for Earth, compare.py for Mars/Moon). Never edit the
+generated JSON by hand: edit this file and rerun  python pipeline/compare.py
 
 Tags:  Measured    = computed by our scripts from an identified dataset
-       Interpreted = our reading of a pattern, or our judgement
-       Hypothesis  = must be checked in the field
        Reference   = established fact from a cited source, not computed by us
+       Judgement   = our reading, decision or threshold (shown as such in the app)
+       Hypothesis  = must be checked in the field
 """
 
 SITES = {
-    # id: name, role, nearest logistics hub [lat, lon]
-    "ahnet":   {"name": "Ahnet Basin",           "hub": ("In Salah",    [27.19, 2.48])},
-    "tassili": {"name": "Tassili n'Ajjer",       "hub": ("Djanet",      [24.55, 9.48])},
-    "hoggar":  {"name": "Hoggar (Atakor)",       "hub": ("Tamanrasset", [22.79, 5.52])},
+    # id: name, nearest logistics hub [lat, lon]
+    "ahnet":   {"name": "Ahnet Basin",     "hub": ("In Salah",    [27.19, 2.48])},
+    "tassili": {"name": "Tassili n'Ajjer", "hub": ("Djanet",      [24.55, 9.48])},
+    "hoggar":  {"name": "Hoggar (Atakor)", "hub": ("Tamanrasset", [22.79, 5.52])},
 }
 SITE_ORDER = ["ahnet", "tassili", "hoggar"]
 
+TAGS = {
+    "Measured": "Computed by our scripts from an identified dataset",
+    "Reference": "Established fact from a cited source, not computed by us",
+    "Judgement": "Our reading, decision or threshold",
+    "Hypothesis": "Must be checked in the field",
+}
+
 SOURCES = [
-    {"id": "cop_dem", "name": "Copernicus DEM GLO-30 (ESA)", "url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_DEM_GLO30"},
-    {"id": "palsar2", "name": "JAXA ALOS-2 PALSAR-2 yearly mosaic (L-band)", "url": "https://developers.google.com/earth-engine/datasets/catalog/JAXA_ALOS_PALSAR_YEARLY_SAR_EPOCH"},
-    {"id": "sentinel1", "name": "ESA Sentinel-1 GRD (C-band)", "url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S1_GRD"},
+    {"id": "cop_dem", "name": "Copernicus DEM GLO-30 (ESA), Earth elevation", "url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_DEM_GLO30"},
+    {"id": "palsar2", "name": "JAXA ALOS-2 PALSAR-2 yearly mosaic (L-band radar)", "url": "https://developers.google.com/earth-engine/datasets/catalog/JAXA_ALOS_PALSAR_YEARLY_SAR_EPOCH"},
+    {"id": "sentinel1", "name": "ESA Sentinel-1 GRD (C-band radar)", "url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S1_GRD"},
     {"id": "sentinel2", "name": "ESA Sentinel-2 SR (optical)", "url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED"},
     {"id": "nasa_power", "name": "NASA POWER climatology (T2M_MAX, T2M_MIN, PRECTOTCORR)", "url": "https://power.larc.nasa.gov/docs/services/api/temporal/climatology/"},
-    {"id": "trek", "name": "NASA Mars Trek and Moon Trek", "url": "https://trek.nasa.gov/"},
+    {"id": "ctx_jezero", "name": "USGS / NASA Mars 2020 Terrain Relative Navigation CTX DTM, 20 m (Fergason et al. 2020)", "url": "https://astrogeology.usgs.gov/search/map/mars_2020_terrain_relative_navigation_ctx_dtm_mosaic"},
+    {"id": "mola", "name": "NASA MGS MOLA MEGDR 128 pixels/degree (PDS), used to check the Jezero DTM", "url": "https://pds-geosciences.wustl.edu/missions/mgs/megdr.html"},
+    {"id": "mmgis_gale", "name": "NASA-AMMOS MMGIS Mars reference mission DEM, Gale crater, 20 m (JPL)", "url": "https://github.com/NASA-AMMOS/MMGIS"},
+    {"id": "lola_adc", "name": "NASA App Development Challenge lunar data file: LRO LOLA heights, 40 m grid around Shackleton", "url": "https://www.nasa.gov/learning-resources/app-development-challenge/"},
+    {"id": "trek", "name": "NASA Mars Trek and Moon Trek (basemaps)", "url": "https://trek.nasa.gov/"},
+    {"id": "jezero_floor", "name": "Farley et al. (2022), Aqueously altered igneous rocks sampled on the floor of Jezero crater, Science 377", "url": "https://doi.org/10.1126/science.abo2196"},
     {"id": "mars2020", "name": "NASA Science: Perseverance view of the delta in Jezero Crater", "url": "https://science.nasa.gov/resource/perseverance-view-of-the-delta-in-jezero-crater/"},
     {"id": "msl_lakes", "name": "NASA JPL: Curiosity rover team confirms ancient lakes on Mars (2015)", "url": "https://www.jpl.nasa.gov/news/nasas-curiosity-rover-team-confirms-ancient-lakes-on-mars/"},
     {"id": "msl_sharp", "name": "NASA JPL: Curiosity finds clues to how water helped shape Martian landscape (2014)", "url": "https://www.jpl.nasa.gov/news/nasas-curiosity-rover-finds-clues-to-how-water-helped-shape-martian-landscape/"},
-    {"id": "lroc_pit", "name": "LROC (NASA/GSFC/ASU): Marius Hills pit, lava tube skylight?", "url": "https://lroc.im-ldi.com/images/202"},
-    {"id": "lroc_marius", "name": "LROC (NASA/GSFC/ASU): Diversity of basaltic lunar volcanism, Marius Hills", "url": "https://lroc.im-ldi.com/images/702"},
+    {"id": "artemis9", "name": "NASA (Oct 2024): nine candidate Artemis landing regions near the lunar south pole", "url": "https://www.nasa.gov/news-release/nasa-provides-update-on-artemis-iii-moon-landing-regions/"},
+    {"id": "artemis13", "name": "NASA App Development Challenge 2023: the 13 Artemis III candidate regions of 2022, including Peak Near Shackleton", "url": "https://www.nasa.gov/learning-resources/app-development-challenge/2023-handbook-and-coding-components"},
+    {"id": "change7", "name": "The Planetary Society: Chang'e-7, preferred landing site on the rim of Shackleton crater", "url": "https://www.planetary.org/space-missions/change-7"},
+    {"id": "shackleton", "name": "Zuber et al. (2012), Constraints on the volatile distribution within Shackleton crater, Nature 486", "url": "https://doi.org/10.1038/nature11216"},
     {"id": "ahnet_epsc", "name": "Caddeo et al. (2025), Water in the Ahnet Basin as a Mars analog, EPSC-DPS2025-1671", "url": "https://meetingorganizer.copernicus.org/EPSC-DPS2025/EPSC-DPS2025-1671.html"},
+    {"id": "tassili_whc", "name": "UNESCO World Heritage Centre: Tassili n'Ajjer (sandstone successions, criterion viii)", "url": "https://whc.unesco.org/en/list/179"},
     {"id": "atakor", "name": "Azzouni-Sekkal et al. (2007), Cenozoic alkaline volcanism of the Atakor massif, GSA Special Paper 418", "url": "https://www.africamuseum.be/publication_docs/Azzouni-Sekkal-2007-GSASP-Atakor-volcanism.pdf"},
     {"id": "sir_a", "name": "Radar penetration of dry sand: SIR-A buried channels (Smithsonian repository)", "url": "https://repository.si.edu/server/api/core/bitstreams/108399f3-14f6-4c8d-950f-8f83cbcd7bd3/content"},
-    {"id": "ice_mapper", "name": "International Mars Ice Mapper concept (EGU24 abstract)", "url": "https://meetingorganizer.copernicus.org/EGU24/EGU24-10754.html"},
-    {"id": "astropy", "name": "Earth-Mars distance on 14 Nov 2026, computed with astropy", "url": "https://www.astropy.org/"},
-    {"id": "moon_facts", "name": "NASA NSSDC Moon fact sheet (mean Earth-Moon distance)", "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html"},
     {"id": "nssdc_mars", "name": "NASA NSSDC Mars fact sheet (pressure, temperature, gravity)", "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html"},
-    {"id": "nssdc_moon", "name": "NASA NSSDC Moon fact sheet (pressure, temperature, gravity)", "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html"},
-    {"id": "msl_wheels", "name": "NASA JPL: Curiosity wheel wear status (wheels 50 cm diameter, 40 cm wide, milled aluminium)", "url": "https://www.jpl.nasa.gov/images/pia20334-routine-inspection-of-rover-wheel-wear-and-tear/"},
+    {"id": "nssdc_moon", "name": "NASA NSSDC Moon fact sheet (pressure, temperature, gravity, distance)", "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html"},
+    {"id": "astropy", "name": "Earth-Mars distance on 14 Nov 2026, computed with astropy", "url": "https://www.astropy.org/"},
     {"id": "scarecrow", "name": "NASA JPL: Mojave Desert tests with the Scarecrow rover (2012)", "url": "https://www.jpl.nasa.gov/news/mojave-desert-tests-prepare-for-nasa-mars-roving/"},
+    {"id": "ml", "name": "Team Hoggar models (pipeline/build_all.py, scikit-learn)", "url": None},
+    {"id": "msl_wheels", "name": "NASA JPL: Curiosity wheel wear (milled aluminium wheels, 50 cm diameter, 40 cm wide)", "url": "https://www.jpl.nasa.gov/images/pia20334-routine-inspection-of-rover-wheel-wear-and-tear/"},
     {"id": "glenn_tire", "name": "ASME: NASA Glenn superelastic nickel-titanium tire", "url": "https://www.asme.org/topics-resources/content/nasas-alien-tire"},
     {"id": "insight_dust", "name": "Space.com: InSight mission ends after dust covers its solar panels (2022)", "url": "https://www.space.com/nasa-mars-insight-lander-mission-ends"},
-    {"id": "lunar_dust", "name": "NASA TM-2010-216781: abrasion testing with lunar dust simulants (Apollo visor scratches, suit seal leaks)", "url": "https://ntrs.nasa.gov/citations/20100033103"},
-    {"id": "isa", "name": "Air pressure estimated from elevation with the standard atmosphere formula", "url": None},
-    {"id": "ml", "name": "Team Hoggar models (pipeline/build_all.py, scikit-learn)", "url": None},
-    {"id": "team", "name": "Team Hoggar planning assumption", "url": None},
+    {"id": "lunar_dust", "name": "NASA TM-2010-216781: abrasion tests with lunar dust simulants (Apollo visor scratches, suit seal leaks)", "url": "https://ntrs.nasa.gov/citations/20100033103"},
+    {"id": "isa", "name": "Air pressure from elevation, International Standard Atmosphere formula", "url": None},
+    {"id": "niosh_heat", "name": "NIOSH (CDC): heat stress workplace recommendations (water, acclimatisation, buddy system)", "url": "https://www.cdc.gov/niosh/heat-stress/recommendations/index.html"},
+    {"id": "team", "name": "Team Hoggar judgement", "url": None},
 ]
-
-TAGS = {
-    "Measured": "Computed by our scripts from an identified dataset",
-    "Interpreted": "Our reading of a pattern, or our judgement",
-    "Hypothesis": "Must be checked in the field",
-    "Reference": "Established fact from a cited source, not computed by us",
-}
 
 MARS_TILES = "https://trek.nasa.gov/tiles/Mars/EQ/Mars_MOLA_blend200ppx_HRSC_ClrShade_clon0dd_200mpp_lzw/1.0.0/default/default028mm/{z}/{y}/{x}.jpg"
 MOON_TILES = "https://trek.nasa.gov/tiles/Moon/EQ/LRO_WAC_Mosaic_Global_303ppd_v02/1.0.0/default/default028mm/{z}/{y}/{x}.jpg"
 
-# The six fingerprint axes. Every scenario uses the same axes, with its own scoring rule.
-AXES = ["Terrain & slope", "Surface materials", "Dryness", "Subsurface structures",
-        "Temperature extremes", "Access for operations"]
-
-# Terrain and materials define the analogy, so they count double in the total (max 24).
-# The other four axes support it. Team judgement, shown in the app next to the badges.
-WEIGHTING = "Terrain & slope and Surface materials count double (they define the analogy); the other four axes count once. Maximum 24."
-
-COMMON_RULES = {
-    "Dryness": "Annual rain (NASA POWER): under 20 mm = 3, under 50 = 2, under 100 = 1, else 0.",
-    "Subsurface structures": "Share of the box where L-band is brighter than the surface predicts (radar surprise z > 2, our ML model). Best site = 3, others scaled.",
-    "Temperature extremes": "Average monthly swing (T2M_MAX - T2M_MIN) of 15 °C or more = 2, else 1. Capped at 2: no Earth site reaches Mars or Moon extremes.",
-    "Access for operations": "Hub under 250 km straight-line, then share of box under 15°: over 90 % = 3, over 75 % = 2, else 1. Hub 250 km or more = 0.",
+# Target environment (Reference). Pressure kPa, temperature range of a typical day, gravity m/s2.
+ENV = {
+    "mars": {"pressure_kpa": 0.636, "day_swing_c": 58, "t_text": "-89 to -31 °C in one day (Viking 1 site)",
+             "gravity": 3.73, "source": "nssdc_mars"},
+    "moon": {"pressure_kpa": 3e-13, "day_swing_c": 295, "t_text": "-178 to +117 °C at the equator; far colder in polar shadow",
+             "gravity": 1.62, "source": "nssdc_moon"},
 }
 
-SCENARIOS = {
-    "mars_water": {
-        "title": "Follow the lost water",
-        "short": "Mars · Jezero",
-        "body": "mars",
-        "question": "Which Algerian setting can help investigate an ancient river-to-lake system like Jezero's?",
-        "default_objective": "water",
+# ---------------------------------------------------------------------------------------------
+# Targets. Terrain numbers are MEASURED from the elevation windows (planetary/*.npz).
+# Geology is REFERENCE (cited) and judged per site: "match" / "partial" / "no".
+# ---------------------------------------------------------------------------------------------
+TARGETS = {
+    "jezero": {
+        "title": "Jezero Crater", "in_text": "Jezero", "short": "Mars · Jezero", "body": "mars",
+        "mission": "Perseverance (landed 2021)",
+        "goal": "An ancient river delta and lake, and the igneous crater floor below them.",
+        "why": "Perseverance is collecting samples here for return to Earth.",
+        "tiles": MARS_TILES, "map_center": [18.4447, 77.4508], "zoom": 9,
         "delay": {"one_way_s": 660, "label": "about 11 min one way (197.5 million km on 14 Nov 2026)", "tag": "Measured", "source": "astropy"},
-        "planet_target": {
-            "name": "Jezero Crater, western delta", "body": "mars", "tiles": MARS_TILES,
-            "center": [18.44, 77.45], "zoom": 6,
-            "specs": [
-                {"key": "slope", "label": "Slope", "value": "< 5° on the basin floor", "tag": "Interpreted", "source": "trek"},
-                {"key": "landform", "label": "Landform", "value": "Delta fan with a feeder channel", "tag": "Interpreted", "source": "mars2020"},
-                {"key": "cover", "label": "Surface cover", "value": "Layered fine sediment", "tag": "Interpreted", "source": "mars2020"},
-                {"key": "dryness", "label": "Dryness", "value": "Hyper-arid", "tag": "Interpreted", "source": "mars2020"},
-            ],
+        "rocks": {"text": "River-delta and lake sediments over igneous rocks (olivine-rich Séítah, basaltic Máaz)", "source": "jezero_floor"},
+        "geology": {
+            "ahnet":   ("match",   "River, alluvial-fan and evaporite deposits of a former valley network: the same family of rocks as Jezero's delta and lake beds.", "ahnet_epsc"),
+            "tassili": ("partial", "Sandstone cut by old river valleys: shaped by water, but rock rather than delta or lake sediment.", "tassili_whc"),
+            "hoggar":  ("partial", "Basalt lava flows, comparable to the igneous rocks of Jezero's floor, but no river or lake deposits.", "jezero_floor"),
         },
-        "terrain_rule": "Mean slope: 5° or less = 3, 10° or less = 2, 15° or less = 1, else 0.",
-        "materials_rule": "River, lake or evaporite sediments = 3, water-carved sandstone = 2, volcanic or crystalline rock = 0.",
-        "materials": {
-            "ahnet":   (3, "Alluvial, evaporitic and aeolian deposits linked to a former valley network", "ahnet_epsc"),
-            "tassili": (2, "Sandstone plateau cut by dry valleys: water-carved, but rock rather than lake sediment", "team"),
-            "hoggar":  (0, "Volcanic and crystalline rock: not a river-lake sediment setting", "atakor"),
-        },
-        "transfers": [
-            {"text": "L-band radar sees through thin, very dry cover", "tag": "Reference", "source": "sir_a"},
-            {"text": "Slope-aware rover routing on low-gradient ground", "tag": "Interpreted"},
-        ],
-        "site_transfers": {
-            "ahnet": [{"text": "Alluvial fans, valley networks and sabkha deposits from a wet-to-arid transition, already proposed as a Mars analog", "tag": "Reference", "source": "ahnet_epsc"}],
-            "tassili": [{"text": "Dry valleys cut by former flowing water", "tag": "Interpreted"}],
-            "hoggar": [],
-        },
-        "breaks": [
-            {"text": "Earth gravity 1 g vs Mars 0.38 g", "tag": "Reference"},
-            {"text": "Thick Earth atmosphere vs thin Martian atmosphere", "tag": "Reference"},
-            {"text": "Different radiation environment (Earth's magnetic field and atmosphere shield the surface)", "tag": "Reference"},
-            {"text": "Quartz sand on Earth vs basaltic material on Mars", "tag": "Interpreted"},
-            {"text": "Instrument gap: our L-band images are not what a Mars orbiter would measure", "tag": "Reference", "source": "ice_mapper"},
-        ],
+        "zone_words": {"all": "the whole map", "gentle": "smooth crater floor", "middle": "delta and rougher floor",
+                       "steep": "crater rim and inlet canyon"},
         "tools": ["Camera (like Mastcam-Z)", "Ground-penetrating radar (like RIMFAX)", "Sampling drill (like Perseverance's corer)"],
+        "questions": ["Are the sediments here rounded and sorted, as flowing water leaves them?",
+                      "Is there coarse or layered material under the surface?",
+                      "Can a short core show fine, lake-like layers?"],
     },
-    "mars_layers": {
-        "title": "Read the layered rocks",
-        "short": "Mars · Gale",
-        "body": "mars",
-        "question": "Which Algerian setting can rehearse a rover climbing through layered sedimentary rock, like Curiosity at Mount Sharp?",
-        "default_objective": "layers",
+    "gale": {
+        "title": "Gale Crater", "in_text": "Gale", "short": "Mars · Gale", "body": "mars",
+        "mission": "Curiosity (landed 2012)",
+        "goal": "Climbing a 5 km mound of layered rock that records a long-lived lake.",
+        "why": "Curiosity has been reading these layers bottom to top for more than a decade.",
+        "tiles": MARS_TILES, "map_center": [-4.707, 137.387], "zoom": 9,
         "delay": {"one_way_s": 660, "label": "about 11 min one way (197.5 million km on 14 Nov 2026)", "tag": "Measured", "source": "astropy"},
-        "planet_target": {
-            "name": "Gale Crater, base of Mount Sharp", "body": "mars", "tiles": MARS_TILES,
-            "center": [-4.7, 137.4], "zoom": 6,
-            "specs": [
-                {"key": "slope", "label": "Slope", "value": "Gentle crater floor rising onto the mound's lower slopes", "tag": "Interpreted", "source": "trek"},
-                {"key": "landform", "label": "Landform", "value": "A mound about 5 km high whose flanks expose hundreds of rock layers", "tag": "Reference", "source": "msl_sharp"},
-                {"key": "cover", "label": "Surface cover", "value": "Finely laminated mudstones laid down in ancient lakes", "tag": "Reference", "source": "msl_lakes"},
-                {"key": "dryness", "label": "Dryness", "value": "Hyper-arid today; the rocks record long-lived lakes", "tag": "Reference", "source": "msl_lakes"},
-            ],
+        "rocks": {"text": "Finely layered lake mudstones and sulfate-bearing layers", "source": "msl_lakes"},
+        "geology": {
+            "ahnet":   ("partial", "Folded sedimentary layers, well exposed from above, but with little height to climb through.", "ahnet_epsc"),
+            "tassili": ("match",   "Thick sandstone successions exposed in cliffs and buttes: a stack of layers to read bottom to top.", "tassili_whc"),
+            "hoggar":  ("no",      "Volcanic and crystalline rock, not sedimentary layers.", "atakor"),
         },
-        "terrain_rule": "One point each for: relief 100 to 600 m, mean slope 3 to 12°, under 25 % of the box steeper than 15°.",
-        "materials_rule": "Thick layered sedimentary rock exposed = 3, layered sediments with little exposure = 2, volcanic or crystalline = 0.",
-        "materials": {
-            "ahnet":   (2, "Folded sedimentary layers well exposed from above, but with little relief to climb", "ahnet_epsc"),
-            "tassili": (3, "Thick sandstone layers exposed in cliffs and buttes", "team"),
-            "hoggar":  (0, "Volcanic and crystalline rock, not sedimentary layers", "atakor"),
-        },
-        "transfers": [
-            {"text": "Reading a stack of layers on a slope, bottom to top, the way Curiosity climbs Mount Sharp", "tag": "Interpreted", "source": "msl_sharp"},
-            {"text": "Rover driving between outcrops on moderate slopes", "tag": "Interpreted"},
-        ],
-        "site_transfers": {"ahnet": [], "tassili": [{"text": "Sandstone buttes and cliffs expose layers over hundreds of metres of relief", "tag": "Interpreted"}], "hoggar": []},
-        "breaks": [
-            {"text": "Earth gravity 1 g vs Mars 0.38 g", "tag": "Reference"},
-            {"text": "Thick Earth atmosphere vs thin Martian atmosphere", "tag": "Reference"},
-            {"text": "Different radiation environment (Earth's magnetic field and atmosphere shield the surface)", "tag": "Reference"},
-            {"text": "Quartz-rich sandstone on Earth vs clay- and sulfate-bearing mudstone in Gale", "tag": "Interpreted", "source": "msl_lakes"},
-            {"text": "Instrument gap: our L-band images are not what a Mars orbiter would measure", "tag": "Reference", "source": "ice_mapper"},
-        ],
+        "zone_words": {"all": "the whole map", "gentle": "crater-floor plains", "middle": "lower slopes of Mount Sharp",
+                       "steep": "steeper mound"},
         "tools": ["Camera (like Mastcam)", "Laser spectrometer (like ChemCam)", "Drill and mineral lab (like CheMin)"],
+        "questions": ["Which layer is at the bottom here, and does it change upslope?",
+                      "What is each layer made of?",
+                      "Is there a fine-grained layer worth drilling?"],
     },
-    "moon_volcanic": {
-        "title": "Volcanic domes and lava tubes",
-        "short": "Moon · Marius Hills",
-        "body": "moon",
-        "question": "Which Algerian setting can rehearse work on volcanic domes and a lava-tube skylight, like the Marius Hills?",
-        "default_objective": "volcanic",
-        "delay": {"one_way_s": 1.3, "label": "about 1.3 s one way (mean distance 384,400 km)", "tag": "Reference", "source": "moon_facts"},
-        "planet_target": {
-            "name": "Marius Hills pit", "body": "moon", "tiles": MOON_TILES,
-            "center": [14.09, -56.77], "zoom": 6,
-            "specs": [
-                {"key": "slope", "label": "Slope", "value": "Steep-sided shields and cones above flat mare plains", "tag": "Interpreted", "source": "lroc_marius"},
-                {"key": "landform", "label": "Landform", "value": "A pit about 58 × 49 m and 40 m deep in a sinuous rille, likely a lava-tube skylight", "tag": "Reference", "source": "lroc_pit"},
-                {"key": "cover", "label": "Surface cover", "value": "Regolith over blocky basaltic lava flows", "tag": "Reference", "source": "lroc_marius"},
-                {"key": "dryness", "label": "Dryness", "value": "Airless, no liquid water", "tag": "Interpreted", "source": "team"},
-            ],
+    "moon_south": {
+        "title": "Lunar south pole", "in_text": "the lunar south pole", "short": "Moon · South pole", "body": "moon",
+        "mission": "Artemis base region; planned Chang'e-7 landing area (2027)",
+        "goal": "A permanent base on sunlit crater rims next to permanently shadowed, icy craters.",
+        "why": "Peak near Shackleton was on NASA's 2022 list of Artemis candidate regions; China's Chang'e-7 targets the same rim.",
+        "tiles": MOON_TILES, "map_center": [-88.838, 124.57], "zoom": 6,
+        "delay": {"one_way_s": 1.3, "label": "about 1.3 s one way (mean distance 384,400 km)", "tag": "Reference", "source": "nssdc_moon"},
+        "rocks": {"text": "Impact-churned highland regolith (feldspar-rich), boulders, and icy cold traps in permanent shadow", "source": "shackleton"},
+        "geology": {
+            "ahnet":   ("no",      "Sedimentary basin: nothing like impact-churned highland rock.", "ahnet_epsc"),
+            "tassili": ("no",      "Sandstone plateau: sedimentary, not igneous or impact rock.", "tassili_whc"),
+            "hoggar":  ("partial", "Igneous and crystalline rock with rugged volcanic relief, but basalt and phonolite rather than lunar highland rock, and no impact regolith.", "atakor"),
         },
-        "terrain_rule": "Relief: 300 m or more = 3, 150 m or more = 2, 50 m or more = 1, else 0.",
-        "materials_rule": "Basaltic lava and volcanic domes = 3, other volcanic rock = 2, no volcanic rock = 0.",
-        "materials": {
-            "ahnet":   (0, "Sedimentary basin: no volcanic rock in this box", "ahnet_epsc"),
-            "tassili": (0, "Sandstone plateau: no volcanic rock in this box", "team"),
-            "hoggar":  (3, "Alkali basalts (about 80 % of Atakor lavas) plus phonolite and trachyte domes", "atakor"),
-        },
-        "transfers": [
-            {"text": "Steep volcanic relief for mobility and navigation tests", "tag": "Interpreted"},
-            {"text": "Short signal delay: near-real-time driving from Earth can be rehearsed", "tag": "Interpreted", "source": "moon_facts"},
-        ],
-        "site_transfers": {"ahnet": [], "tassili": [], "hoggar": [{"text": "Basalt flows, cones and phonolite domes of the Atakor volcanic field", "tag": "Reference", "source": "atakor"}]},
-        "breaks": [
-            {"text": "Earth gravity 1 g vs Moon 0.17 g", "tag": "Reference"},
-            {"text": "Earth atmosphere vs almost no atmosphere on the Moon", "tag": "Reference"},
-            {"text": "Different radiation environment (no global magnetic field or atmosphere on the Moon)", "tag": "Reference"},
-            {"text": "Weathered rock and wind-blown sand on Earth vs impact-made regolith on the Moon", "tag": "Interpreted"},
-            {"text": "Instrument gap: no lava-tube void has been found in our boxes; L-band hotspots are candidates only", "tag": "Interpreted"},
-        ],
-        "tools": ["Stereo navigation camera", "Ground-penetrating radar (like Yutu-2's)", "Spectrometer and sample bag"],
+        "zone_words": {"all": "the whole map", "gentle": "gentler ground between craters", "middle": "rolling crater rims",
+                       "steep": "crater walls and ridges"},
+        "tools": ["Stereo navigation camera", "Ground-penetrating radar", "Neutron spectrometer (hydrogen / ice)"],
+        "questions": ["Can the rover hold a slope this steep on loose ground?",
+                      "Where would shadows fall at a low Sun angle?",
+                      "Is there a safe, flat pad for a lander near the ridge?"],
     },
 }
-SCENARIO_ORDER = ["mars_water", "mars_layers", "moon_volcanic"]
+TARGET_ORDER = ["jezero", "gale", "moon_south"]
 
-# ---------------------------------------------------------------------------------------------
-# Analog Finder. Preferences on cell features, pooled percentiles (0 = lowest of all 7,500 cells,
-# 100 = highest). want: "low" | "high" | [lo, hi] band. The weights are team judgements (Interpreted).
-# ---------------------------------------------------------------------------------------------
-DESTINATION_PROFILES = {
-    "mars_water":    [{"f": "slope_mean", "want": "low", "w": 2}, {"f": "rough", "want": "low", "w": 1},
-                      {"f": "bright", "want": "high", "w": 1}],
-    "mars_layers":   [{"f": "relief", "want": [50, 90], "w": 2}, {"f": "slope_mean", "want": [40, 80], "w": 1},
-                      {"f": "red", "want": "high", "w": 1}],
-    "moon_volcanic": [{"f": "bright", "want": "low", "w": 2}, {"f": "relief", "want": "high", "w": 2},
-                      {"f": "rough", "want": "high", "w": 1}],
+# What every target shares (Reference) and where Earth cannot help.
+BREAKS = {
+    "mars": [
+        {"text": "Gravity: Earth 9.81 m/s², Mars 3.73 m/s² (0.38 g)", "tag": "Reference", "source": "nssdc_mars"},
+        {"text": "Air: about 0.64 kPa on Mars, 75 to 100 kPa at our sites", "tag": "Reference", "source": "nssdc_mars"},
+        {"text": "Radiation: Earth's magnetic field and thick air shield our sites", "tag": "Reference"},
+        {"text": "Rock chemistry: quartz sand and sandstone here, basaltic dust and clays on Mars", "tag": "Judgement"},
+    ],
+    "moon": [
+        {"text": "Gravity: Earth 9.81 m/s², Moon 1.62 m/s² (0.17 g)", "tag": "Reference", "source": "nssdc_moon"},
+        {"text": "Vacuum on the Moon; no wind, no weathering, very sharp regolith grains", "tag": "Reference", "source": "nssdc_moon"},
+        {"text": "Light: at the pole the Sun stays within a few degrees of the horizon; long shadows all day", "tag": "Reference", "source": "shackleton"},
+        {"text": "Cold traps colder than anywhere on Earth inside permanently shadowed craters", "tag": "Reference", "source": "shackleton"},
+    ],
 }
 
-OBJECTIVES = {
-    "mobility": {"label": "Rover driving and navigation", "label_fr": "Conduite et navigation du rover",
-                 "prefs": [{"f": "slope_mean", "want": "low", "w": 3}, {"f": "steep", "want": "low", "w": 2},
-                           {"f": "rough", "want": "low", "w": 1}], "rover": True, "alpha": 0.25},
-    "water": {"label": "Ancient water and sediments", "label_fr": "Eau ancienne et sédiments",
-              "prefs": [{"f": "surprise", "want": "high", "w": 2}, {"f": "lmc", "want": "high", "w": 1},
-                        {"f": "slope_mean", "want": "low", "w": 1}, {"f": "bright", "want": "high", "w": 1}],
-              "rover": True, "alpha": 0.25},
-    "subsurface": {"label": "Ground-penetrating radar (what is under the sand)", "label_fr": "Radar de sol (ce qu'il y a sous le sable)",
-                   "prefs": [{"f": "surprise", "want": "high", "w": 3}, {"f": "lmc", "want": "high", "w": 2},
-                             {"f": "rough", "want": "low", "w": 1}], "rover": True, "alpha": 0.25},
-    "layers": {"label": "Layered rock and outcrop science", "label_fr": "Roches en couches et affleurements",
-               "prefs": [{"f": "relief", "want": [50, 90], "w": 2}, {"f": "slope_mean", "want": [40, 80], "w": 1},
-                         {"f": "red", "want": "high", "w": 1}, {"f": "rough", "want": [30, 80], "w": 1}],
-               "rover": False, "alpha": 0.25},
-    "volcanic": {"label": "Volcanic terrain and lava-tube scouting", "label_fr": "Terrain volcanique et repérage de tubes de lave",
-                 "prefs": [{"f": "bright", "want": "low", "w": 2}, {"f": "relief", "want": "high", "w": 2},
-                           {"f": "rough", "want": "high", "w": 1}, {"f": "cvv", "want": "high", "w": 1}],
-                 "rover": False, "alpha": 0.25},
-    "crew": {"label": "Human crew field training", "label_fr": "Entraînement d'équipe humaine sur le terrain",
-             "prefs": [{"f": "slope_mean", "want": "low", "w": 1}, {"f": "steep", "want": "low", "w": 1}],
-             "rover": False, "alpha": 0.6},
+# Plain-language bands for the terrain match (Judgement: our thresholds, shown in the app).
+MATCH_BANDS = [(65, "close"), (45, "moderate"), (0, "poor")]
+
+# Radar-hotspot checks (Judgement: thresholds).
+HOTSPOT_RULES = {
+    "edge_m": 500,          # hotspot centre closer than this to the box edge: unreliable (filters and model border)
+    "contact_ratio": 2.0,   # share of hotspot pixels on strong surface boundaries vs the site average
+    "contact_share": 0.5,
+    "flat_slope_deg": 5.0,  # L-band can only see under a dry, flat, smooth cover ...
+    "cband_pct": 0.40,      # ... that is dark to C-band (smooth at 5.6 cm): lowest 40 % of the site
+    "texture_pct": 0.50,    # ... and shows no layered or broken rock in the optical image: lower half of the site
 }
 
+# Cell features kept in public/ml/cells.json (build_all.py)
 FEATURES = {
-    # key: label, unit, source, short description (shown in the app)
     "slope_mean": ("Mean slope", "°", "cop_dem", "average slope in the 400 m cell"),
     "slope_p90": ("Slope, 90th percentile", "°", "cop_dem", "steepest 10 % of the cell"),
     "steep": ("Steeper than 15°", "% of cell", "cop_dem", "share of the cell a rover could not climb"),
-    "relief": ("Relief", "m", "cop_dem", "highest minus lowest point in a 1 km window"),
+    "relief": ("Relief within 1 km", "m", "cop_dem", "highest minus lowest point in a 1 km window"),
     "rough": ("Roughness", "m", "cop_dem", "local height variation (standard deviation, 125 m window)"),
     "bright": ("Optical brightness", "reflectance", "sentinel2", "mean of red, green, blue reflectance"),
-    "red": ("Redness", "red/blue", "sentinel2", "red-to-blue reflectance ratio (iron oxide proxy)"),
+    "red": ("Redness", "red/blue", "sentinel2", "red-to-blue reflectance ratio"),
     "lhh": ("L-band HH", "dB", "palsar2", "L-band radar backscatter"),
     "cvv": ("C-band VV", "dB", "sentinel1", "C-band radar backscatter"),
     "lmc": ("L minus C", "dB", "palsar2", "how much brighter L-band is than C-band"),
     "surprise": ("Radar surprise", "z", "ml", "L-band brighter (+) or darker (-) than the surface predicts"),
     "elev": ("Elevation", "m", "cop_dem", "mean height above sea level"),
 }
-FINDER_FEATURES = ["slope_mean", "steep", "relief", "rough", "bright", "red", "lhh", "cvv", "lmc", "surprise"]

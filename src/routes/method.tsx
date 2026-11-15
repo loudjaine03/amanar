@@ -1,72 +1,318 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { useMissionTranslation } from '@/components/mission/MissionShell';
-import { TagChip } from '@/components/mission/TagChip';
-import { missionHead } from '@/lib/mission-head';
-import { useModel } from '@/lib/ml-data';
-import { useMissionStore } from '@/lib/mission-store';
-import { MATERIALS_WEIGHT } from '@/lib/finder';
-export const Route = createFileRoute('/method')({ head: () => missionHead('Method & limitations', 'Data sources, machine learning, scoring rules, planning assumptions, the tags used on every number, and the limits of Earth-based planetary analog testing.'), component: Method });
+import { createFileRoute } from "@tanstack/react-router";
+import { DataGate, useMissionData } from "@/components/mission/MissionShell";
+import { TagChip } from "@/components/mission/TagChip";
+import { missionHead } from "@/lib/mission-head";
+import { useMissionStore } from "@/lib/mission-store";
+
+export const Route = createFileRoute("/method")({
+  head: () =>
+    missionHead(
+      "Method & limits",
+      "How Amanar compares Algerian sites with real Mars and Moon terrain, what is measured, what is judged, and the limits.",
+    ),
+  component: Method,
+});
+
 function Method() {
-  const { language } = useMissionTranslation();
-  const l = (en: string, fr: string) => (language === 'fr' ? fr : en);
-  const ml = useModel();
-  const meta = useMissionStore((s) => s.missionData?.meta);
-  const sm = ml.status === 'ok' ? ml.model.surprise_model : null;
-  return <div className="foundation-page">
-    <div className="eyebrow">AMANAR · ALGERIA BEYOND EARTH / {l('METHOD', 'MÉTHODE')}</div>
-    <h1>{l('Method & limitations', 'Méthode et limites')}</h1>
-    <p className="text-muted-foreground leading-7">{l('Team-built experimental indicators, not an official NASA assessment. Same physics, different instrument: PALSAR-2 images are not what a Mars or lunar orbiter would measure.', 'Indicateurs expérimentaux conçus par l’équipe, pas une évaluation officielle de la NASA. Même physique, instrument différent : les images PALSAR-2 ne sont pas ce que mesurerait un orbiteur martien ou lunaire.')}</p>
-    <div className="method-sections">
-      <section><h2>{l('Data sources', 'Sources de données')}</h2>
-        <ul className="list-disc pl-5 leading-7">
-          <li>JAXA: ALOS-2 PALSAR-2 {l('yearly L-band mosaic (HH, HV), 25 m. JAXA owns the PALSAR-2 data.', 'mosaïque annuelle bande L (HH, HV), 25 m. JAXA est propriétaire des données PALSAR-2.')}</li>
-          <li>ESA / Copernicus: Sentinel-1 (C-band VV), Sentinel-2 ({l('optical', 'optique')}), Copernicus DEM GLO-30</li>
-          <li>NASA: POWER {l('climatology (monthly maximum and minimum temperature, rain)', 'climatologie (températures maximales et minimales mensuelles, pluie)')}, Mars Trek, Moon Trek</li>
-          <li>{l('Published references for the targets: NASA JPL (Curiosity, Gale), LROC (Marius Hills), NASA Science (Perseverance, Jezero), and for the sites: EPSC-DPS 2025 (Ahnet), GSA Special Paper 418 (Atakor).', 'Références publiées pour les cibles : NASA JPL (Curiosity, Gale), LROC (Marius Hills), NASA Science (Perseverance, Jezero), et pour les sites : EPSC-DPS 2025 (Ahnet), GSA Special Paper 418 (Atakor).')}</li>
-          <li>Esri World Imagery ({l('basemap only', 'fond de carte seulement')})</li></ul>
-        {meta?.sources && <details className="rules-box"><summary>{l('Full list with links', 'Liste complète avec liens')}</summary><ul>{meta.sources.map((s) => <li key={s.id}>{s.url ? <a href={s.url} target="_blank" rel="noreferrer">{s.name}</a> : s.name}</li>)}</ul></details>}</section>
-      <section><h2>{l('The four tags', 'Les quatre étiquettes')}</h2>
-        <div className="flex flex-wrap gap-3"><TagChip tag="Measured" /><TagChip tag="Interpreted" /><TagChip tag="Hypothesis" /><TagChip tag="Reference" /></div>
-        <ul className="list-disc pl-5 leading-7">
-          <li><b>Measured</b>: {l('computed by our scripts from an identified dataset.', 'calculé par nos scripts à partir d’un jeu de données identifié.')}</li>
-          <li><b>Interpreted</b>: {l('our reading of a pattern, or our judgement (a radar-surprise hotspot is a candidate, never a confirmed buried river).', 'notre lecture d’un motif, ou notre jugement (un point chaud de surprise radar est un candidat, jamais une rivière enterrée confirmée).')}</li>
-          <li><b>Hypothesis</b>: {l('must be checked in the field. Waypoints and Finder spots are sampling objectives, not discoveries.', 'à vérifier sur le terrain. Les points de passage et les points du Finder sont des objectifs d’échantillonnage, pas des découvertes.')}</li>
-          <li><b>Reference</b>: {l('an established fact from a cited source, not computed by us.', 'un fait établi par une source citée, pas calculé par nous.')}</li></ul>
-        <p>{l('A value nobody has computed is shown as TBD. If the data file is ever incomplete, a MOCK DATA banner appears.', 'Une valeur que personne n’a calculée s’affiche TBD. Si le fichier de données est incomplet, un bandeau MOCK DATA apparaît.')}</p></section>
-      <section><h2>{l('Machine learning', 'Apprentissage automatique')}</h2>
-        <p>{l('Everything runs offline in pipeline/build_all.py (scikit-learn). The website only reads the results.', 'Tout tourne hors ligne dans pipeline/build_all.py (scikit-learn). Le site ne fait que lire les résultats.')}</p>
-        <ul className="list-disc pl-5 leading-7">
-          <li><b>{l('Radar surprise (self-supervised regression).', 'Surprise radar (régression auto-supervisée).')}</b> {l('A gradient-boosting model predicts L-band backscatter from what the surface shows: optical bands, redness, texture, slope, roughness, relief and C-band. The residual, out-of-fold on 2.5 km spatial blocks so no pixel predicts itself, is centred per site and scaled: z > 2 is a hotspot.', 'Un modèle de gradient boosting prédit la rétrodiffusion bande L à partir de ce que montre la surface : bandes optiques, rougeur, texture, pente, rugosité, relief et bande C. Le résidu, hors échantillon sur des blocs spatiaux de 2,5 km pour qu’aucun pixel ne se prédise lui-même, est centré par site et normalisé : z > 2 est un point chaud.')}
-            {sm && <span> {l('Quality (R², per site):', 'Qualité (R², par site) :')} {Object.entries(sm.r2_block_cv_by_site).map(([k, v]) => `${k} ${v}`).join(', ')}. {l('Leave-one-site-out:', 'En laissant un site de côté :')} {Object.entries(sm.r2_leave_one_site_out).map(([k, v]) => `${k} ${v}`).join(', ')}. {l('The negative value for Ahnet is real: its dark sand sheet is unlike the two rocky sites, so hotspots are only compared inside each site.', 'La valeur négative pour Ahnet est réelle : son voile de sable sombre ne ressemble pas aux deux sites rocheux, donc les points chauds ne sont comparés qu’à l’intérieur de chaque site.')}</span>}</li>
-          <li><b>{l('Terrain units (unsupervised).', 'Unités de terrain (non supervisé).')}</b> {l('A Gaussian mixture groups the 7,500 cells of about 400 m from the three sites by slope, relief, roughness, brightness, redness and radar response. The number of units is chosen with the BIC. Unit names are our reading.', 'Un mélange gaussien regroupe les 7 500 cellules d’environ 400 m des trois sites par pente, relief, rugosité, luminosité, rougeur et réponse radar. Le nombre d’unités est choisi avec le BIC. Les noms des unités sont notre lecture.')}{ml.status === 'ok' && ` (k = ${ml.model.units_model.k})`}</li>
-          <li><b>{l('Analog Finder.', 'Analog Finder.')}</b> {l(`Weighted percentiles for the destination and the objective, the team's materials score (${Math.round(MATERIALS_WEIGHT * 100)} % of the science match), and the operations weight you choose. Look-alike places are nearest neighbours in percentile space. No labelled analog database exists, so nothing here is "trained to find analogs": the ranking rules are written out and every pick lists its reasons.`, `Percentiles pondérés pour la destination et l’objectif, le score matériaux de l’équipe (${Math.round(MATERIALS_WEIGHT * 100)} % de la ressemblance scientifique), et le poids des opérations que tu choisis. Les endroits similaires sont les plus proches voisins dans l’espace des percentiles. Aucune base d’analogues étiquetée n’existe, donc rien ici n’est « entraîné à trouver des analogues » : les règles de classement sont écrites et chaque choix liste ses raisons.`)}</li></ul></section>
-      <section><h2>{l('How sites are scored', 'Comment les sites sont notés')}</h2>
-        <p>{l('Six axes, 0 to 3 each: terrain, materials, dryness, subsurface, temperature, access. Terrain and materials count double because they define the analogy (maximum 24). Highest total = STRONGEST, others with at least 50 % = PARTIAL, below = WEAK. The terrain rule changes with the destination (flat for Jezero, moderate relief for Gale, high relief for the Marius Hills). All thresholds are team assumptions, listed in Stage 02.', 'Six axes, de 0 à 3 : terrain, matériaux, sécheresse, sous-sol, température, accès. Terrain et matériaux comptent double car ils définissent l’analogie (maximum 24). Total le plus haut = STRONGEST, les autres avec au moins 50 % = PARTIAL, en dessous = WEAK. La règle de terrain change avec la destination (plat pour Jezero, relief modéré pour Gale, relief fort pour les Marius Hills). Tous les seuils sont des hypothèses d’équipe, listées à l’étape 02.')}</p></section>
-      <section><h2>{l('How slope is used', 'Comment la pente est utilisée')}</h2>
-        <p>{l('The rover route is planned in the browser with A* on a 160 × 160 slope grid (about 125 m per cell, 90th percentile of the 30 m elevation model in each cell). Cells steeper than the slope limit (15° by default, adjustable) are walls, steeper cells cost more, and corners are never cut. The 15° limit is a team prototype assumption. This is not a certified rover route.', 'Le parcours du rover est planifié dans le navigateur avec A* sur une grille de pente de 160 × 160 (environ 125 m par cellule, 90e percentile du modèle d’élévation de 30 m dans chaque cellule). Les cellules plus raides que la limite (15° par défaut, réglable) sont des murs, les pentes fortes coûtent plus cher, et les coins ne sont jamais coupés. La limite de 15° est une hypothèse de prototype. Ce n’est pas un parcours certifié pour rover.')}</p></section>
-      <section><h2>{l('Hardware: materials and pressure', 'Matériel : matériaux et pression')}</h2>
-        <ul className="list-disc pl-5 leading-7">
-          <li>{l('Target environments from the NASA NSSDC fact sheets: Mars 0.64 kPa and -89 to -31 °C in a day (Viking 1 site), Moon about 3 × 10⁻¹³ kPa and -178 to +117 °C. Site temperatures from NASA POWER, site air pressure estimated from elevation with the standard atmosphere.', 'Environnements cibles d’après les fiches NASA NSSDC : Mars 0,64 kPa et -89 à -31 °C en une journée (site de Viking 1), Lune environ 3 × 10⁻¹³ kPa et -178 à +117 °C. Températures des sites : NASA POWER ; pression estimée à partir de l’altitude (atmosphère standard).')}</li>
-          <li>{l('Each material is marked TEST HERE, HERE + LAB or LAB ONLY. Vacuum, low pressure and deep cold always need a chamber; heat cycling, dust, sand and rough rock can be tested in the field.', 'Chaque matériau est marqué ICI, ICI + LABO ou LABO SEULEMENT. Le vide, la basse pression et le grand froid demandent toujours une chambre ; cycles de chaleur, poussière, sable et roche rugueuse se testent sur le terrain.')}</li>
-          <li>{l('Wheel ground pressure = mass × gravity ÷ (wheels × width × footprint). A test rover of mass × g(target) ÷ g(Earth) presses the ground like the real rover on the target; for a 900 kg rover on Mars that is about 340 kg, the mass of JPL’s Scarecrow test rover. The footprint length is our assumption.', 'Pression au sol des roues = masse × gravité ÷ (roues × largeur × appui). Un rover d’essai de masse × g(cible) ÷ g(Terre) appuie sur le sol comme le vrai rover sur la cible ; pour 900 kg sur Mars, environ 340 kg, la masse du rover d’essai Scarecrow du JPL. La longueur d’appui est notre hypothèse.')}</li>
-          <li>{l('Habitat wall load = (inside pressure - outside pressure) × area: 1 kPa on 1 m² is 1 kN. Pumping an uncrewed test habitat to (site pressure + target pressure difference) reproduces the target wall load on Earth.', 'Charge sur la paroi = (pression intérieure - pression extérieure) × surface : 1 kPa sur 1 m² = 1 kN. Gonfler un habitat d’essai sans équipage à (pression du site + différence de pression de la cible) reproduit la charge de la cible sur Terre.')}</li>
-          <li>{l('The sensor panel in step 05 is simulated: values come from our elevation model and the hardware settings, not from real sensors.', 'Le panneau de capteurs de l’étape 05 est simulé : les valeurs viennent de notre modèle d’élévation et des réglages matériel, pas de vrais capteurs.')}</li></ul></section>
-      <section><h2>{l('Signal delay', 'Délai du signal')}</h2>
-        <p>{l('Mars: about 11 minutes one way on 14 November 2026 (197.5 million km, computed with astropy), shown compressed (1 min = 1 s). Moon: about 1.3 s one way (mean distance 384,400 km), shown in real time.', 'Mars : environ 11 minutes dans un sens le 14 novembre 2026 (197,5 millions de km, calculé avec astropy), affiché compressé (1 min = 1 s). Lune : environ 1,3 s dans un sens (distance moyenne 384 400 km), affiché en temps réel.')}</p></section>
-      <section><h2>{l('Field-access rules (Earth simulation)', 'Règles d’accès terrain (simulation sur Terre)')}</h2>
-        <ul className="list-disc pl-5 leading-7">
-          <li>{l('Route slope under the slope limit (15°).', 'Pente de la route sous la limite de pente (15°).')}</li>
-          <li>{l('NASA POWER monthly maximum temperature (climatology) under the heat limit (40 °C by default, adjustable).', 'Température maximale mensuelle NASA POWER (climatologie) sous la limite de chaleur (40 °C par défaut, réglable).')}</li>
-          <li>{l('Straight-line distance from the box centre to the nearest logistics hub under 250 km.', 'Distance en ligne droite du centre de la zone au hub logistique le plus proche inférieure à 250 km.')}</li>
-          <li>{l('Crew safety: a NASA POWER monthly minimum below 0 °C raises a night-cold caution; the months under the heat limit are listed as the workable season; the share of the box steeper than 15° is shown so crews stay on the route; a checklist covers water and shade, communications, evacuation, sandstorms and wadi floods, first aid and permits.', 'Sécurité de l’équipe : un minimum mensuel NASA POWER sous 0 °C déclenche une alerte de froid nocturne ; les mois sous la limite de chaleur forment la saison de travail ; la part de la zone plus raide que 15° est affichée pour garder l’équipe sur la route ; une liste couvre eau et ombre, communications, évacuation, tempêtes de sable et crues d’oued, premiers secours et autorisations.')}</li></ul>
-        <p>{l('All three thresholds are team assumptions. Straight-line distance is not road access, and climate averages are not a forecast. A real deployment needs on-site assessment and further safety checks.', 'Les trois seuils sont des hypothèses de l’équipe. La distance en ligne droite n’est pas un accès routier, et une moyenne climatique n’est pas une prévision. Un déploiement réel exige une évaluation sur place et des contrôles de sécurité supplémentaires.')}</p></section>
-      <section><h2>{l('What Earth cannot reproduce', 'Ce que la Terre ne peut pas reproduire')}</h2>
-        <ul className="list-disc pl-5 leading-7">
-          <li>{l('Gravity: 1 g on Earth against about 0.38 g on Mars and 0.17 g on the Moon.', 'Gravité : 1 g sur Terre contre environ 0,38 g sur Mars et 0,17 g sur la Lune.')}</li>
-          <li>{l('Atmosphere: thick on Earth, thin on Mars, almost none on the Moon.', 'Atmosphère : épaisse sur Terre, mince sur Mars, quasi absente sur la Lune.')}</li>
-          <li>{l('Radiation environment.', 'Environnement de radiations.')}</li>
-          <li>{l('Materials: quartz sand and sandstone on Earth against basaltic Martian material and impact-made lunar regolith.', 'Matériaux : sable et grès de quartz sur Terre contre matériau basaltique martien et régolithe lunaire produit par les impacts.')}</li>
-          <li>{l('Instrument gap between our radar images and a Mars or lunar orbiter.', 'Écart d’instrument entre nos images radar et un orbiteur martien ou lunaire.')}</li></ul></section>
+  const { data, error } = useMissionData();
+  const target = useMissionStore((s) => s.target);
+  if (!data) {
+    return (
+      <div className="foundation-page">
+        <div className="eyebrow">METHOD</div>
+        <h1>Method & limits</h1>
+        <DataGate error={error} />
+      </div>
+    );
+  }
+  const m = data.meta.radar_model;
+  const rules = data.meta.hotspot_rules;
+  const name = (id: string) => data.sites[id as keyof typeof data.sites]?.name ?? id;
+  return (
+    <div className="foundation-page page-wide method-page">
+      <div className="eyebrow">METHOD</div>
+      <h1>Method & limits</h1>
+      <p className="page-sub">What is measured, what is judged, and where Earth cannot help.</p>
+
+      <div className="method-sections">
+        <section>
+          <h2>1. Terrain match: the same ruler on Earth, Mars and the Moon</h2>
+          <p>
+            Every 400 m cell of each Algerian box and of each Mars/Moon window gets the same six
+            measures (<code>pipeline/terrain.py</code>):
+          </p>
+          <ul className="plain-list">
+            {data.meta.features.map((f) => (
+              <li key={f.key}>
+                <b>{f.label}</b> ({f.unit}, {f.scale} scale)
+              </li>
+            ))}
+          </ul>
+          <p>
+            The terrain match is the average overlap of the six distributions (log scale, 30 bins):
+            0 means nothing in common, 100 means identical. It is <TagChip tag="Measured" />. To
+            check that the ranking does not depend on our choices, it is recomputed{" "}
+            {data.targets[target].robustness.n} ways: each measure left out in turn, fine-scale
+            only, landscape-scale only, a quantile (Wasserstein) distance and coarser histograms.
+            The &ldquo;close / moderate / poor&rdquo; bands (65 and 45) are our{" "}
+            <TagChip tag="Judgement" />.
+          </p>
+          <p>
+            The ranking above uses one window per target (20 km around Perseverance&apos;s landing
+            site, Curiosity&apos;s climb, Peak near Shackleton). Because that window is our choice,
+            two checks look at the <b>whole</b> Mars/Moon map we have: the machine-learning twin
+            model (section 2) and a zone-by-zone ranking (8 km zones every 4 km). When no site holds
+            at least 60% of the twins, the headline says &ldquo;it depends on the part of the
+            target&rdquo; and names which site matches which kind of ground.
+          </p>
+          <p>
+            Inside each site we also search the best 4 × 4 km area and rank every cell by how
+            typical it is of the target (the &ldquo;looks like&rdquo; map). The outer{" "}
+            {data.meta.border_cells * 400} m of each box are excluded from spot picks, because 1 km
+            windows and the radar model are unreliable at the edge.
+          </p>
+        </section>
+
+        <section>
+          <h2>2. Machine learning: the twin model</h2>
+          <p>
+            A k-nearest-neighbour model (k = {data.targets[target].twins.k}) is trained on the six
+            measures of all 7,500 Algerian cells, each labelled with its site. For every 400 m cell
+            of the Mars/Moon map it finds the {data.targets[target].twins.k} closest Earth cells
+            (Euclidean distance on standardised, log-scaled measures) and predicts the site that
+            holds most of them. If even the nearest Earth cell is farther than 1.5 × the 99th
+            percentile of Earth-to-Earth nearest distances, the cell gets &ldquo;no twin on
+            Earth&rdquo;. No weight is set by hand <TagChip tag="Measured" />.
+          </p>
+          <p>
+            Checks: the model recognises the right Algerian site on{" "}
+            {data.targets[target].twins.site_recognition}% of 4 km blocks it never saw (5-fold
+            spatial cross-validation; chance 33%), and the shares move by at most{" "}
+            {Math.max(...data.target_order.map((id) => data.targets[id].twins.max_change))} points
+            when it is trained on other sets of measures. Whole-map shares:{" "}
+            {data.target_order
+              .map((id) => {
+                const sh = data.targets[id].twins.share;
+                return `${data.targets[id].title}: ${data.site_order.map((x) => `${name(x)} ${sh[x]}%`).join(", ")}, no twin ${sh.none}%`;
+              })
+              .join(". ")}
+            .
+          </p>
+          <p>
+            The same model runs <b>live in your browser</b> on the Plan page (
+            <code>src/lib/twins.ts</code>, checked by a test to give back the pipeline&apos;s
+            predictions). There it only searches the Earth ground you can use: cells under your
+            slope limit, inside the box border, at sites within your distance limit. The ordering
+            rule for each goal (driving, rocks, radar, crew) is written on the page.
+          </p>
+        </section>
+
+        <section>
+          <h2>3. The Mars and Moon elevation data</h2>
+          <ul className="plain-list">
+            {data.target_order.map((id) => {
+              const t = data.targets[id];
+              return (
+                <li key={id}>
+                  <b>{t.title}</b>: {t.dem.product}. {t.dem.where}. {t.dem.size_km[0]} ×{" "}
+                  {t.dem.size_km[1]} km at {t.dem.res_m} m.{" "}
+                  {t.dem.check_vs_mola &&
+                    `Checked against MOLA (PDS): r = ${t.dem.check_vs_mola.correlation}, RMS ${t.dem.check_vs_mola.rms_m} m. `}
+                  {t.dem.check_slope &&
+                    `${t.dem.check_slope.note} Shackleton's wall: ${t.dem.check_slope.shackleton_inner_wall_deg}° (published ~${t.dem.check_slope.published_wall_deg}°). `}
+                  <a href={t.dem.product_url} target="_blank" rel="noreferrer">
+                    product
+                  </a>{" "}
+                  ·{" "}
+                  <a href={t.dem.copy_url} target="_blank" rel="noreferrer">
+                    copy used
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+          <p>
+            Each window is centred on the place the mission actually works: 20 km around
+            Perseverance&apos;s landing site, Curiosity&apos;s climb on lower Mount Sharp, and the
+            Peak-near-Shackleton region of the lunar south pole (on NASA&apos;s 2022 list of Artemis
+            candidate regions and the planned Chang&apos;e-7 landing area). Earth slopes use the
+            Copernicus 30 m DEM; the Moon window is a 40 m grid, so its fine-scale slopes are
+            slightly smoothed. The two landscape-scale measures do not depend on this.
+          </p>
+        </section>
+
+        <section>
+          <h2>4. Rocks: kept out of the score</h2>
+          <p>
+            For every target and site, one sentence with a source says whether the rocks match,
+            partly match, or do not match <TagChip tag="Reference" />. Geology never changes the
+            terrain number. It only sets the label: <b>Strong analog</b> (close terrain + matching
+            rocks), <b>Partial analog</b>, <b>Terrain only</b> (good for driving tests),{" "}
+            <b>Rocks only</b> (good for rock science) and <b>Weak analog</b>.
+          </p>
+        </section>
+
+        <section>
+          <h2>5. Radar: what may be under the sand</h2>
+          <p>
+            A gradient-boosting model ({m.type}) predicts {m.target} from what the surface shows (
+            {Object.values(m.predictors).join(", ")}). Where L-band is much brighter than predicted
+            (z &gt; {m.hotspot_z}), something the surface does not explain may be there, as the
+            shuttle radar SIR-A showed with buried river channels in the eastern Sahara.
+          </p>
+          <p>
+            Accuracy inside each site (spatial-block cross-validation):{" "}
+            {data.site_order.map((s) => `${name(s)} R² = ${m.r2_by_site[s]}`).join(", ")}. On a site
+            the model has never seen it fails for Ahnet (R² = {m.r2_leave_one_site_out.ahnet}), so
+            hotspots are compared inside each site only. A pooled R² over the three sites would look
+            higher only because the sites differ so much; we do not use it.
+          </p>
+          <p>
+            Every hotspot then goes through four checks <TagChip tag="Judgement" />:
+          </p>
+          <ul className="plain-list">
+            <li>away from the box edge (more than {rules["edge_m"]} m);</li>
+            <li>
+              not tracing a sharp boundary of the optical image (at most{" "}
+              {Math.round((rules["contact_share"] ?? 0) * 100)}% of it on strong edges, or under{" "}
+              {rules["contact_ratio"]}× the site average);
+            </li>
+            <li>radar images aligned around it (local L-band vs C-band offset under 1.5 px);</li>
+            <li>
+              on a smooth, flat cover where L-band can see below: slope under{" "}
+              {rules["flat_slope_deg"]}°, in the C-band-darkest{" "}
+              {Math.round((rules["cband_pct"] ?? 0) * 100)}% of the site, and without visible
+              layered rock (optical texture in the lower{" "}
+              {Math.round((rules["texture_pct"] ?? 0) * 100)}%).
+            </li>
+          </ul>
+          <p>
+            Result:{" "}
+            {data.site_order
+              .map(
+                (s) =>
+                  `${name(s)} ${data.sites[s].radar.candidates} of ${data.sites[s].radar.total}`,
+              )
+              .join(", ")}{" "}
+            hotspots pass. Many of the rest follow exposed rock layers (for example the folded
+            strata of Ahnet). No hotspot is confirmed; the field test is a ground-penetrating-radar
+            line across the candidates.
+          </p>
+        </section>
+
+        <section>
+          <h2>6. Materials, crew safety and simulated sensors</h2>
+          <p>
+            <b>Materials</b> (Site page): for wheels, seals, solar panels, structure, thermal
+            blankets, mechanisms and the habitat shell we cite what threatens them on the target{" "}
+            <TagChip tag="Reference" /> and decide whether the site can test it from a ratio of
+            measured numbers: rough ground (90th percentile) and daily temperature swing, site
+            divided by target. 50% or more = test here, 25 to 50% = partly. Habitat wall loads use
+            the pressure difference (1 kPa on 1 m² = 1 kN).
+          </p>
+          <p>
+            <b>Crew safety</b>: heat and cold from NASA POWER for the chosen month, drinking water
+            from the NIOSH heat-stress advice (1 cup every 15 to 20 minutes), falls from the share
+            of ground steeper than 15°, flash floods from yearly rain, and time to help from the
+            straight-line distance to the nearest town at 40 km/h <TagChip tag="Judgement" />.
+          </p>
+          <p>
+            <b>Simulated pressure sensors</b> (Rehearse page): along the planned route the barometer
+            follows elevation (standard atmosphere on Earth; NSSDC mean pressure and 11.1 km scale
+            height on Mars), the tilt sensor follows the slope grid, and each wheel load cell reads
+            m · g · cos(slope) / wheels for a lighter Earth twin rover (mass × g<sub>target</sub> /
+            9.81, JPL&apos;s Scarecrow method). Ground pressure assumes a wheel footprint you can
+            change. These are formulas, not recorded sensor data: they show what the field test
+            should log and check.
+          </p>
+        </section>
+
+        <section>
+          <h2>7. What we removed, and why</h2>
+          <ul className="plain-list">
+            <li>
+              A hand-scored &ldquo;materials&rdquo; axis that counted double: it decided two of
+              three results by itself. Rocks are now a separate, cited check.
+            </li>
+            <li>
+              Temperature and dryness as score axes: they gave almost the same value to every site.
+              They are now field conditions for the test team.
+            </li>
+            <li>
+              A hand-weighted &ldquo;finder&rdquo; score (preferences set by us): replaced by the
+              twin model run live on your choices.
+            </li>
+            <li>
+              A pooled radar-model R² (0.93): high only because the three sites differ so much. We
+              report R² inside each site.
+            </li>
+            <li>
+              Six &ldquo;AI terrain types&rdquo; from clustering: most types existed at only one
+              site, so they mostly told the sites apart. Replaced by the kNN twin model, trained on
+              Earth and applied to real Mars/Moon cells.
+            </li>
+            <li>
+              The Marius Hills target, compared only with typed-in specs. Replaced by the lunar
+              south pole, where permanent bases are planned, with real LOLA heights.
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>8. Limits</h2>
+          <ul className="plain-list">
+            <li>
+              Three 20 km boxes chosen by the team; other Algerian places may match better. The
+              best-4-km search only looks inside these boxes.
+            </li>
+            <li>
+              Terrain shape and published geology only: no mineral spectra, no grain size, no
+              regolith properties.
+            </li>
+            <li>
+              Gravity, air pressure, radiation and polar light cannot be reproduced at any Earth
+              site (each target lists them).
+            </li>
+            <li>
+              Radar hotspots are candidates, look-alike spots and rover stops are hypotheses,
+              straight-line distance is not road access, climate averages are not a forecast.
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>9. Reproduce it</h2>
+          <p>
+            <code>python pipeline/planetary/prepare_targets.py …</code> cuts the Mars/Moon windows
+            (already committed as small .npz files). <code>python pipeline/build_all.py</code> needs
+            the three Earth Engine stacks (not in the repository, about 20 MB each).{" "}
+            <code>python pipeline/compare.py</code> rebuilds everything the website reads in a few
+            seconds, offline.
+          </p>
+          <p>
+            AI use: the app was scaffolded with Lovable, and code, analysis scripts and text were
+            written and reviewed with AI assistants (including Claude by Anthropic). All numbers
+            come from our scripts and the cited datasets.
+          </p>
+        </section>
+
+        <section>
+          <h2>Sources</h2>
+          <ul className="plain-list sources">
+            {data.meta.sources.map((s) => (
+              <li key={s.id}>
+                {s.url ? (
+                  <a href={s.url} target="_blank" rel="noreferrer">
+                    {s.name}
+                  </a>
+                ) : (
+                  s.name
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      </div>
     </div>
-  </div>;
+  );
 }

@@ -10,21 +10,20 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as FinderRouteImport } from './routes/finder'
+import { Route as CompareRouteImport } from './routes/compare'
 import { Route as MethodRouteImport } from './routes/method'
-import { Route as MissionBenchmarkRouteImport } from './routes/mission.benchmark'
-import { Route as MissionHardwareRouteImport } from './routes/mission.hardware'
-import { Route as MissionMatchRouteImport } from './routes/mission.match'
-import { Route as MissionValidateRouteImport } from './routes/mission.validate'
+import { Route as PlanRouteImport } from './routes/plan'
+import { Route as RehearseRouteImport } from './routes/rehearse'
+import { Route as SiteRouteImport } from './routes/site'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const FinderRoute = FinderRouteImport.update({
-  id: '/finder',
-  path: '/finder',
+const CompareRoute = CompareRouteImport.update({
+  id: '/compare',
+  path: '/compare',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MethodRoute = MethodRouteImport.update({
@@ -32,93 +31,63 @@ const MethodRoute = MethodRouteImport.update({
   path: '/method',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MissionBenchmarkRoute = MissionBenchmarkRouteImport.update({
-  id: '/mission/benchmark',
-  path: '/mission/benchmark',
+const PlanRoute = PlanRouteImport.update({
+  id: '/plan',
+  path: '/plan',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MissionHardwareRoute = MissionHardwareRouteImport.update({
-  id: '/mission/hardware',
-  path: '/mission/hardware',
+const RehearseRoute = RehearseRouteImport.update({
+  id: '/rehearse',
+  path: '/rehearse',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MissionMatchRoute = MissionMatchRouteImport.update({
-  id: '/mission/match',
-  path: '/mission/match',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MissionValidateRoute = MissionValidateRouteImport.update({
-  id: '/mission/validate',
-  path: '/mission/validate',
+const SiteRoute = SiteRouteImport.update({
+  id: '/site',
+  path: '/site',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/finder': typeof FinderRoute
+  '/compare': typeof CompareRoute
   '/method': typeof MethodRoute
-  '/mission/benchmark': typeof MissionBenchmarkRoute
-  '/mission/hardware': typeof MissionHardwareRoute
-  '/mission/match': typeof MissionMatchRoute
-  '/mission/validate': typeof MissionValidateRoute
+  '/plan': typeof PlanRoute
+  '/rehearse': typeof RehearseRoute
+  '/site': typeof SiteRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/finder': typeof FinderRoute
+  '/compare': typeof CompareRoute
   '/method': typeof MethodRoute
-  '/mission/benchmark': typeof MissionBenchmarkRoute
-  '/mission/hardware': typeof MissionHardwareRoute
-  '/mission/match': typeof MissionMatchRoute
-  '/mission/validate': typeof MissionValidateRoute
+  '/plan': typeof PlanRoute
+  '/rehearse': typeof RehearseRoute
+  '/site': typeof SiteRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/finder': typeof FinderRoute
+  '/compare': typeof CompareRoute
   '/method': typeof MethodRoute
-  '/mission/benchmark': typeof MissionBenchmarkRoute
-  '/mission/hardware': typeof MissionHardwareRoute
-  '/mission/match': typeof MissionMatchRoute
-  '/mission/validate': typeof MissionValidateRoute
+  '/plan': typeof PlanRoute
+  '/rehearse': typeof RehearseRoute
+  '/site': typeof SiteRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/finder'
-    | '/method'
-    | '/mission/benchmark'
-    | '/mission/hardware'
-    | '/mission/match'
-    | '/mission/validate'
+  fullPaths: '/' | '/compare' | '/method' | '/plan' | '/rehearse' | '/site'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/finder'
-    | '/method'
-    | '/mission/benchmark'
-    | '/mission/hardware'
-    | '/mission/match'
-    | '/mission/validate'
+  to: '/' | '/compare' | '/method' | '/plan' | '/rehearse' | '/site'
   id:
-    | '__root__'
-    | '/'
-    | '/finder'
-    | '/method'
-    | '/mission/benchmark'
-    | '/mission/hardware'
-    | '/mission/match'
-    | '/mission/validate'
+    '__root__' | '/' | '/compare' | '/method' | '/plan' | '/rehearse' | '/site'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  FinderRoute: typeof FinderRoute
+  CompareRoute: typeof CompareRoute
   MethodRoute: typeof MethodRoute
-  MissionBenchmarkRoute: typeof MissionBenchmarkRoute
-  MissionHardwareRoute: typeof MissionHardwareRoute
-  MissionMatchRoute: typeof MissionMatchRoute
-  MissionValidateRoute: typeof MissionValidateRoute
+  PlanRoute: typeof PlanRoute
+  RehearseRoute: typeof RehearseRoute
+  SiteRoute: typeof SiteRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -130,11 +99,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/finder': {
-      id: '/finder'
-      path: '/finder'
-      fullPath: '/finder'
-      preLoaderRoute: typeof FinderRouteImport
+    '/compare': {
+      id: '/compare'
+      path: '/compare'
+      fullPath: '/compare'
+      preLoaderRoute: typeof CompareRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/method': {
@@ -144,32 +113,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MethodRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/mission/benchmark': {
-      id: '/mission/benchmark'
-      path: '/mission/benchmark'
-      fullPath: '/mission/benchmark'
-      preLoaderRoute: typeof MissionBenchmarkRouteImport
+    '/plan': {
+      id: '/plan'
+      path: '/plan'
+      fullPath: '/plan'
+      preLoaderRoute: typeof PlanRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/mission/hardware': {
-      id: '/mission/hardware'
-      path: '/mission/hardware'
-      fullPath: '/mission/hardware'
-      preLoaderRoute: typeof MissionHardwareRouteImport
+    '/rehearse': {
+      id: '/rehearse'
+      path: '/rehearse'
+      fullPath: '/rehearse'
+      preLoaderRoute: typeof RehearseRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/mission/match': {
-      id: '/mission/match'
-      path: '/mission/match'
-      fullPath: '/mission/match'
-      preLoaderRoute: typeof MissionMatchRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/mission/validate': {
-      id: '/mission/validate'
-      path: '/mission/validate'
-      fullPath: '/mission/validate'
-      preLoaderRoute: typeof MissionValidateRouteImport
+    '/site': {
+      id: '/site'
+      path: '/site'
+      fullPath: '/site'
+      preLoaderRoute: typeof SiteRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -177,12 +139,11 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  FinderRoute: FinderRoute,
+  CompareRoute: CompareRoute,
   MethodRoute: MethodRoute,
-  MissionBenchmarkRoute: MissionBenchmarkRoute,
-  MissionHardwareRoute: MissionHardwareRoute,
-  MissionMatchRoute: MissionMatchRoute,
-  MissionValidateRoute: MissionValidateRoute,
+  PlanRoute: PlanRoute,
+  RehearseRoute: RehearseRoute,
+  SiteRoute: SiteRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

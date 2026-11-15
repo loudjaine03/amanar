@@ -1,54 +1,58 @@
 # Data pipeline (runs on a laptop, never deployed)
 
-The website only reads files. One script makes all of them.
-
-## Setup (once)
+The website only reads files. Two scripts make them.
 
 ```
 pip install -r pipeline/requirements.txt
+python pipeline/build_all.py     # step 1, Earth side: needs the three Earth Engine stacks
+python pipeline/compare.py       # step 2, comparison with Mars and the Moon: runs offline in seconds
 ```
 
-## 1. Export one stack per site (Earth Engine)
+## Step 1: `build_all.py` (Earth)
 
-Open https://code.earthengine.google.com, paste `01_export_stack.js`, set `SITE`, Run, then start the task in the Tasks tab.
-Put the three files here as `ahnet_stack.tif`, `tassili_stack.tif`, `hoggar_stack.tif`
-(7 bands: L_HH, L_HV, C_VV, B4, B3, B2, DEM; EPSG:4326, 25 m).
+Inputs, not committed (about 20 MB each): `pipeline/{ahnet,tassili,hoggar}_stack.tif` from `01_export_stack.js`
+(Earth Engine Code Editor: set `SITE`, Run, start the task; 7 bands L_HH, L_HV, C_VV, B4, B3, B2, DEM; EPSG:4326, 25 m),
+and `power_<site>.json` (NASA POWER climatology, T2M_MAX, T2M_MIN, PRECTOTCORR).
 
-## 2. Climate (NASA POWER)
+Writes `public/overlays/<site>_{optical,lband,cband,slope,anomalies,surprise}.png`, `public/grids/<site>_slope.json`
+(160 x 160 rover grid), `public/ml/cells.json` (7,500 cells of ~400 m) and `pipeline/sites.json` (metrics, climate, hub,
+radar-model validation with R² inside each site).
 
-`power_ahnet.json`, `power_tassili.json`, `power_hoggar.json`: the climatology response for the box centre
-(parameters T2M_MAX, T2M_MIN, PRECTOTCORR), saved as-is.
+## Step 2: `compare.py` (Mars and Moon)
 
-## 3. Build everything
+Reads `sites.json`, `cells.json`, the overlays and grids, and the Mars/Moon windows in `pipeline/planetary/*.npz`.
+Writes `public/mission_data.json`, `public/ml/lookalike.json`, `public/ml/twins.json` (the kNN twin model the browser
+runs), `public/overlays/target_*_{slope,zones,twins}.png`, `*_slopec.png`, `*_like_<target>.png` and
+`pipeline/out/compare_report.txt`.
 
-```
-python pipeline/build_all.py
-```
+- Terrain measures: `terrain.py`, the same code for Earth cells and Mars/Moon cells.
+- Twin model: k-nearest neighbours (k = 15, scikit-learn) trained on the 7,500 Earth cells, applied to every Mars/Moon
+  cell; 'no twin' beyond 1.5 x the 99th percentile of Earth nearest distances; checked with 4 km spatial cross-validation
+  and three measure sets. Exported with standardised measures so `src/lib/twins.ts` can run it live.
+- Terrain match = average overlap of the six distributions; re-run 11 ways to report how stable the ranking is.
+- Look-alike map: how typical each Earth cell is of the target; top spots and the best 4 km area, outside an 800 m border.
+- Radar hotspots: four checks (box edge, visible boundary, image alignment, smooth flat cover).
+- Site tests: slopes, wheel wear, relief, radar, heating and cooling, computed per site and target.
+- Rover: A* through the three most target-like reachable cells (same algorithm as the app).
 
-About 30 seconds. Writes:
+## The Mars and Moon windows: `planetary/prepare_targets.py`
 
-| File | What |
-| --- | --- |
-| `public/mission_data.json` | 3 scenarios x 3 sites: metrics, scores, verdicts, hotspots, audit, rover waypoints, climate |
-| `public/ml/cells.json`, `model.json` | Analog Finder data: 7,500 cells, percentiles, terrain units, model validation |
-| `public/overlays/<site>_<layer>.png` | optical, lband, cband, slope, anomalies (hotspots), classes (terrain units), surprise |
-| `public/grids/<site>_slope.json` | 160 x 160 rover slope grid (90th percentile per cell, row 0 = north) |
-| `pipeline/out/report.txt` | R², feature importance, units, waypoints, route lengths, missing inputs |
+Already done; the small `.npz` windows and `targets.json` (sources, checksums, checks) are committed.
 
-`meta.mock` becomes `false` only when nothing is missing.
+| Target | Product | Window | Check |
+| --- | --- | --- | --- |
+| Jezero | USGS/NASA Mars 2020 TRN CTX DTM, 20 m | 20 x 20 km on the Perseverance landing site | vs MOLA MEGDR: r = 0.995, 28 m RMS |
+| Gale | NASA-AMMOS MMGIS reference DEM, 20 m | 8 x 16 km, lower Mount Sharp | NASA/JPL repository |
+| Moon south pole | NASA ADC lunar data file, LRO LOLA, 40 m | 20 x 20 km, Peak near Shackleton | Shackleton wall 31° vs published ~30° |
 
 ## What a person decides
 
-`content.py`: planetary targets and specs, sources, materials judgements, scoring rules and weights,
-"what transfers / where it breaks", Analog Finder objectives and weights, waypoint instruments.
-Change it there and rerun; never edit the generated JSON by hand.
+`content.py`: target texts, the cited geology check per site, what transfers and what breaks, thresholds (match bands,
+hotspot checks). Change it there and rerun `compare.py`; never edit the generated JSON by hand.
 
-## What is Measured and what is Interpreted
+## Smoke test without the real stacks
 
-- Slope, relief, steep share, temperatures, rain, hub distance: **Measured**.
-- Radar-surprise share: **Measured** (computed), but each hotspot is **Interpreted** (a candidate, never "a buried river").
-- Terrain unit names, materials scores, Finder weights: **Interpreted**.
-- Waypoints and Finder spots: **Hypothesis**.
+`AMANAR_STACKS`, `AMANAR_PUBLIC`, `AMANAR_SITES` and `AMANAR_REPORT` redirect inputs and outputs, so both scripts can be
+run end to end on synthetic stacks in a temporary folder without touching `public/`.
 
-`legacy/` holds the earlier scripts (`compute_site_numbers.py`, `score_and_merge.py`, ...), kept for reference only.
-Do not commit the `.tif` stacks (about 20 MB each).
+`legacy/` holds the earliest scripts, kept for reference only.

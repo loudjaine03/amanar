@@ -1,5 +1,23 @@
 # What changed
 
+## Choices, real ML, materials, safety, sensors (15 Nov, evening)
+- **Plan page is back (step 1)**: you choose the destination, what to test (driving, rock science, radar under sand, crew training), which part of the target (landing area, whole map, or a spot you click), your rover's slope limit, the month, a heat limit and the farthest distance from town.
+- **Real machine learning, run live**: a k-nearest-neighbour "twin" model is trained on the 7,500 Algerian cells and applied to every 400 m cell of the real Mars/Moon maps. On the Plan page the same model runs in your browser, only on Earth ground your rover or crew can use. No hand-set weights; each goal's ordering rule is written on the page. A test checks that the browser gives back the pipeline's (scikit-learn) predictions. Model check: 87% of unseen 4 km Earth blocks are given back to the right site; shares move by at most 2 points with other measure sets.
+- **Twin map on Compare**: which Algerian site holds the closest terrain twins of each part of Jezero, Gale and the lunar south pole; the "it depends on the part" headline now follows it (zones kept as a second check).
+- **Materials (Site page)**: wheels, seals, solar panels, structure, thermal blankets, mechanisms, habitat shell: threat on the target (cited) and whether the site can test it, from measured site/target ratios (roughness, daily temperature swing) and pressure physics.
+- **Crew safety (Site page)**: heat, drinking water (NIOSH), cold nights, falls on steep ground, flash floods, time to help, per month.
+- **Simulated pressure sensors (Rehearse)**: barometer, tilt, wheel load cells and ground pressure along the planned route, with elevation and slope profiles; rover mass, wheels and footprint can be changed; Earth twin rover mass from the target's gravity (JPL Scarecrow method).
+- "Rehearse a drive through these spots" sends the Plan's spots to the Rehearse page. 62 tests.
+
+## Review fixes (15 Nov, afternoon)
+- **Real Mars and Moon data in the comparison**: Jezero (USGS/NASA CTX DTM 20 m, checked against MOLA), Gale (NASA-AMMOS MMGIS DEM 20 m), lunar south pole (NASA LOLA heights 40 m, checked against Shackleton's published wall slope). Same six terrain measures on Earth and on the target (`pipeline/terrain.py`).
+- **Challenge fit**: the lunar target is now the south pole (permanent-base region: Peak near Shackleton, Artemis 2022 candidate, Chang'e-7 target) instead of the equatorial Marius Hills.
+- **Not decided by design**: ranking by measured terrain match only; geology is a separate cited check that sets the label; the double-weighted hand "materials" axis, and the temperature and dryness axes that did not separate the sites, are gone. Stability over 11 variants is shown. Result: no site wins everything (Jezero: Tassili for driving, Ahnet for rocks).
+- **ML honesty**: R² inside each site only (pooled 0.93 removed); clustering terrain types removed (they mostly re-found the sites); radar hotspots checked for box edge, visible boundaries, image alignment and smooth flat cover; spot picks keep out of the 800 m border.
+- **Scale**: equal windows compared cell by cell; best 4 km area searched inside each box.
+- **Hardware**: tests computed per site and target (slopes, wheel wear, relief, radar, heating and cooling), shown on the Site page; generic lab-only items listed separately.
+- **Interface**: four steps (Destination, Compare, Site, Rehearse), English only, larger text, downloadable Markdown report. 42 tests.
+
 ## Jury round (15 Nov)
 - **Name**: Amanar (Tuareg name for Orion, "the guide"), with Algeria Beyond Earth as subtitle.
 - **Simpler interface**: one 5-step bar (Target, Find, Compare, Hardware, Rehearse); Compare split into Map / Score / Limits tabs; Finder shows 3 questions, the rest under "More options"; fewer captions; status chip removed.

@@ -1,46 +1,42 @@
-import { SCENARIOS, type MissionData, type DossierItem, type FieldAccessResult, type CheckState } from '@/types/mission';
-import { useMissionStore } from './mission-store';
+import {
+  SITES,
+  TARGETS,
+  type CheckState,
+  type FieldAccessResult,
+  type MissionData,
+} from "@/types/mission";
 
-async function live<T>(path: string, payload?: unknown): Promise<T> {
-  const base = import.meta.env['VITE_API_BASE'];
-  if (!base) throw new Error('API not configured');
-  const response = await fetch(`${base.replace(/\/$/, '')}/api/${path}`, {
-    signal: AbortSignal.timeout(5000),
-    ...(payload === undefined
-      ? {}
-      : { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }),
-  });
-  if (!response.ok) throw new Error('API unavailable');
-  const result = (await response.json()) as T;
-  useMissionStore.setState({ apiStatus: 'live' });
-  return result;
-}
-function offline() {
-  useMissionStore.setState({ apiStatus: 'offline' });
-}
-
-/** Lit mission_data.json (API optionnelle, sinon fichier statique). N'invente jamais de données. */
-export async function getMissionData(): Promise<MissionData> {
-  try {
-    return await live<MissionData>('mission-data');
-  } catch {
-    offline();
+/** Checks that a parsed JSON follows the version-2 contract. Returns an error message, or null when valid. */
+export function validateMissionData(data: unknown): string | null {
+  const d = data as Partial<MissionData> | null;
+  if (!d || typeof d !== "object") return "not an object";
+  if (d.meta?.version !== 2) return "meta.version must be 2";
+  if (typeof d.meta.mock !== "boolean") return "meta.mock missing";
+  for (const t of TARGETS) {
+    const tg = d.targets?.[t];
+    if (!tg) return `target ${t} missing`;
+    for (const s of SITES) if (!tg.sites?.[s]) return `target ${t} has no result for ${s}`;
   }
-  const response = await fetch('/mission_data.json');
-  if (!response.ok || !(response.headers.get('content-type') ?? '').includes('json'))
-    throw new Error('MISSION_DATA_NOT_SUPPLIED');
+  for (const s of SITES) if (!d.sites?.[s]) return `site ${s} missing`;
+  return null;
+}
+
+/** Reads public/mission_data.json. Never invents data: throws when the file is missing or invalid. */
+export async function getMissionData(): Promise<MissionData> {
+  const response = await fetch("/mission_data.json");
+  if (!response.ok || !(response.headers.get("content-type") ?? "").includes("json"))
+    throw new Error("MISSION_DATA_NOT_SUPPLIED");
   const data = (await response.json()) as MissionData;
-  if (typeof data?.meta?.mock !== 'boolean' || !SCENARIOS.every((s) => Array.isArray(data?.scenarios?.[s]?.candidates)))
-    throw new Error('MISSION_DATA_INVALID');
+  const err = validateMissionData(data);
+  if (err) throw new Error(`MISSION_DATA_INVALID: ${err}`);
   return data;
 }
 
 const below = (value: number | null, limit: number): CheckState =>
-  value === null || !Number.isFinite(value) ? 'tbd' : value < limit ? 'ok' : 'fail';
+  value === null || !Number.isFinite(value) ? "tbd" : value < limit ? "ok" : "fail";
 
-/** Vérification préliminaire d'accès terrain (PDF, "Key logic" n°7).
- *  Les 3 seuils sont des hypothèses d'équipe, affichées à l'écran. Un seuil est "strictement inférieur à".
- *  Une valeur inconnue (null) donne "tbd", jamais "ok". */
+/** Preliminary field-access check for an Earth test team. The three limits are team assumptions shown on screen.
+ *  An unknown value gives "tbd", never "ok". */
 export function computeFieldAccess(input: {
   maxSlopeDeg: number | null;
   slopeLimitDeg: number;
@@ -49,19 +45,11 @@ export function computeFieldAccess(input: {
   hubKm: number | null;
   hubLimitKm: number;
 }): FieldAccessResult {
-  const slope = below(input.maxSlopeDeg, input.slopeLimitDeg);
+  // the route is planned with slope <= limit, so a route exactly at the limit is fine
+  const slope = below(input.maxSlopeDeg, input.slopeLimitDeg + 1e-9);
   const heat = below(input.tmaxC, input.heatLimitC);
   const logistics = below(input.hubKm, input.hubLimitKm);
   const all = [slope, heat, logistics];
-  const verdict = all.includes('fail') ? 'outside' : all.includes('tbd') ? 'tbd' : 'meets';
-  return { slope, heat, logistics, verdict, tag: 'Interpreted' };
-}
-
-export async function saveDossier(payload: DossierItem[]) {
-  try {
-    return await live('dossier', payload);
-  } catch {
-    offline();
-    return { saved: false, mode: 'offline', items: payload };
-  }
+  const verdict = all.includes("fail") ? "outside" : all.includes("tbd") ? "tbd" : "meets";
+  return { slope, heat, logistics, verdict };
 }
