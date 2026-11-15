@@ -1,8 +1,7 @@
-# Amanar · Algeria Beyond Earth (Team Hoggar)
+﻿# Amanar · Algeria Beyond Earth (Team Hoggar)
 
 *Amanar* is the Tuareg name for Orion, "the guide" of desert nights.
 
-NASA Space Apps Challenge 2026, Boumerdes. Challenge: *Identify Earth locations that analog the permanent Moon base locations and Mars.*
 
 You choose a destination: **Jezero** (Mars, ancient river delta), **Gale** (Mars, layered rocks of Mount Sharp) or the **Marius Hills** (Moon, volcanic domes and a lava-tube pit). The app then shows which of three Algerian Sahara sites is the best place on Earth to rehearse that mission, explains why, and shows where the analogy breaks.
 
